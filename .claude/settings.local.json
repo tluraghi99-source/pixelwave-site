@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh repo *)",
+      "WebFetch(domain:github.com)",
+      "Bash(npm view *)",
+      "Bash(command -v npm)",
+      "Read(//usr/local/**)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(brew install *)",
+      "Bash(npx shadcn@latest init -d)",
+      "Bash(npm install *)",
+      "Bash(rm -f src/App.css src/assets/react.svg src/assets/vite.svg src/assets/hero.png)",
+      "Bash(rmdir src/assets)",
+      "Bash(npx tsc *)",
+      "Bash(awk 'NR==100,NR==177' \"/Users/pixelwave/Downloads/PixellWave Homepage.html\")",
+      "Bash(python3 -)"
+    ]
+  }
+}
