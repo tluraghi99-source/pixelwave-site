@@ -29,13 +29,21 @@ export function Card({
 
   const body = (
     <>
-      {media ? <div className="pw-card__media">{media}</div> : null}
+      {media ? (
+        <div className="pw-card__media">
+          {media}
+          <div className="pw-card__overlay">
+            <div className="pw-card__overlay-content">
+              {description ? <p className="pw-card__desc">{description}</p> : null}
+              {children}
+            </div>
+          </div>
+        </div>
+      ) : null}
       <div className="pw-card__body">
         {index ? <span className="pw-card__index">{index}</span> : null}
         {meta ? <div className="pw-card__meta">{meta}</div> : null}
         {title ? <h3 className="pw-card__title">{title}</h3> : null}
-        {description ? <p className="pw-card__desc">{description}</p> : null}
-        {children}
       </div>
     </>
   )

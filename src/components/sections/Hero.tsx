@@ -25,8 +25,8 @@ export function Hero({ introDone }: HeroProps) {
   return (
     <section className="hero" data-screen-label="Hero">
       <PixelTrail
-        pixelSize={screenSize.lessThan("md") ? 120 : 192}
-        fadeDuration={600}
+        pixelSize={screenSize.lessThan("md") ? 60 : 96}
+        fadeDuration={1500}
         delay={0}
         className="z-0"
         pixelClassName="hero__trail-pixel"

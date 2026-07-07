@@ -15,7 +15,25 @@
       "Bash(rmdir src/assets)",
       "Bash(npx tsc *)",
       "Bash(awk 'NR==100,NR==177' \"/Users/pixelwave/Downloads/PixellWave Homepage.html\")",
-      "Bash(python3 -)"
+      "Bash(python3 -)",
+      "Bash(command -v node)",
+      "Read(//Users/thomasluraghi/**)",
+      "Read(//opt/homebrew/**)",
+      "Bash(find /Users/thomasluraghi -maxdepth 3 -iname *nvm*)",
+      "Bash(find /Users/thomasluraghi -maxdepth 3 -iname *volta*)",
+      "Bash(/bin/zsh -lc 'which node; which npm; echo $PATH')",
+      "Bash(/bin/bash -lc 'which node; which npm; echo $PATH')",
+      "Bash(/bin/zsh -ic 'which node; which npm')",
+      "Read(//opt/**)",
+      "Bash(find /Users/thomasluraghi -maxdepth 2 -iname .fnm -o -maxdepth 2 -iname .asdf -o -maxdepth 2 -iname .mise*)",
+      "Bash(mdfind -name \"node\" -onlyin /usr/local -onlyin /opt)",
+      "Bash(grep -E \"/bin/node$\")",
+      "Bash(command -v brew)",
+      "Bash(brew --version)",
+      "Bash(sw_vers)",
+      "Bash(command -v node npm)",
+      "Bash(npm -v)",
+      "Bash(jobs -l)"
     ]
   }
 }

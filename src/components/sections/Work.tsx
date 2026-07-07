@@ -1,5 +1,5 @@
 import { useRef, type PointerEvent, type ReactNode } from "react"
-import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion"
+import { motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform } from "framer-motion"
 import type { MotionValue } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
 import { SectionLabel } from "@/components/pw/SectionLabel"
@@ -9,6 +9,7 @@ import { Tag } from "@/components/pw/Tag"
 import { Reveal } from "@/components/motion/Reveal"
 import { wrap } from "@/lib/motion"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
+import { CircularGallery, type CircularGalleryHandle } from "@/components/ui/circular-gallery"
 
 type TagVariant = "orange" | ""
 
@@ -53,6 +54,12 @@ const WORK: {
 ]
 
 const CARDS = [...WORK, ...WORK]
+
+// Temporary stand-in photography (Lorem Picsum) until real project imagery is ready.
+const GALLERY_ITEMS = WORK.map((w) => ({
+  image: `https://picsum.photos/seed/pixellwave-${w.id}/1200/900?grayscale`,
+  text: w.title,
+}))
 
 function WorkMedia({ index }: { index: string }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -126,6 +133,24 @@ function WorkTrack({ x }: { x: MotionValue<string> }) {
   )
 }
 
+function WorkGallery({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
+  const galleryRef = useRef<CircularGalleryHandle>(null)
+
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    galleryRef.current?.setProgress(latest)
+  })
+
+  return (
+    <CircularGallery
+      ref={galleryRef}
+      items={GALLERY_ITEMS}
+      bend={2}
+      borderRadius={0.04}
+      className="work__gallery"
+    />
+  )
+}
+
 function WorkHeading(): ReactNode {
   return (
     <div className="work__head">
@@ -151,7 +176,6 @@ function WorkHeading(): ReactNode {
 function WorkPinned() {
   const pinRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: pinRef, offset: ["start start", "end end"] })
-  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-50%"])
 
   return (
     <section id="work" className="work__pin" data-screen-label="Selected Work" ref={pinRef}>
@@ -159,8 +183,8 @@ function WorkPinned() {
         <div className="wrap">
           <WorkHeading />
         </div>
-        <div className="work__carousel">
-          <WorkTrack x={x} />
+        <div className="work__gallery-wrap">
+          <WorkGallery scrollYProgress={scrollYProgress} />
         </div>
       </div>
     </section>
