@@ -108,7 +108,7 @@ export function WorkGallery({ scrollYProgress }: { scrollYProgress: MotionValue<
       ref={galleryRef}
       items={GALLERY_ITEMS}
       bend={2}
-      borderRadius={0.04}
+      borderRadius={0}
       className="work__gallery"
     />
   )
