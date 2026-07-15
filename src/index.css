@@ -710,18 +710,27 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .svc-pin__inner > .wrap { width: 100%; }
 
 .svc { border-top: 1px solid var(--border-subtle); }
-.svc__row { display: grid; grid-template-columns: 80px 1fr auto auto; gap: clamp(1rem, 0.63vw, 2rem); align-items: center; padding: 1.75rem 0; border-bottom: 1px solid var(--border-subtle); transition: padding-left .3s var(--ease-wave); cursor: pointer; }
-.svc__row:hover { padding-left: 1rem; }
-.svc__num { font-family: var(--font-mono-accent); font-size: 14px; letter-spacing: 0.12em; color: var(--pw-orange); }
-.svc__name { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.5rem, 1.25vw, 3.5rem); letter-spacing: -0.01em; transition: color var(--dur-base) var(--ease-wave); }
-.svc__row:hover .svc__name { color: var(--pw-cyan); }
-.svc__tags { display: flex; gap: .5rem; flex-wrap: wrap; }
-.svc__arrow {
-  color: var(--pw-cyan); opacity: 0; transform: translate(-6px, 6px) rotate(-8deg);
-  transition: opacity var(--dur-base) var(--ease-wave), transform var(--dur-base) var(--ease-wave);
+.svc__row {
+  position: relative; overflow: hidden;
+  padding: 1.5rem 0; border-bottom: 1px solid var(--border-subtle);
+  transition: padding-left .3s var(--ease-wave);
+  cursor: pointer;
 }
-.svc__row:hover .svc__arrow { opacity: 1; transform: translate(0, 0) rotate(0deg); }
-@media (max-width: 640px){ .svc__row { grid-template-columns: 40px 1fr auto; } .svc__arrow { display: none; } }
+.svc__row:hover { padding-left: 1.25rem; }
+.svc__swatch {
+  position: absolute; inset: 0; z-index: 0;
+  background: linear-gradient(100deg, var(--pw-orange), var(--pw-cyan));
+  transform: scaleX(0); transform-origin: left;
+  transition: transform var(--dur-slow) var(--ease-wave);
+}
+.svc__row:hover .svc__swatch { transform: scaleX(1); }
+.svc__top { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: baseline; }
+.svc__name { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.75rem, 2vw, 3.5rem); letter-spacing: -0.02em; transition: color var(--dur-base) var(--ease-wave); }
+.svc__row:hover .svc__name { color: var(--pw-black); }
+.svc__num { font-family: var(--font-mono-accent); font-size: 0.72rem; letter-spacing: 0.08em; color: var(--pw-orange); transition: color var(--dur-base) var(--ease-wave); }
+.svc__row:hover .svc__num { color: var(--pw-black); }
+.svc__tags { position: relative; z-index: 1; display: flex; gap: 1rem; flex-wrap: wrap; margin-top: .6rem; }
+.svc__row:hover .svc__tags .pw-tag { color: var(--pw-black); border-color: var(--pw-black); }
 
 /* /contact — a single, non-scrolling full-viewport screen on desktop (the
    header floats transparently over it, same as the homepage hero); mobile
