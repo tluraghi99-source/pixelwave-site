@@ -12,6 +12,7 @@
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "@fontsource-variable/geist": "^5.2.9",
+    "@fontsource/ibm-plex-mono": "^5.2.7",
     "@types/three": "^0.185.0",
     "@types/uuid": "^10.0.0",
     "class-variance-authority": "^0.7.1",
@@ -22,6 +23,7 @@
     "ogl": "^1.0.11",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "react-router-dom": "^7.18.1",
     "shadcn": "^4.12.0",
     "tailwind-merge": "^3.6.0",
     "three": "^0.185.0",
