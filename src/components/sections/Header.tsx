@@ -164,7 +164,7 @@ export function Header() {
           text={open ? "Close" : "Menu"}
           icon={open ? <X size={16} /> : <Menu size={16} />}
           aria-label={open ? "Close menu" : "Open menu"}
-          className="hidden text-foreground md:inline-flex"
+          className="hidden text-foreground md:inline-flex border-none pl-2 pr-8"
           onClick={() => setOpen((v) => !v)}
         />
 
