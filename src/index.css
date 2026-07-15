@@ -592,14 +592,11 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 }
 .accent-orange { color: var(--pw-orange); }
 .accent-cyan { color: #008B8B; }
-.studio__stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1.25rem, 0.78vw, 2.5rem); align-self: stretch; }
-@media (max-width: 640px){ .studio__stats { grid-template-columns: 1fr; } }
-.stat {
-  display: flex; flex-direction: column; gap: .5rem; padding: 1.75rem 1.5rem;
-  background: var(--surface-raised); border: 1px solid var(--border-faint); border-radius: var(--radius-lg);
-}
-.stat__num { font-family: var(--font-display); font-weight: 700; font-size: clamp(2rem, 0.94vw, 3.5rem); letter-spacing: -0.02em; color: var(--pw-orange); }
-.stat__label { font-size: var(--fs-small); color: var(--text-secondary); }
+.studio__stats { display: flex; flex-direction: column; align-self: stretch; }
+.stat { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 1.1rem 0; border-bottom: 1px solid var(--border-subtle); }
+.studio__stats > .stat:first-child { border-top: 1px solid var(--border-subtle); }
+.stat__label { font-family: var(--font-mono-accent); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); }
+.stat__num { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.5rem, 1.2vw, 2.25rem); letter-spacing: -0.02em; color: var(--pw-orange); }
 
 .lead { font-family: var(--font-display); font-weight: 600; font-size: clamp(2rem, 1.6vw, 4.5rem); line-height: 1.05; letter-spacing: -0.02em; margin: 1.25rem 0 0; text-wrap: balance; }
 .secbody { font-size: 1.125rem; line-height: 1.5; color: var(--text-secondary); max-width: 52ch; margin: 1.25rem 0 0; }

@@ -5,7 +5,7 @@ import { Counter } from "@/components/motion/Counter"
 const STATS = [
   { value: 40, suffix: "+", label: "Projects shipped" },
   { value: 98, suffix: "%", label: "Client satisfaction" },
-  { value: 4, suffix: "", label: "Disciplines, one studio" },
+  { value: 6, suffix: "", label: "Disciplines, one studio" },
 ]
 
 export function Studio() {
@@ -29,10 +29,10 @@ export function Studio() {
         <RevealGroup className="studio__stats">
           {STATS.map((s) => (
             <RevealItem className="stat" key={s.label}>
+              <span className="stat__label">{s.label}</span>
               <span className="stat__num">
                 <Counter value={s.value} suffix={s.suffix} />
               </span>
-              <span className="stat__label">{s.label}</span>
             </RevealItem>
           ))}
         </RevealGroup>
