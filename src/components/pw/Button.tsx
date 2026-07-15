@@ -1,4 +1,6 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react"
+import { Link } from "react-router-dom"
+import { ScrambleText } from "@/components/motion/ScrambleText"
 
 type Variant = "primary" | "secondary" | "ghost"
 type Size = "sm" | "md" | "lg"
@@ -61,7 +63,7 @@ export function Button(props: PwButtonProps) {
   const content = (
     <>
       {iconLeft ? <span className="pw-btn__icon">{iconLeft}</span> : null}
-      {children}
+      {typeof children === "string" ? <ScrambleText text={children} /> : children}
       {iconRight ? <span className="pw-btn__icon">{iconRight}</span> : null}
     </>
   )
@@ -69,7 +71,16 @@ export function Button(props: PwButtonProps) {
   const classes = cls({ variant, size, pill, block, className })
 
   if ("href" in rest && rest.href && !("disabled" in rest && rest.disabled)) {
-    const { href, ...anchorRest } = rest as AnchorHTMLAttributes<HTMLAnchorElement>
+    const { href, ...anchorRest } = rest as AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }
+    // In-page anchors (and cross-page "/#hash" links) stay plain <a> so the
+    // browser's native hash-scroll applies; plain paths get client-side routing.
+    if (href.startsWith("/") && !href.includes("#")) {
+      return (
+        <Link to={href} className={classes} {...anchorRest}>
+          {content}
+        </Link>
+      )
+    }
     return (
       <a href={href} className={classes} {...anchorRest}>
         {content}

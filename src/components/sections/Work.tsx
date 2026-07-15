@@ -7,51 +7,13 @@ import { Button } from "@/components/pw/Button"
 import { Card } from "@/components/pw/Card"
 import { Tag } from "@/components/pw/Tag"
 import { Reveal } from "@/components/motion/Reveal"
+import { ScrambleText } from "@/components/motion/ScrambleText"
 import { wrap } from "@/lib/motion"
-import { useScreenSize } from "@/components/hooks/use-screen-size"
 import { CircularGallery, type CircularGalleryHandle } from "@/components/ui/circular-gallery"
+import { PROJECTS } from "@/data/work"
 
-type TagVariant = "orange" | ""
-
-const WORK: {
-  id: string
-  idx: string
-  title: string
-  desc: string
-  tags: [TagVariant, string][]
-}[] = [
-  {
-    id: "pw-w1",
-    idx: "01",
-    title: "Northwind",
-    desc: "Identity and site for a renewable-energy startup.",
-    tags: [
-      ["orange", "Featured"],
-      ["", "Web"],
-      ["", "Brand"],
-    ],
-  },
-  {
-    id: "pw-w2",
-    idx: "02",
-    title: "Tidal Commerce",
-    desc: "A storefront that moves — fluid product reveals.",
-    tags: [
-      ["", "Motion"],
-      ["", "Dev"],
-    ],
-  },
-  {
-    id: "pw-w3",
-    idx: "03",
-    title: "Solstice",
-    desc: "Editorial platform for a culture magazine.",
-    tags: [
-      ["", "Web"],
-      ["", "CMS"],
-    ],
-  },
-]
+// The homepage teases a curated few — the full roster lives on the /work page.
+const WORK = PROJECTS.slice(0, 3)
 
 const CARDS = [...WORK, ...WORK]
 
@@ -59,6 +21,7 @@ const CARDS = [...WORK, ...WORK]
 const GALLERY_ITEMS = WORK.map((w) => ({
   image: `https://picsum.photos/seed/pixellwave-${w.id}/1200/900?grayscale`,
   text: w.title,
+  tags: w.tags.map(([variant, label]) => ({ variant: variant || ("outline" as const), label })),
 }))
 
 function WorkMedia({ index }: { index: string }) {
@@ -121,10 +84,10 @@ function WorkTrack({ x }: { x: MotionValue<string> }) {
             ))}
             title={w.title}
             description={w.desc}
-            href="#work"
+            href="/work"
           >
             <span className="work__view">
-              View project <ArrowUpRight size={15} />
+              <ScrambleText text="View project" /> <ArrowUpRight size={15} />
             </span>
           </Card>
         </div>
@@ -133,7 +96,7 @@ function WorkTrack({ x }: { x: MotionValue<string> }) {
   )
 }
 
-function WorkGallery({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
+export function WorkGallery({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
   const galleryRef = useRef<CircularGalleryHandle>(null)
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
@@ -151,7 +114,7 @@ function WorkGallery({ scrollYProgress }: { scrollYProgress: MotionValue<number>
   )
 }
 
-function WorkHeading(): ReactNode {
+export function WorkHeading(): ReactNode {
   return (
     <div className="work__head">
       <div>
@@ -163,7 +126,7 @@ function WorkHeading(): ReactNode {
         </Reveal>
       </div>
       <Reveal delay={0.15}>
-        <Button variant="secondary" href="#work">
+        <Button variant="secondary" href="/work">
           All projects
         </Button>
       </Reveal>
@@ -171,28 +134,8 @@ function WorkHeading(): ReactNode {
   )
 }
 
-/** Desktop: the section pins in place and the scroll gesture drives the carousel
- *  horizontally until all cards have passed, then normal page scroll resumes. */
-function WorkPinned() {
-  const pinRef = useRef<HTMLElement>(null)
-  const { scrollYProgress } = useScroll({ target: pinRef, offset: ["start start", "end end"] })
-
-  return (
-    <section id="work" className="work__pin" data-screen-label="Selected Work" ref={pinRef}>
-      <div className="work__pin-inner">
-        <div className="wrap">
-          <WorkHeading />
-        </div>
-        <div className="work__gallery-wrap">
-          <WorkGallery scrollYProgress={scrollYProgress} />
-        </div>
-      </div>
-    </section>
-  )
-}
-
 /** Mobile/tablet: ambient scroll-linked drift, no pinning (revisit later). */
-function WorkAmbient() {
+export function WorkAmbient() {
   const sectionRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -211,11 +154,4 @@ function WorkAmbient() {
       </Reveal>
     </section>
   )
-}
-
-export function Work() {
-  const screenSize = useScreenSize()
-  const isDesktop = screenSize.greaterThanOrEqual("lg")
-
-  return isDesktop ? <WorkPinned /> : <WorkAmbient />
 }

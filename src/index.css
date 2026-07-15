@@ -347,6 +347,13 @@ a { color: var(--text-link); text-decoration: none; }
 .pw-seclabel--lg .pw-seclabel__num,
 .pw-seclabel--lg .pw-seclabel__text{font-size:var(--fs-small);}
 
+/* InteractiveHoverButton's color/border — plain CSS, not Tailwind's
+   text-foreground/border-foreground utilities, since those live inside
+   Tailwind's CSS layer and lose to index.css's unlayered `a { color }` rule
+   regardless of specificity when this renders as an anchor. */
+.ihb{border-color:var(--border-strong);color:var(--text-primary);}
+.ihb:hover{border-color:var(--accent-primary);color:var(--accent-primary);}
+
 .pw-btn{
   font-family:var(--font-text);
   font-weight:var(--fw-semibold);
