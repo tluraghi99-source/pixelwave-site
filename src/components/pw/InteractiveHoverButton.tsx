@@ -31,8 +31,12 @@ export function InteractiveHoverButton(props: InteractiveHoverButtonProps) {
   // CSS layer, which loses to index.css's unlayered `a { color: ... }` rule
   // regardless of specificity, so an anchor-rendered button here would stay
   // stuck on that link color no matter what Tailwind class is applied.
+  //
+  // Typography matches Button/.pw-btn (Hanken Grotesk, mixed-case) rather
+  // than a mono/uppercase treatment of its own — the two components render
+  // side by side on the same pages and need to read as one button system.
   const classes = cn(
-    "group cta-breathe ihb relative inline-flex w-fit cursor-pointer items-center justify-center gap-2 border bg-transparent px-6 py-2.5 text-center text-sm font-semibold uppercase tracking-wide font-mono transition-colors duration-300",
+    "group ihb relative inline-flex w-fit cursor-pointer items-center justify-center gap-2 border bg-transparent px-6 py-2.5 text-center text-sm font-semibold tracking-tight transition-colors duration-300",
     className
   )
 

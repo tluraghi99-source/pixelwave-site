@@ -889,17 +889,8 @@ footer { background: var(--surface-subtle); color: var(--pw-black); overflow-x: 
   80%  { transform: translate(3%, -2%); }
   100% { transform: translate(0, 0); }
 }
-@keyframes cta-breathe {
-  0%, 100% { box-shadow: 0 4px 16px rgba(255, 91, 0, 0.2); }
-  50%      { box-shadow: 0 6px 28px rgba(255, 91, 0, 0.55); }
-}
-.pw-btn--primary { animation: cta-breathe 3.2s ease-in-out infinite; }
-.pw-btn--primary:hover { animation: none; }
-.cta-breathe { animation: cta-breathe 3.2s ease-in-out infinite; }
-.cta-breathe:hover { animation: none; }
 @media (prefers-reduced-motion: reduce) {
   .grain-overlay { animation: none; }
-  .pw-btn--primary, .cta-breathe { animation: none; }
 }
 
 .split-text__mask { display: inline-block; overflow: hidden; vertical-align: top; }
