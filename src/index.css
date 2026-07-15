@@ -494,7 +494,7 @@ a { color: var(--text-link); text-decoration: none; }
 
 .sec { padding-block: clamp(4.5rem, 4.7vw, 12rem); }
 .sec--tint { background: var(--surface-subtle); }
-.sec--dark { background: var(--pw-black); color: var(--pw-white); }
+.sec--dark { position: relative; background: var(--pw-black); color: var(--pw-white); }
 .sec--dark .secbody { color: rgba(255,255,255,0.66); }
 
 header.nav {
@@ -744,6 +744,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
    falls back to a normal stacked, scrollable layout since cramming a
    two-column wizard + giant text into one screen isn't workable that small. */
 .contact-page {
+  position: relative;
   height: 100svh; overflow: hidden;
   display: flex; flex-direction: column;
   background: var(--pw-black); color: var(--pw-white);
@@ -859,6 +860,35 @@ footer { background: var(--surface-subtle); color: var(--pw-black); overflow-x: 
   position: fixed; top: 0; left: 0; margin: -6px 0 0 -6px;
   width: 12px; height: 12px; border-radius: 50%;
   background: var(--pw-orange); pointer-events: none; z-index: var(--z-toast);
+}
+
+.grain-overlay {
+  position: absolute; inset: 0; z-index: 5; pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 180px 180px;
+  animation: grain-shift 8s steps(8) infinite;
+  mix-blend-mode: overlay;
+}
+@keyframes grain-shift {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-3%, 2%); }
+  40%  { transform: translate(2%, -4%); }
+  60%  { transform: translate(-2%, 3%); }
+  80%  { transform: translate(3%, -2%); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes cta-breathe {
+  0%, 100% { box-shadow: 0 4px 16px rgba(255, 91, 0, 0.2); }
+  50%      { box-shadow: 0 6px 28px rgba(255, 91, 0, 0.55); }
+}
+.pw-btn--primary { animation: cta-breathe 3.2s ease-in-out infinite; }
+.pw-btn--primary:hover { animation: none; }
+.cta-breathe { animation: cta-breathe 3.2s ease-in-out infinite; }
+.cta-breathe:hover { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .grain-overlay { animation: none; }
+  .pw-btn--primary, .cta-breathe { animation: none; }
 }
 
 .split-text__mask { display: inline-block; overflow: hidden; vertical-align: top; }

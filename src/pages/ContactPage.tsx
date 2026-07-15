@@ -44,6 +44,7 @@ export function ContactPage() {
   return (
     <main>
       <section className="contact-page" data-theme="dark" data-screen-label="Contact">
+        <div className="grain-overlay" aria-hidden="true" />
         <div className="wrap contact-page__body">
           <div className="contact-page__left">
             <nav className="contact-page__steps" aria-label="Contact form steps">

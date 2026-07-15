@@ -72,6 +72,7 @@ function ServicesPinned() {
       style={{ height: `${pinHeight}vh` }}
     >
       <div className="svc-pin__inner sec--dark" data-theme="dark">
+        <div className="grain-overlay" aria-hidden="true" />
         <div className="wrap">
           <Reveal>
             <SectionLabel number="03">Services</SectionLabel>
@@ -107,6 +108,7 @@ function ServicesPinned() {
 function ServicesAmbient() {
   return (
     <section id="services" className="sec sec--dark" data-theme="dark" data-screen-label="Services">
+      <div className="grain-overlay" aria-hidden="true" />
       <div className="wrap">
         <Reveal>
           <SectionLabel number="03">Services</SectionLabel>
