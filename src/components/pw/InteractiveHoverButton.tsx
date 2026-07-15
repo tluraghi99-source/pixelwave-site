@@ -36,14 +36,22 @@ export function InteractiveHoverButton(props: InteractiveHoverButtonProps) {
   // than a mono/uppercase treatment of its own — the two components render
   // side by side on the same pages and need to read as one button system.
   const classes = cn(
-    "group ihb relative inline-flex w-fit cursor-pointer items-center justify-center gap-2 border bg-transparent px-6 py-2.5 text-center text-sm font-semibold tracking-tight transition-colors duration-300",
+    "group ihb relative inline-flex w-fit cursor-pointer items-center justify-center border bg-transparent px-6 py-2.5 text-center text-sm font-semibold tracking-tight transition-colors duration-300",
     className
   )
 
+  // The icon is an absolutely-positioned overlay, not a flex sibling of the
+  // text — a flex sibling still claims its layout width (plus the gap) even
+  // while invisible at rest, which pushes justify-center's centered group
+  // off from the button's true visual center. Overlaying it keeps the text
+  // perfectly centered at rest regardless of whether the icon is shown.
+  // On hover the text nudges left by exactly enough to clear the icon —
+  // for a short label like "Menu" the centered text and the right-aligned
+  // icon would otherwise land on top of each other.
   const content = (
     <>
-      <ScrambleText text={text} />
-      <span className="inline-flex -translate-x-1 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+      <ScrambleText text={text} className="transition-transform duration-300 group-hover:-translate-x-3" />
+      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 translate-x-1 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
         {icon}
       </span>
     </>
