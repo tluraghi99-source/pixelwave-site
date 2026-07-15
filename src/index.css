@@ -605,6 +605,17 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .stat__label { font-family: var(--font-mono-accent); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); }
 .stat__num { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.5rem, 1.2vw, 2.25rem); letter-spacing: -0.02em; color: var(--pw-orange); }
 
+/* Desktop scroll-scrubbed variant only (StudioScrubbed in Studio.tsx) — the
+   static border-bottom/top rules above are replaced by an animated
+   .stat__rule that draws in as scroll passes through the section, instead
+   of always being fully visible. The mobile/tablet ambient variant never
+   adds these modifier classes, so it keeps the plain static rules above. */
+.stat--scrubbed { position: relative; border-bottom: none; overflow: hidden; }
+.studio__stats > .stat--scrubbed:first-child { border-top: none; }
+.studio__stats--scrubbed { position: relative; }
+.studio__stats--scrubbed::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: var(--border-subtle); }
+.stat__rule { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--border-subtle); transform-origin: left; }
+
 .lead { font-family: var(--font-display); font-weight: 600; font-size: clamp(2rem, 1.6vw, 4.5rem); line-height: 1.05; letter-spacing: -0.02em; margin: 1.25rem 0 0; text-wrap: balance; }
 .secbody { font-size: 1.125rem; line-height: 1.5; color: var(--text-secondary); max-width: 52ch; margin: 1.25rem 0 0; }
 
