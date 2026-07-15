@@ -724,13 +724,17 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 /* Flex items shrink-to-fit their content by default in the main axis — without
    this, .wrap (a normal block everywhere else on the site) stops spanning the
    full page width the moment it becomes a flex child here. */
-.svc-pin__inner { position: sticky; top: 0; height: 100svh; overflow: hidden; display: flex; align-items: center; }
+.svc-pin__inner {
+  position: sticky; top: 0; height: 100svh; overflow: hidden;
+  display: flex; align-items: center;
+  padding-block: clamp(2.5rem, 5vw, 5rem);
+}
 .svc-pin__inner > .wrap { width: 100%; }
 
 .svc { border-top: 1px solid var(--border-subtle); }
 .svc__row {
   position: relative; overflow: hidden;
-  padding: 1.5rem 0; border-bottom: 1px solid var(--border-subtle);
+  padding: 1.1rem 0; border-bottom: 1px solid var(--border-subtle);
   transition: padding-left .3s var(--ease-wave);
   cursor: pointer;
 }
