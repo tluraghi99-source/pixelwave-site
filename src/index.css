@@ -678,12 +678,12 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 
 /* video-scrub+carousel pin — starts already fully open (the iris itself runs
    earlier, as a fixed overlay directly on the hero, not in here — see
-   reel__reveal-overlay below) — scrubs the video to its last frame, then
-   holds it there while the carousel scrolls on top (WorkReel.tsx); 570vh =
-   PIN_HEIGHT_VH there, kept in sync by hand. No background here — while
-   .reel__inner is still hidden (pre-handoff) the fixed hero/overlay need to
-   show through. */
-.reel { position: relative; height: 570vh; }
+   reel__reveal-overlay below) — scrubs the video to its last frame, holds
+   there through a deliberate black pause, then the carousel scrolls on top
+   (WorkReel.tsx); 720vh = PIN_HEIGHT_VH there, kept in sync by hand. No
+   background here — while .reel__inner is still hidden (pre-handoff) the
+   fixed hero/overlay need to show through. */
+.reel { position: relative; height: 720vh; }
 .reel__inner { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 /* Fixed reveal overlay — sits directly on the hero (not part of .reel's own
    document flow), so the video's iris opens in place from the very first

@@ -12,6 +12,10 @@ import { WorkHeading, WorkGallery, WorkAmbient } from "@/components/sections/Wor
 // the video-scrub and carousel phases live inside the pin's own local
 // scrollYProgress, which starts right where the overlay hands off.
 const VIDEO_VH = 250
+/** Pure hold on the video's last (already-black) frame — scroll passes
+ *  through this whole span with nothing changing on screen, before the
+ *  carousel starts to appear. */
+const BLACK_HOLD_VH = 150
 const CAROUSEL_VH = 220
 /** studio.mp4's actual duration (see video.duration, logged during dev). */
 const VIDEO_DURATION = 8.0833
@@ -20,7 +24,8 @@ const VIDEO_DURATION = 8.0833
 // HERO_REVEAL_START/END), working forward from the shared reveal window.
 const VIDEO_START_GLOBAL = HERO_REVEAL_END
 const VIDEO_END_GLOBAL = VIDEO_START_GLOBAL + VIDEO_VH / 100
-const CAROUSEL_END_GLOBAL = VIDEO_END_GLOBAL + CAROUSEL_VH / 100
+const HOLD_END_GLOBAL = VIDEO_END_GLOBAL + BLACK_HOLD_VH / 100
+const CAROUSEL_END_GLOBAL = HOLD_END_GLOBAL + CAROUSEL_VH / 100
 /** The pin starts sticking at HERO_REVEAL_END — exactly where the fixed
  *  reveal overlay finishes opening and hands off — and has to run through
  *  CAROUSEL_END_GLOBAL — its CSS height is that spread of extra scroll, plus
@@ -60,13 +65,14 @@ const ENTRANCE_FADE_VH = 40
 // starts at 0 since the pin's local progress begins exactly at the handoff.
 const VIDEO_START_FRACTION = (VIDEO_START_GLOBAL - HERO_REVEAL_END) / PIN_SCROLL_VH
 const VIDEO_END_FRACTION = (VIDEO_END_GLOBAL - HERO_REVEAL_END) / PIN_SCROLL_VH
-/** The content block (heading + gallery) only starts fading/rising in once
- *  the video scrub is fully finished (scrollYProgress reaches
- *  VIDEO_END_FRACTION) — not partway through the video's last second like
- *  before — and the carousel's own card-scroll starts at that same instant,
- *  so nothing about the carousel moves or appears until the video is done. */
-const CAROUSEL_SCROLL_START = VIDEO_END_FRACTION
-const ENTRANCE_END_FRACTION = VIDEO_END_FRACTION + (ENTRANCE_FADE_VH / 100) / PIN_SCROLL_VH
+/** Where the black-hold span ends and the content block is allowed to start
+ *  fading/rising in — BLACK_HOLD_VH of pure scroll after the video finishes,
+ *  during which nothing on screen changes. The carousel's own card-scroll
+ *  starts at that same instant, so nothing about the carousel moves or
+ *  appears until the hold is over. */
+const HOLD_END_FRACTION = (HOLD_END_GLOBAL - HERO_REVEAL_END) / PIN_SCROLL_VH
+const CAROUSEL_SCROLL_START = HOLD_END_FRACTION
+const ENTRANCE_END_FRACTION = HOLD_END_FRACTION + (ENTRANCE_FADE_VH / 100) / PIN_SCROLL_VH
 
 /** Desktop: the video's iris opens as a fixed overlay sitting directly on the
  *  hero (scroll 0 → HERO_REVEAL_END, in exact lockstep with the hero mark's
@@ -101,9 +107,9 @@ function WorkReelPinned() {
   // (below) waits for that to be done before it starts.
   const blackoutKeyframes = FADE_KEYFRAME_SECONDS.map((s) => s / VIDEO_DURATION)
   const blackoutOpacity = useTransform(videoProgress, blackoutKeyframes, BLACKOUT_OPACITY, { ease: [FADE_EASE] })
-  const contentOpacity = useTransform(scrollYProgress, [VIDEO_END_FRACTION, ENTRANCE_END_FRACTION], FADE_KEYFRAME_OPACITY, { ease: [FADE_EASE] })
-  const headingY = useTransform(scrollYProgress, [VIDEO_END_FRACTION, ENTRANCE_END_FRACTION], HEADING_RISE_Y, { ease: [FADE_EASE] })
-  const galleryY = useTransform(scrollYProgress, [VIDEO_END_FRACTION, ENTRANCE_END_FRACTION], GALLERY_RISE_Y, { ease: [FADE_EASE] })
+  const contentOpacity = useTransform(scrollYProgress, [HOLD_END_FRACTION, ENTRANCE_END_FRACTION], FADE_KEYFRAME_OPACITY, { ease: [FADE_EASE] })
+  const headingY = useTransform(scrollYProgress, [HOLD_END_FRACTION, ENTRANCE_END_FRACTION], HEADING_RISE_Y, { ease: [FADE_EASE] })
+  const galleryY = useTransform(scrollYProgress, [HOLD_END_FRACTION, ENTRANCE_END_FRACTION], GALLERY_RISE_Y, { ease: [FADE_EASE] })
   const pointerEvents = useTransform(contentOpacity, (v) => (v > 0.05 ? "auto" : "none"))
 
   return (
