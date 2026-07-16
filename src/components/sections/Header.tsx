@@ -5,7 +5,6 @@ import { Menu, X } from "lucide-react"
 import { Button } from "@/components/pw/Button"
 import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
 import { BrandLogo } from "@/components/pw/Logo"
-import { ScrambleText } from "@/components/motion/ScrambleText"
 import { EASE_WAVE, HERO_CROSSFADE_RATIO, HERO_NAV_HIDE_AFTER, HERO_REVEAL_END, HERO_REVEAL_START } from "@/lib/motion"
 import { SERVICES } from "@/data/services"
 import { PROJECTS } from "@/data/work"
@@ -68,13 +67,13 @@ export function Header() {
     if (href.startsWith("/")) {
       return (
         <Link key={key} className={className} to={href} onClick={onClick}>
-          <ScrambleText text={label} />
+          {label}
         </Link>
       )
     }
     return (
       <a key={key} className={className} href={href === "#" ? href : homeHref(href)} onClick={onClick}>
-        <ScrambleText text={label} />
+        {label}
       </a>
     )
   }
