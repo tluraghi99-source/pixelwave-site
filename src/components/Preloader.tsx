@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import { useMotionValue } from "framer-motion"
 import { PixelResolveGrid } from "@/components/motion/PixelResolveGrid"
+import { useLoadProgress } from "@/components/hooks/use-load-progress"
 
 const SEEN_KEY = "pw-intro-seen"
 
@@ -9,9 +9,9 @@ interface PreloaderProps {
 }
 
 /** Brief branded loading screen shown once per session — a full-black pixel
- *  grid that resolves to white in sync with page-load progress, then hands
- *  off to the Hero (already showing through, since the grid resolves to the
- *  same white the Hero's own background already is). */
+ *  grid that resolves to white in sync with real page-load progress, then
+ *  hands off to the Hero (already showing through, since the grid resolves
+ *  to the same white the Hero's own background already is). */
 export function Preloader({ onReveal }: PreloaderProps) {
   const [alreadySeen] = useState(() => {
     try {
@@ -21,38 +21,21 @@ export function Preloader({ onReveal }: PreloaderProps) {
     }
   })
   const [hidden, setHidden] = useState(false)
-  const progress = useMotionValue(0)
-  const [displayPercent, setDisplayPercent] = useState(0)
+
+  function handleReveal() {
+    onReveal()
+    try {
+      sessionStorage.setItem(SEEN_KEY, "1")
+    } catch {
+      /* ignore */
+    }
+    setHidden(true)
+  }
+
+  const { progress, displayPercent } = useLoadProgress({ onReveal: handleReveal })
 
   useEffect(() => {
-    if (alreadySeen) {
-      onReveal()
-      return
-    }
-    // TEMPORARY: linear 0→100 over 1.5s, verifies the grid's visual
-    // behavior only — replaced by real asset-loading progress in Task 2.
-    const start = performance.now()
-    const duration = 1500
-    let raf: number
-    function tick() {
-      const elapsed = performance.now() - start
-      const pct = Math.min(100, (elapsed / duration) * 100)
-      progress.set(pct)
-      setDisplayPercent(Math.round(pct))
-      if (pct < 100) {
-        raf = requestAnimationFrame(tick)
-      } else {
-        onReveal()
-        try {
-          sessionStorage.setItem(SEEN_KEY, "1")
-        } catch {
-          /* ignore */
-        }
-        setTimeout(() => setHidden(true), 400)
-      }
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
+    if (alreadySeen) onReveal()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alreadySeen])
 
