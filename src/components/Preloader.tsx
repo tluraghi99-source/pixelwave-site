@@ -32,7 +32,7 @@ export function Preloader({ onReveal }: PreloaderProps) {
     setHidden(true)
   }
 
-  const { progress, displayPercent } = useLoadProgress({ onReveal: handleReveal })
+  const { progress, displayPercent } = useLoadProgress({ onReveal: handleReveal, enabled: !alreadySeen })
 
   useEffect(() => {
     if (alreadySeen) onReveal()

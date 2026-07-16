@@ -4,11 +4,16 @@ import type { MotionValue } from "framer-motion"
 
 interface UseLoadProgressOptions {
   onReveal: () => void
+  /** Set false to skip the internal loading-timer/font-tracking entirely
+   *  (e.g. the sessionStorage-skip path, where the preloader never
+   *  renders) — avoids redundant background work and a second onReveal
+   *  call. @default true */
+  enabled?: boolean
   /** Preloader must stay visible at least this long, even if fonts resolve instantly (e.g. already cached). @default 900 */
   minDurationMs?: number
   /** Force-complete if fonts.ready hasn't resolved by then — must never hang. @default 3500 */
   maxWaitMs?: number
-  /** Extra delay after progress hits 100 before calling onReveal, so the last tiles' own transition actually finishes before handoff. @default 400 */
+  /** Extra delay after the spring's own value (not just its target) reaches ~100, so the last tiles' own transition actually finishes before handoff. @default 400 */
   settleMs?: number
 }
 
@@ -22,10 +27,12 @@ interface UseLoadProgressResult {
 /** Tracks real webfont-loading (document.fonts.ready) instead of a fixed
  *  timer, smoothed by a spring so the displayed percentage (and the pixel
  *  grid driven by the same value) read as continuous progress rather than
- *  a single binary jump — then calls onReveal once loading is done and the
- *  minimum display duration has elapsed. */
+ *  a single binary jump — then calls onReveal once loading is done, the
+ *  minimum display duration has elapsed, and the spring has actually
+ *  finished animating to 100 (not just been told to). */
 export function useLoadProgress({
   onReveal,
+  enabled = true,
   minDurationMs = 900,
   maxWaitMs = 3500,
   settleMs = 400,
@@ -43,8 +50,13 @@ export function useLoadProgress({
   }, [spring])
 
   useEffect(() => {
+    if (!enabled) return
+
     const mountTime = performance.now()
     let done = false
+    let waitTimer: ReturnType<typeof setTimeout> | undefined
+    let settleTimer: ReturnType<typeof setTimeout> | undefined
+    let unsubSpring: (() => void) | undefined
 
     // Eases toward 90 while waiting, never reaching it on its own — real
     // completion (finish()) is what pushes the value the rest of the way
@@ -61,9 +73,19 @@ export function useLoadProgress({
       clearTimeout(maxWaitTimer)
       const elapsed = performance.now() - mountTime
       const wait = Math.max(0, minDurationMs - elapsed)
-      setTimeout(() => {
+      waitTimer = setTimeout(() => {
         rawTarget.set(100)
-        setTimeout(onReveal, settleMs)
+        // Wait for the spring's own value (what's actually visible,
+        // driving the tile grid) to reach ~100, not just the instant its
+        // target is set — the spring takes real time to converge under
+        // its own physics, and starting the settle countdown before that
+        // would cut tiles off mid-transition.
+        unsubSpring = spring.on("change", (v) => {
+          if (v >= 99.5) {
+            unsubSpring?.()
+            settleTimer = setTimeout(onReveal, settleMs)
+          }
+        })
       }, wait)
     }
 
@@ -79,9 +101,12 @@ export function useLoadProgress({
     return () => {
       clearInterval(nudgeInterval)
       clearTimeout(maxWaitTimer)
+      clearTimeout(waitTimer)
+      clearTimeout(settleTimer)
+      unsubSpring?.()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [enabled])
 
   return { progress: spring, displayPercent }
 }
