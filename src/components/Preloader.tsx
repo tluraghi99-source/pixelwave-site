@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
-import { AnimatePresence, motion } from "framer-motion"
-import { BrandLogo } from "@/components/pw/Logo"
-import { EASE_WAVE } from "@/lib/motion"
+import { useMotionValue } from "framer-motion"
+import { PixelResolveGrid } from "@/components/motion/PixelResolveGrid"
 
 const SEEN_KEY = "pw-intro-seen"
 
@@ -9,7 +8,10 @@ interface PreloaderProps {
   onReveal: () => void
 }
 
-/** Brief branded curtain shown once per session; wipes up to reveal the hero underneath. */
+/** Brief branded loading screen shown once per session — a full-black pixel
+ *  grid that resolves to white in sync with page-load progress, then hands
+ *  off to the Hero (already showing through, since the grid resolves to the
+ *  same white the Hero's own background already is). */
 export function Preloader({ onReveal }: PreloaderProps) {
   const [alreadySeen] = useState(() => {
     try {
@@ -18,53 +20,48 @@ export function Preloader({ onReveal }: PreloaderProps) {
       return false
     }
   })
-  const [exiting, setExiting] = useState(false)
+  const [hidden, setHidden] = useState(false)
+  const progress = useMotionValue(0)
+  const [displayPercent, setDisplayPercent] = useState(0)
 
   useEffect(() => {
     if (alreadySeen) {
       onReveal()
       return
     }
-    const t = setTimeout(() => {
-      setExiting(true)
-      onReveal()
-      try {
-        sessionStorage.setItem(SEEN_KEY, "1")
-      } catch {
-        /* ignore */
+    // TEMPORARY: linear 0→100 over 1.5s, verifies the grid's visual
+    // behavior only — replaced by real asset-loading progress in Task 2.
+    const start = performance.now()
+    const duration = 1500
+    let raf: number
+    function tick() {
+      const elapsed = performance.now() - start
+      const pct = Math.min(100, (elapsed / duration) * 100)
+      progress.set(pct)
+      setDisplayPercent(Math.round(pct))
+      if (pct < 100) {
+        raf = requestAnimationFrame(tick)
+      } else {
+        onReveal()
+        try {
+          sessionStorage.setItem(SEEN_KEY, "1")
+        } catch {
+          /* ignore */
+        }
+        setTimeout(() => setHidden(true), 400)
       }
-    }, 1050)
-    return () => clearTimeout(t)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alreadySeen])
 
-  if (alreadySeen) return null
+  if (alreadySeen || hidden) return null
 
   return (
-    <AnimatePresence>
-      {!exiting && (
-        <motion.div
-          className="preloader"
-          exit={{ clipPath: "inset(0 0 100% 0)" }}
-          transition={{ duration: 0.75, ease: EASE_WAVE }}
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, ease: EASE_WAVE }}
-          >
-            <BrandLogo variant="icon" height={40} className="preloader__mark" />
-          </motion.div>
-          <div className="preloader__bar">
-            <motion.span
-              className="preloader__fill"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 0.9, ease: EASE_WAVE }}
-            />
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div className="preloader">
+      <PixelResolveGrid progress={progress} className="preloader__grid" />
+      <span className="preloader__pct">{displayPercent}%</span>
+    </div>
   )
 }

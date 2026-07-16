@@ -853,14 +853,14 @@ footer { background: var(--surface-subtle); color: var(--pw-black); overflow-x: 
    PixellWave — motion primitives (preloader, scroll progress, split-text, marquee)
    =========================================================================== */
 
-.preloader {
-  position: fixed; inset: 0; z-index: var(--z-modal);
-  background: var(--pw-black); color: var(--pw-white);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem;
+.preloader { position: fixed; inset: 0; z-index: var(--z-modal); background: var(--pw-black); overflow: hidden; }
+.pixel-resolve-grid { position: absolute; inset: 0; display: grid; }
+.pixel-resolve-grid__tile { background: var(--pw-black); }
+.preloader__pct {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1;
+  font-family: var(--font-mono-accent); font-weight: 600; font-size: clamp(1.75rem, 3vw, 2.5rem);
+  color: var(--pw-white); letter-spacing: -0.02em;
 }
-.preloader__mark { filter: drop-shadow(0 0 24px rgba(255, 91, 0, 0.5)); }
-.preloader__bar { width: 120px; height: 2px; background: rgba(255, 255, 255, 0.14); overflow: hidden; }
-.preloader__fill { display: block; width: 100%; height: 100%; background: var(--pw-orange); transform-origin: 0% 50%; }
 
 .scroll-progress {
   position: fixed; top: 0; left: 0; right: 0; height: 3px;
