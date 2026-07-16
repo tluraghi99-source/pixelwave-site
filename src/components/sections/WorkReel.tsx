@@ -52,17 +52,21 @@ const BLACKOUT_OPACITY = [0, 1]
  *  than the heading's small settle-in-place rise. */
 const GALLERY_RISE_Y = ["100%", "0%"]
 const FADE_EASE = cubicBezier(...EASE_WAVE)
+/** How much of the carousel's own scroll budget (CAROUSEL_VH) the entrance
+ *  fade/rise itself consumes, once the video scrub is fully done. */
+const ENTRANCE_FADE_VH = 40
 
 // Pin-local scrollYProgress fractions where the video-scrub phase runs —
 // starts at 0 since the pin's local progress begins exactly at the handoff.
 const VIDEO_START_FRACTION = (VIDEO_START_GLOBAL - HERO_REVEAL_END) / PIN_SCROLL_VH
 const VIDEO_END_FRACTION = (VIDEO_END_GLOBAL - HERO_REVEAL_END) / PIN_SCROLL_VH
-/** Where, in pin scroll-progress terms, the fade/rise starts (i.e. video hits
- *  FADE_KEYFRAME_SECONDS[0]) — the carousel's own card-scroll starts here
- *  too, so it's already drifting as the block appears instead of waiting for
- *  the reveal to finish first. */
-const CAROUSEL_SCROLL_START =
-  VIDEO_START_FRACTION + (FADE_KEYFRAME_SECONDS[0] / VIDEO_DURATION) * (VIDEO_END_FRACTION - VIDEO_START_FRACTION)
+/** The content block (heading + gallery) only starts fading/rising in once
+ *  the video scrub is fully finished (scrollYProgress reaches
+ *  VIDEO_END_FRACTION) — not partway through the video's last second like
+ *  before — and the carousel's own card-scroll starts at that same instant,
+ *  so nothing about the carousel moves or appears until the video is done. */
+const CAROUSEL_SCROLL_START = VIDEO_END_FRACTION
+const ENTRANCE_END_FRACTION = VIDEO_END_FRACTION + (ENTRANCE_FADE_VH / 100) / PIN_SCROLL_VH
 
 /** Desktop: the video's iris opens as a fixed overlay sitting directly on the
  *  hero (scroll 0 → HERO_REVEAL_END, in exact lockstep with the hero mark's
@@ -92,11 +96,14 @@ function WorkReelPinned() {
 
   const videoProgress = useTransform(scrollYProgress, [VIDEO_START_FRACTION, VIDEO_END_FRACTION], [0, 1])
   const carouselProgress = useTransform(scrollYProgress, [CAROUSEL_SCROLL_START, 1], [0, 1])
-  const fadeKeyframes = FADE_KEYFRAME_SECONDS.map((s) => s / VIDEO_DURATION)
-  const contentOpacity = useTransform(videoProgress, fadeKeyframes, FADE_KEYFRAME_OPACITY, { ease: [FADE_EASE] })
-  const blackoutOpacity = useTransform(videoProgress, fadeKeyframes, BLACKOUT_OPACITY, { ease: [FADE_EASE] })
-  const headingY = useTransform(videoProgress, fadeKeyframes, HEADING_RISE_Y, { ease: [FADE_EASE] })
-  const galleryY = useTransform(videoProgress, fadeKeyframes, GALLERY_RISE_Y, { ease: [FADE_EASE] })
+  // Blackout still tracks the video's own last second (finishes exactly as
+  // the video scrub completes) — only the content block's own entrance
+  // (below) waits for that to be done before it starts.
+  const blackoutKeyframes = FADE_KEYFRAME_SECONDS.map((s) => s / VIDEO_DURATION)
+  const blackoutOpacity = useTransform(videoProgress, blackoutKeyframes, BLACKOUT_OPACITY, { ease: [FADE_EASE] })
+  const contentOpacity = useTransform(scrollYProgress, [VIDEO_END_FRACTION, ENTRANCE_END_FRACTION], FADE_KEYFRAME_OPACITY, { ease: [FADE_EASE] })
+  const headingY = useTransform(scrollYProgress, [VIDEO_END_FRACTION, ENTRANCE_END_FRACTION], HEADING_RISE_Y, { ease: [FADE_EASE] })
+  const galleryY = useTransform(scrollYProgress, [VIDEO_END_FRACTION, ENTRANCE_END_FRACTION], GALLERY_RISE_Y, { ease: [FADE_EASE] })
   const pointerEvents = useTransform(contentOpacity, (v) => (v > 0.05 ? "auto" : "none"))
 
   return (
