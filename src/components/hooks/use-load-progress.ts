@@ -69,11 +69,15 @@ export function useLoadProgress({
     function finish() {
       if (done) return
       done = true
-      clearInterval(nudgeInterval)
       clearTimeout(maxWaitTimer)
       const elapsed = performance.now() - mountTime
       const wait = Math.max(0, minDurationMs - elapsed)
       waitTimer = setTimeout(() => {
+        // Only stop nudging once the min-duration hold is actually over —
+        // clearing it as soon as loading finishes would freeze the number
+        // (and the grid) for the whole hold on the common cached-fonts
+        // path, where finish() runs before the first 150ms nudge tick.
+        clearInterval(nudgeInterval)
         rawTarget.set(100)
         // Wait for the spring's own value (what's actually visible,
         // driving the tile grid) to reach ~100, not just the instant its

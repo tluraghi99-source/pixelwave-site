@@ -43,7 +43,7 @@ export function Preloader({ onReveal }: PreloaderProps) {
 
   return (
     <div className="preloader">
-      <PixelResolveGrid progress={progress} className="preloader__grid" />
+      <PixelResolveGrid progress={progress} />
       <span className="preloader__pct">{displayPercent}%</span>
     </div>
   )
