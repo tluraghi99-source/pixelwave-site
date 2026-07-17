@@ -12,20 +12,27 @@ import { WorkHeading, WorkGallery, WorkAmbient } from "@/components/sections/Wor
 // the video-scrub and carousel phases live inside the pin's own local
 // scrollYProgress, which starts right where the overlay hands off.
 const VIDEO_VH = 250
-/** Pure hold on the video's last (already-black) frame — scroll passes
- *  through this whole span with nothing changing on screen, before the
- *  carousel starts to appear. */
-const BLACK_HOLD_VH = 150
+/** Pure hold on the video's last (still undimmed) frame — scroll passes
+ *  through this whole short span with nothing changing on screen, before
+ *  the black fade-in below starts. */
+const FROZEN_HOLD_VH = 30
+/** The black background's own fade-in — deliberately long and slow, scrubbed
+ *  1:1 with scroll rather than time. The carousel begins its own entrance at
+ *  80% through this span (see CAROUSEL_ENTRANCE_START_GLOBAL below), not at
+ *  its end, and keeps fading in on its own past that point. */
+const BLACK_FADE_VH = 200
+const CAROUSEL_START_FRACTION_OF_FADE = 0.8
 const CAROUSEL_VH = 220
-/** studio.mp4's actual duration (see video.duration, logged during dev). */
-const VIDEO_DURATION = 8.0833
 
 // Global scroll milestones (multiples of viewport height, same units as
 // HERO_REVEAL_START/END), working forward from the shared reveal window.
 const VIDEO_START_GLOBAL = HERO_REVEAL_END
 const VIDEO_END_GLOBAL = VIDEO_START_GLOBAL + VIDEO_VH / 100
-const HOLD_END_GLOBAL = VIDEO_END_GLOBAL + BLACK_HOLD_VH / 100
-const CAROUSEL_END_GLOBAL = HOLD_END_GLOBAL + CAROUSEL_VH / 100
+const FROZEN_HOLD_END_GLOBAL = VIDEO_END_GLOBAL + FROZEN_HOLD_VH / 100
+const BLACK_FADE_END_GLOBAL = FROZEN_HOLD_END_GLOBAL + BLACK_FADE_VH / 100
+const CAROUSEL_ENTRANCE_START_GLOBAL =
+  FROZEN_HOLD_END_GLOBAL + (BLACK_FADE_VH * CAROUSEL_START_FRACTION_OF_FADE) / 100
+const CAROUSEL_END_GLOBAL = CAROUSEL_ENTRANCE_START_GLOBAL + CAROUSEL_VH / 100
 /** The pin starts sticking at HERO_REVEAL_END — exactly where the fixed
  *  reveal overlay finishes opening and hands off — and has to run through
  *  CAROUSEL_END_GLOBAL — its CSS height is that spread of extra scroll, plus
@@ -41,38 +48,38 @@ const PIN_SCROLL_VH = PIN_HEIGHT_VH / 100 - 1
  *  so all three land together instead of merely "around the same time." */
 const REVEAL_CLIP_START = "inset(45% 42% 45% 42%)"
 const REVEAL_CLIP_END = "inset(0% 0% 0% 0%)"
-/** Reveal checkpoints, keyed to the video's own timestamp: 0% at 7.2s, 100%
- *  at 8s — same window, same ease, for every layer below, so the whole
- *  reveal stays scrubbed 1:1 with scroll instead of running on its own timer,
- *  matching how the video itself is driven. */
-const FADE_KEYFRAME_SECONDS = [7.2, 8]
-const FADE_KEYFRAME_OPACITY = [0, 1]
 /** Heading settles in place (small rise), same as before. */
-const HEADING_RISE_Y = [48, 0]
-/** The video's own last frame is a dim, lit studio interior, not black — this
- *  is what actually gets the screen to "almost black" as the scrub finishes;
- *  the gallery then makes its entrance against that black, not the footage. */
-const BLACKOUT_OPACITY = [0, 1]
-/** Gallery makes a full screen-height entrance from off-screen below, rather
- *  than the heading's small settle-in-place rise. */
-const GALLERY_RISE_Y = ["100%", "0%"]
+const HEADING_RISE_START = 48
+const HEADING_RISE_END = 0
 const FADE_EASE = cubicBezier(...EASE_WAVE)
 /** How much of the carousel's own scroll budget (CAROUSEL_VH) the entrance
  *  fade/rise itself consumes, once the video scrub is fully done. */
 const ENTRANCE_FADE_VH = 40
 
+/** Clamped 0→1 local progress of v within [start, end]. */
+function clampedProgress(v: number, start: number, end: number) {
+  if (end <= start) return v >= end ? 1 : 0
+  return Math.min(1, Math.max(0, (v - start) / (end - start)))
+}
+function lerp(from: number, to: number, t: number) {
+  return from + (to - from) * t
+}
+
 // Pin-local scrollYProgress fractions where the video-scrub phase runs —
 // starts at 0 since the pin's local progress begins exactly at the handoff.
 const VIDEO_START_FRACTION = (VIDEO_START_GLOBAL - HERO_REVEAL_END) / PIN_SCROLL_VH
 const VIDEO_END_FRACTION = (VIDEO_END_GLOBAL - HERO_REVEAL_END) / PIN_SCROLL_VH
-/** Where the black-hold span ends and the content block is allowed to start
- *  fading/rising in — BLACK_HOLD_VH of pure scroll after the video finishes,
- *  during which nothing on screen changes. The carousel's own card-scroll
- *  starts at that same instant, so nothing about the carousel moves or
- *  appears until the hold is over. */
-const HOLD_END_FRACTION = (HOLD_END_GLOBAL - HERO_REVEAL_END) / PIN_SCROLL_VH
-const CAROUSEL_SCROLL_START = HOLD_END_FRACTION
-const ENTRANCE_END_FRACTION = HOLD_END_FRACTION + (ENTRANCE_FADE_VH / 100) / PIN_SCROLL_VH
+/** Where the frozen hold ends and the black fade-in starts — the video's
+ *  last frame stays fixed and undimmed for this whole span. */
+const FROZEN_HOLD_END_FRACTION = (FROZEN_HOLD_END_GLOBAL - HERO_REVEAL_END) / PIN_SCROLL_VH
+/** Where the black fade-in itself finishes (opacity reaches 1). The carousel
+ *  starts before this point (see CAROUSEL_SCROLL_START), not at it. */
+const BLACK_FADE_END_FRACTION = (BLACK_FADE_END_GLOBAL - HERO_REVEAL_END) / PIN_SCROLL_VH
+/** The carousel's own entrance starts once the black fade-in is 80% of the
+ *  way through — it keeps fading/rising in on its own past that point,
+ *  independent of when the blackout itself finishes. */
+const CAROUSEL_SCROLL_START = (CAROUSEL_ENTRANCE_START_GLOBAL - HERO_REVEAL_END) / PIN_SCROLL_VH
+const ENTRANCE_END_FRACTION = CAROUSEL_SCROLL_START + (ENTRANCE_FADE_VH / 100) / PIN_SCROLL_VH
 
 /** Desktop: the video's iris opens as a fixed overlay sitting directly on the
  *  hero (scroll 0 → HERO_REVEAL_END, in exact lockstep with the hero mark's
@@ -102,14 +109,30 @@ function WorkReelPinned() {
 
   const videoProgress = useTransform(scrollYProgress, [VIDEO_START_FRACTION, VIDEO_END_FRACTION], [0, 1])
   const carouselProgress = useTransform(scrollYProgress, [CAROUSEL_SCROLL_START, 1], [0, 1])
-  // Blackout still tracks the video's own last second (finishes exactly as
-  // the video scrub completes) — only the content block's own entrance
-  // (below) waits for that to be done before it starts.
-  const blackoutKeyframes = FADE_KEYFRAME_SECONDS.map((s) => s / VIDEO_DURATION)
-  const blackoutOpacity = useTransform(videoProgress, blackoutKeyframes, BLACKOUT_OPACITY, { ease: [FADE_EASE] })
-  const contentOpacity = useTransform(scrollYProgress, [HOLD_END_FRACTION, ENTRANCE_END_FRACTION], FADE_KEYFRAME_OPACITY, { ease: [FADE_EASE] })
-  const headingY = useTransform(scrollYProgress, [HOLD_END_FRACTION, ENTRANCE_END_FRACTION], HEADING_RISE_Y, { ease: [FADE_EASE] })
-  const galleryY = useTransform(scrollYProgress, [HOLD_END_FRACTION, ENTRANCE_END_FRACTION], GALLERY_RISE_Y, { ease: [FADE_EASE] })
+  // Frozen hold (video-end → FROZEN_HOLD_END_FRACTION): blackout stays at 0,
+  // clamped by useTransform below its input range — the video's last frame
+  // reads undimmed. The black fade-in itself then runs, scroll-linked, over
+  // FROZEN_HOLD_END_FRACTION → BLACK_FADE_END_FRACTION.
+  // Callback-form transforms with a manually-clamped lerp, not array-range
+  // useTransform — array ranges have an established v12 bug in this codebase
+  // where overlapping active domains fed to a shared/adjacent transform on
+  // the same scrollYProgress produce a corrupted (decaying) DOM-rendered
+  // value despite the underlying MotionValue reading correctly, once one
+  // transform's active span overlaps another's (as blackout's and the
+  // content entrance's now deliberately do, by spec). Callback form sidesteps
+  // it entirely by doing the interpolation in plain JS.
+  const blackoutOpacity = useTransform(scrollYProgress, (v) =>
+    FADE_EASE(clampedProgress(v, FROZEN_HOLD_END_FRACTION, BLACK_FADE_END_FRACTION))
+  )
+  const contentOpacity = useTransform(scrollYProgress, (v) =>
+    FADE_EASE(clampedProgress(v, CAROUSEL_SCROLL_START, ENTRANCE_END_FRACTION))
+  )
+  const headingY = useTransform(scrollYProgress, (v) =>
+    lerp(HEADING_RISE_START, HEADING_RISE_END, FADE_EASE(clampedProgress(v, CAROUSEL_SCROLL_START, ENTRANCE_END_FRACTION)))
+  )
+  const galleryY = useTransform(scrollYProgress, (v) =>
+    `${lerp(100, 0, FADE_EASE(clampedProgress(v, CAROUSEL_SCROLL_START, ENTRANCE_END_FRACTION)))}%`
+  )
   const pointerEvents = useTransform(contentOpacity, (v) => (v > 0.05 ? "auto" : "none"))
 
   return (
