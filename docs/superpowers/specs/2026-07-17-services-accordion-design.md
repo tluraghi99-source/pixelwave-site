@@ -73,13 +73,17 @@ scrubbed), not just a restyle.
     - No background-wash/highlight effect on the row itself — tried and explicitly
       rejected during mockup iteration.
 11. **Data shape changes** (`src/data/services.ts`): `SERVICES` currently has
-    `{ num, name, tags: string[] }`. This becomes `{ num, name, desc: string,
-    tagCols: string[][], image: string }` — `desc` is a short (1–2 sentence)
-    description per service, `tagCols` groups the existing tags into 2 columns
-    (splitting today's 2-tag lists roughly in half, one tag per column, matching
-    the mockup), `image` is a placeholder photo URL. Real copy for `desc` is
-    drafted below (placeholder, swap for real copy when available — same posture
-    as `Work.tsx`'s placeholder project descriptions).
+    `{ num, name, tags: string[] }`. The `tags` field is replaced with `desc:
+    string` and `tagCols: string[][]` — `desc` is a short (1–2 sentence)
+    description per service; `tagCols` is 2 columns of 2 tags each (4 tags total
+    per service — expanded from today's 2-tag lists with one additional invented
+    tag per column, matching the mockup and the copy table below, not a literal
+    split of the existing 2 tags). The placeholder `image` URL is **not** stored
+    in `services.ts` — it's derived at the call site in `Services.tsx`, mirroring
+    `Work.tsx`'s existing `GALLERY_ITEMS = WORK.map(...)` pattern, so the data file
+    stays free of presentational placeholder URLs. Real copy for `desc`/`tagCols`
+    is drafted below (placeholder, swap for real copy when available — same
+    posture as `Work.tsx`'s placeholder project descriptions).
 12. **Placeholder imagery**, matching the existing convention in `Work.tsx`
     (`https://picsum.photos/seed/pixellwave-{id}/1200/900?grayscale`, explicitly
     commented as "Temporary stand-in photography… until real project imagery is
