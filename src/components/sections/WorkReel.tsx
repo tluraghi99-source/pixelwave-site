@@ -23,6 +23,10 @@ const FROZEN_HOLD_VH = 30
 const BLACK_FADE_VH = 200
 const CAROUSEL_START_FRACTION_OF_FADE = 0.8
 const CAROUSEL_VH = 220
+/** The blackout never goes fully opaque — it settles at a dimmed 60%, so the
+ *  video's last frame stays faintly visible underneath rather than reading
+ *  as pure black. */
+const BLACKOUT_MAX_OPACITY = 0.6
 
 // Global scroll milestones (multiples of viewport height, same units as
 // HERO_REVEAL_START/END), working forward from the shared reveal window.
@@ -122,7 +126,7 @@ function WorkReelPinned() {
   // content entrance's now deliberately do, by spec). Callback form sidesteps
   // it entirely by doing the interpolation in plain JS.
   const blackoutOpacity = useTransform(scrollYProgress, (v) =>
-    FADE_EASE(clampedProgress(v, FROZEN_HOLD_END_FRACTION, BLACK_FADE_END_FRACTION))
+    lerp(0, BLACKOUT_MAX_OPACITY, FADE_EASE(clampedProgress(v, FROZEN_HOLD_END_FRACTION, BLACK_FADE_END_FRACTION)))
   )
   const contentOpacity = useTransform(scrollYProgress, (v) =>
     FADE_EASE(clampedProgress(v, CAROUSEL_SCROLL_START, ENTRANCE_END_FRACTION))
