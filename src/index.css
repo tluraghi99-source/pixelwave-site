@@ -788,7 +788,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   padding: 0 0 2.5rem 4rem;
   opacity: 0;
   transform: translateY(10px);
-  transition: opacity 0.35s ease 0.05s, transform 0.35s ease 0.05s;
+  transition: opacity 0.35s var(--ease-wave) 0.05s, transform 0.35s var(--ease-wave) 0.05s;
 }
 .svc-row--open .svc-row__content { opacity: 1; transform: translateY(0); }
 
@@ -806,7 +806,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .svc-row__tags .pw-tag {
   opacity: 0;
   transform: translateY(6px);
-  transition: opacity 0.35s ease, transform 0.35s ease;
+  transition: opacity 0.35s var(--ease-wave), transform 0.35s var(--ease-wave);
 }
 .svc-row--open .svc-row__tags .pw-tag { opacity: 1; transform: translateY(0); }
 
