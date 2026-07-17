@@ -77,15 +77,6 @@ function ServicesPinned() {
           <Reveal>
             <SectionLabel number="03">Services</SectionLabel>
           </Reveal>
-          <Reveal delay={0.1}>
-            <p className="lead">What we make.</p>
-          </Reveal>
-          <Reveal delay={0.18}>
-            <p className="secbody">
-              Six disciplines, one studio. We move between them so the work stays coherent end to
-              end.
-            </p>
-          </Reveal>
           <div className="svc mt-12">
             {SERVICES.map((s, i) => (
               <ServiceRow
@@ -112,15 +103,6 @@ function ServicesAmbient() {
       <div className="wrap">
         <Reveal>
           <SectionLabel number="03">Services</SectionLabel>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <p className="lead">What we make.</p>
-        </Reveal>
-        <Reveal delay={0.18}>
-          <p className="secbody">
-            Six disciplines, one studio. We move between them so the work stays coherent end to
-            end.
-          </p>
         </Reveal>
         <RevealGroup className="svc mt-12" stagger={0.1}>
           {SERVICES.map((s) => (
