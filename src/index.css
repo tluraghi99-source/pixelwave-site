@@ -680,12 +680,12 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
    earlier, as a fixed overlay directly on the hero, not in here — see
    reel__reveal-overlay below) — scrubs the video to its last frame, holds it
    there undimmed through a short frozen pause, fades a black background in
-   slowly (scroll-linked), then the carousel starts fading in at 80% through
-   that black fade and keeps scrolling on top (WorkReel.tsx); 760vh =
+   slowly (scroll-linked), then the carousel starts fading in at 65% through
+   that black fade and keeps scrolling on top (WorkReel.tsx); 730vh =
    PIN_HEIGHT_VH there, kept in sync by hand. No background here — while
    .reel__inner is still hidden (pre-handoff) the fixed hero/overlay need to
    show through. */
-.reel { position: relative; height: 760vh; }
+.reel { position: relative; height: 730vh; }
 .reel__inner { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 /* Fixed reveal overlay — sits directly on the hero (not part of .reel's own
    document flow), so the video's iris opens in place from the very first

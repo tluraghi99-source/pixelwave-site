@@ -18,10 +18,10 @@ const VIDEO_VH = 250
 const FROZEN_HOLD_VH = 30
 /** The black background's own fade-in — deliberately long and slow, scrubbed
  *  1:1 with scroll rather than time. The carousel begins its own entrance at
- *  80% through this span (see CAROUSEL_ENTRANCE_START_GLOBAL below), not at
+ *  65% through this span (see CAROUSEL_ENTRANCE_START_GLOBAL below), not at
  *  its end, and keeps fading in on its own past that point. */
 const BLACK_FADE_VH = 200
-const CAROUSEL_START_FRACTION_OF_FADE = 0.8
+const CAROUSEL_START_FRACTION_OF_FADE = 0.65
 const CAROUSEL_VH = 220
 /** The blackout never goes fully opaque — it settles at a dimmed 60%, so the
  *  video's last frame stays faintly visible underneath rather than reading
