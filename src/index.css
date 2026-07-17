@@ -720,41 +720,117 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 }
 .gallery-caption__tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
-/* Desktop Services — pinned, like .reel: scroll scrubs each row's reveal in
-   sequence before the section releases (WorkReel.tsx follows the same shape). */
-.svc-pin { position: relative; }
-/* Flex items shrink-to-fit their content by default in the main axis — without
-   this, .wrap (a normal block everywhere else on the site) stops spanning the
-   full page width the moment it becomes a flex child here. */
-.svc-pin__inner {
-  position: sticky; top: 0; height: 100svh; overflow: hidden;
-  display: flex; align-items: center;
-  padding-block: clamp(2.5rem, 5vw, 5rem);
-}
-.svc-pin__inner > .wrap { width: 100%; }
+/* Services accordion — plain in-flow list, no scroll-pin. Rows expand on
+   hover (desktop) or tap (touch), one open at a time (Services.tsx owns the
+   open/close state; this is purely the `.svc-row--open` visual state). */
+.svc-list { border-top: 1px solid var(--border-subtle); }
 
-.svc { border-top: 1px solid var(--border-subtle); }
-.svc__row {
-  position: relative; overflow: hidden;
-  padding: 1.1rem 0; border-bottom: 1px solid var(--border-subtle);
-  transition: padding-left .3s var(--ease-wave);
+.svc-row {
+  border-bottom: 1px solid var(--border-subtle);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
-.svc__row:hover { padding-left: 1.25rem; }
-.svc__swatch {
-  position: absolute; inset: 0; z-index: 0;
-  background: linear-gradient(100deg, var(--pw-orange), var(--pw-cyan));
-  transform: scaleX(0); transform-origin: left;
+
+.svc-row__head {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1.25rem 0;
+}
+/* Number and name are one visual unit — same size/weight/color, not a small
+   muted index next to a big name. */
+.svc-row__num,
+.svc-row__name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  font-size: clamp(3rem, 6.5vw, 6.25rem);
+  transition: color var(--dur-slow) var(--ease-wave), transform var(--dur-slow) var(--ease-wave);
+}
+.svc-row__num { flex-shrink: 0; }
+.svc-row__name { flex: 1; }
+.svc-row--open .svc-row__num,
+.svc-row--open .svc-row__name { color: var(--pw-orange); transform: translateX(10px); }
+
+.svc-row__plus {
+  width: 28px; height: 28px;
+  flex-shrink: 0;
+  align-self: center;
+  position: relative;
   transition: transform var(--dur-slow) var(--ease-wave);
 }
-.svc__row:hover .svc__swatch { transform: scaleX(1); }
-.svc__top { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: baseline; }
-.svc__name { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.75rem, 2vw, 3.5rem); letter-spacing: -0.02em; transition: color var(--dur-base) var(--ease-wave); }
-.svc__row:hover .svc__name { color: var(--pw-black); }
-.svc__num { font-family: var(--font-mono-accent); font-size: 0.72rem; letter-spacing: 0.08em; color: var(--pw-orange); transition: color var(--dur-base) var(--ease-wave); }
-.svc__row:hover .svc__num { color: var(--pw-black); }
-.svc__tags { position: relative; z-index: 1; display: flex; gap: 1rem; flex-wrap: wrap; margin-top: .6rem; }
-.svc__row:hover .svc__tags .pw-tag { color: var(--pw-black); border-color: var(--pw-black); }
+.svc-row--open .svc-row__plus { transform: rotate(135deg); }
+.svc-row__plus::before,
+.svc-row__plus::after {
+  content: "";
+  position: absolute;
+  background: var(--pw-orange);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+.svc-row__plus::before { width: 16px; height: 2px; }
+.svc-row__plus::after { width: 2px; height: 16px; }
+
+/* grid-template-rows 0fr -> 1fr trick: animates height without measuring it. */
+.svc-row__body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s var(--ease-wave);
+}
+.svc-row--open .svc-row__body { grid-template-rows: 1fr; }
+.svc-row__body-inner { overflow: hidden; }
+
+.svc-row__content {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 2.5rem;
+  padding: 0 0 2.5rem 4rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.35s ease 0.05s, transform 0.35s ease 0.05s;
+}
+.svc-row--open .svc-row__content { opacity: 1; transform: translateY(0); }
+
+.svc-row__desc {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 44ch;
+  margin: 0 0 1.5rem;
+}
+.svc-row__tags { display: flex; gap: 2.5rem; }
+.svc-row__tag-col { display: flex; flex-direction: column; gap: 0.6rem; }
+/* Scoped to this component's own tag pills only — must not affect .pw-tag
+   anywhere else on the site. */
+.svc-row__tags .pw-tag {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.svc-row--open .svc-row__tags .pw-tag { opacity: 1; transform: translateY(0); }
+
+.svc-row__image {
+  border-radius: 4px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: var(--pw-neutral-10);
+  width: 280px;
+}
+.svc-row__image img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: grayscale(1);
+  display: block;
+  transform: scale(1.12);
+  transition: transform 0.6s var(--ease-wave);
+}
+.svc-row--open .svc-row__image img { transform: scale(1); }
+
+@media (max-width: 860px) {
+  .svc-row__content { grid-template-columns: 1fr; padding-left: 0; }
+  .svc-row__image { width: 100%; max-width: 280px; }
+}
 
 /* /contact — a single, non-scrolling full-viewport screen on desktop (the
    header floats transparently over it, same as the homepage hero); mobile
