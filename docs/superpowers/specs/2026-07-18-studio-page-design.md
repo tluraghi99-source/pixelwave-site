@@ -22,6 +22,10 @@ team photo-cards, and a two-floor wireframe floor plan navigated by scrolling.
   alongside `/work` and `/contact`. Ends in `<Footer />`, matching `WorkPage`'s
   shape (not `ContactPage`'s single-locked-viewport shape, since this page has
   real scrollable content).
+- **Dark theme throughout** (`data-theme="dark"`, `background: var(--pw-black)`),
+  matching the wireframe (black background, white text, grayscale photography)
+  and `ContactPage`'s existing dark-page pattern — not `WorkPage`'s default light
+  background.
 - Header nav updated in both places "Studio" appears — the top-bar `links` array
   and the full-panel `MENU_COLUMNS` entry (`src/components/sections/Header.tsx`)
   — from `href: "#studio"` to `href: "/studio"`.
