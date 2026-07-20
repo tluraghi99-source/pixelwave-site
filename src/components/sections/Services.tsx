@@ -76,7 +76,7 @@ export function Services() {
       <div className="grain-overlay" aria-hidden="true" />
       <div className="wrap">
         <Reveal>
-          <SectionLabel number="03">Services</SectionLabel>
+          <SectionLabel number="02">Services</SectionLabel>
         </Reveal>
         <div
           className="svc-list mt-12"

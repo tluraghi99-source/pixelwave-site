@@ -14,7 +14,7 @@ import { PROJECTS } from "@/data/work"
 const links = [
   { label: "Work", href: "/work" },
   { label: "Services", href: "#services" },
-  { label: "Studio", href: "#studio" },
+  { label: "Studio", href: "/studio" },
 ]
 
 // Desktop-only full menu panel — columns mirror the top-level nav, filled
@@ -33,7 +33,7 @@ const MENU_COLUMNS = [
   },
   {
     label: "Studio",
-    href: "#studio",
+    href: "/studio",
     links: [] as { label: string; href: string }[],
   },
   {

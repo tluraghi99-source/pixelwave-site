@@ -590,31 +590,17 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .ticker__dot { width: clamp(10px, 0.6vw, 16px); height: clamp(10px, 0.6vw, 16px); border-radius: 50%; background: var(--pw-neutral-80); }
 .ticker__dot--orange { background: var(--pw-orange); }
 
-/* studio */
-.studio__grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: clamp(2.5rem, 2.2vw, 6rem); align-items: start; }
-@media (max-width: 900px){ .studio__grid { grid-template-columns: 1fr; gap: 2.5rem; } }
-.studio__statement {
-  font-family: var(--font-display); font-weight: 500; font-size: clamp(1.5rem, 0.94vw, 3rem);
-  line-height: 1.3; letter-spacing: -0.01em; color: var(--text-primary); margin: 1.5rem 0 0; text-wrap: balance;
-}
-.accent-orange { color: var(--pw-orange); }
-.accent-cyan { color: #008B8B; }
-.studio__stats { display: flex; flex-direction: column; align-self: stretch; }
-.stat { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; padding: 1.1rem 0; border-bottom: 1px solid var(--border-subtle); }
-.studio__stats > .stat:first-child { border-top: 1px solid var(--border-subtle); }
-.stat__label { font-family: var(--font-mono-accent); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); }
-.stat__num { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.5rem, 1.2vw, 2.25rem); letter-spacing: -0.02em; color: var(--pw-orange); }
+/* Studio page (src/pages/StudioPage.tsx) — dark throughout. */
+.studio-page { background: var(--pw-black); }
 
-/* Desktop scroll-scrubbed variant only (StudioScrubbed in Studio.tsx) — the
-   static border-bottom/top rules above are replaced by an animated
-   .stat__rule that draws in as scroll passes through the section, instead
-   of always being fully visible. The mobile/tablet ambient variant never
-   adds these modifier classes, so it keeps the plain static rules above. */
-.stat--scrubbed { position: relative; border-bottom: none; overflow: hidden; }
-.studio__stats > .stat--scrubbed:first-child { border-top: none; }
-.studio__stats--scrubbed { position: relative; }
-.studio__stats--scrubbed::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: var(--border-subtle); }
-.stat__rule { position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--border-subtle); transform-origin: left; }
+.studio-intro { padding-top: clamp(6rem, 9vw, 8rem); padding-bottom: clamp(2rem, 4vw, 3rem); }
+.studio-intro__line {
+  font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em;
+  font-size: clamp(1.75rem, 4vw, 3.5rem); line-height: 1.15; margin: 0;
+}
+.studio-intro__line--bright { color: var(--pw-white); }
+.studio-intro__line--mid { color: var(--pw-neutral-70); }
+.studio-intro__line--dim { color: var(--pw-neutral-50); }
 
 .lead { font-family: var(--font-display); font-weight: 600; font-size: clamp(2rem, 1.6vw, 4.5rem); line-height: 1.05; letter-spacing: -0.02em; margin: 1.25rem 0 0; text-wrap: balance; }
 .secbody { font-size: 1.125rem; line-height: 1.5; color: var(--text-secondary); max-width: 52ch; margin: 1.25rem 0 0; }
