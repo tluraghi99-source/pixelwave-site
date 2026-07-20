@@ -596,7 +596,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .studio-intro { padding-top: clamp(6rem, 9vw, 8rem); padding-bottom: clamp(2rem, 4vw, 3rem); }
 .studio-intro__line {
   font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em;
-  font-size: clamp(3rem, 7vw, 6.5rem); line-height: 1.1; margin: 0;
+  font-size: clamp(6rem, 14vw, 13rem); line-height: 1.05; margin: 0;
 }
 .studio-intro__line--bright { color: var(--pw-white); }
 .studio-intro__line--mid { color: var(--pw-neutral-70); }
