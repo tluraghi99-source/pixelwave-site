@@ -60,6 +60,7 @@ function StudioIntroScrubbed() {
   return (
     <section className="studio-intro" data-theme="dark" data-screen-label="Studio Intro" ref={sectionRef}>
       <div className="grain-overlay" aria-hidden="true" />
+      <div className="studio-intro__hero" aria-hidden="true" />
       <div className="wrap">
         {/* First line is always visible, unanimated — the section sits at the
             very top of the page with no scroll runway before it, so scrubbing
@@ -86,6 +87,7 @@ function StudioIntroAmbient() {
   return (
     <section className="studio-intro" data-theme="dark" data-screen-label="Studio Intro">
       <div className="grain-overlay" aria-hidden="true" />
+      <div className="studio-intro__hero" aria-hidden="true" />
       <RevealGroup className="wrap" stagger={0.08}>
         {INTRO_LINES.map((line) => (
           <RevealItem key={line.text}>

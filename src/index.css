@@ -593,7 +593,10 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 /* Studio page (src/pages/StudioPage.tsx) — dark throughout. */
 .studio-page { background: var(--pw-black); }
 
-.studio-intro { padding-top: clamp(6rem, 9vw, 8rem); padding-bottom: clamp(2rem, 4vw, 3rem); }
+.studio-intro { padding-bottom: clamp(2rem, 4vw, 3rem); }
+/* Same role as WorkPage's .work-hero: an empty spacer pushing the real
+   content down to start at the vertical midpoint of the viewport. */
+.studio-intro__hero { height: 50svh; }
 .studio-intro__line {
   font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em;
   font-size: clamp(6rem, 14vw, 13rem); line-height: 1.05; margin: 0;
