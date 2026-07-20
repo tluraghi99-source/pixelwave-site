@@ -61,8 +61,19 @@ function StudioIntroScrubbed() {
     <section className="studio-intro" data-theme="dark" data-screen-label="Studio Intro" ref={sectionRef}>
       <div className="grain-overlay" aria-hidden="true" />
       <div className="wrap">
-        {INTRO_LINES.map((line, i) => (
-          <IntroLine key={line.text} line={line} index={i} total={INTRO_LINES.length} progress={scrollYProgress} />
+        {/* First line is always visible, unanimated — the section sits at the
+            very top of the page with no scroll runway before it, so scrubbing
+            it in too would leave the page reading as blank until the user
+            scrolls. The remaining lines still scrub in as before. */}
+        <p className={`studio-intro__line studio-intro__line--${INTRO_LINES[0].tone}`}>{INTRO_LINES[0].text}</p>
+        {INTRO_LINES.slice(1).map((line, i) => (
+          <IntroLine
+            key={line.text}
+            line={line}
+            index={i}
+            total={INTRO_LINES.length - 1}
+            progress={scrollYProgress}
+          />
         ))}
       </div>
     </section>
