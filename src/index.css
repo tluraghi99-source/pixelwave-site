@@ -648,7 +648,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   background: var(--pw-black);
   display: flex; align-items: center;
 }
-.floor-plan { position: relative; width: 100%; min-height: 60vh; padding-block: clamp(2.5rem, 5vw, 5rem); }
+.floor-plan { position: relative; width: 100%; min-height: 66vh; padding-block: clamp(2.5rem, 5vw, 5rem); }
 .floor-plan__layer {
   position: absolute; inset: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem;
@@ -657,7 +657,11 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   font-family: var(--font-mono-accent); font-size: 0.8rem;
   text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary);
 }
-.floor-plan__svg { width: 100%; max-width: 700px; height: auto; }
+/* flex-shrink: 0 matters here — .floor-plan__layer is a flex column with a
+   fixed-height box (the pinned viewport), so without it the flex algorithm
+   would compress the svg's height alone to fit, warping the isometric
+   shapes instead of just scaling them down. */
+.floor-plan__svg { width: 100%; max-width: clamp(700px, 58vw, 1050px); height: auto; flex-shrink: 0; }
 
 .floor-block__top { fill: var(--pw-neutral-10); stroke: var(--pw-white); stroke-width: 1; }
 .floor-block__top--accent { fill: var(--pw-orange); }
