@@ -125,8 +125,19 @@ export function Header() {
   // dependency) unless a scroll happens to fire in between. Keyed on the full
   // pathname instead so it re-samples on every route change.
   useLayoutEffect(() => {
-    const behind = document.elementFromPoint(window.innerWidth / 2, 90)
-    setOnDark(!!behind?.closest('[data-theme="dark"]'))
+    const sample = () => {
+      const behind = document.elementFromPoint(window.innerWidth / 2, 90)
+      setOnDark(!!behind?.closest('[data-theme="dark"]'))
+    }
+    sample()
+    // A link clicked from inside the full-panel menu navigates almost
+    // immediately, but the panel itself (data-theme="dark") takes 0.5s to
+    // exit-animate away — if it's still covering the sample point right now,
+    // this first read is a false positive that would otherwise stick until
+    // the next scroll. Re-sample once the exit transition has definitely
+    // finished to correct for that.
+    const t = setTimeout(sample, 550)
+    return () => clearTimeout(t)
   }, [pathname])
 
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -154,9 +165,20 @@ export function Header() {
     >
       <div className="wrap nav__inner">
         <a href={isHome ? "#top" : "/"} aria-label="PixellWave home">
-          <motion.span style={{ opacity: isHome ? heroLogoOpacity : 1, display: "inline-block" }}>
-            <BrandLogo height={26} invert={onDark || open} />
-          </motion.span>
+          {/* Separate elements rather than one swapping opacity between a
+              MotionValue (home) and a plain number (elsewhere) — framer-motion
+              doesn't reliably pick up that type change on the same element,
+              so the logo could get stuck at the home page's last hero-crossfade
+              opacity after navigating away. */}
+          {isHome ? (
+            <motion.span style={{ opacity: heroLogoOpacity, display: "inline-block" }}>
+              <BrandLogo height={26} invert={onDark || open} />
+            </motion.span>
+          ) : (
+            <span style={{ display: "inline-block" }}>
+              <BrandLogo height={26} invert={onDark || open} />
+            </span>
+          )}
         </a>
 
         <InteractiveHoverButton
