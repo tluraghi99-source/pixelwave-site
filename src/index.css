@@ -622,7 +622,13 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 }
 .team-card__photo--base { opacity: 1; }
 .team-card__photo--hover { opacity: 0; }
-.team-card:hover .team-card__photo--hover { opacity: 1; }
+/* Gated to real hover pointers only — on touch, a tap sets a sticky :hover
+   state that would otherwise swap the photo and hold it until tapped
+   elsewhere, which is exactly the tap-toggle behavior this decorative
+   flourish is meant to skip (see Services.tsx's own (hover: hover) gate). */
+@media (hover: hover) {
+  .team-card:hover .team-card__photo--hover { opacity: 1; }
+}
 .team-card__body { padding-top: 0.75rem; display: flex; flex-direction: column; gap: 0.15rem; }
 .team-card__name { font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: var(--pw-white); }
 .team-card__role {
