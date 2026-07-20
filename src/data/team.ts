@@ -1,0 +1,16 @@
+export const TEAM = [
+  { id: "t01", name: "Mara Lindqvist", role: "Founder & Creative Director" },
+  { id: "t02", name: "Theo Castellano", role: "Head of Design" },
+  { id: "t03", name: "Priya Nandakumar", role: "Senior Product Designer" },
+  { id: "t04", name: "Owen Fairweather", role: "UX Designer" },
+  { id: "t05", name: "Ines Duarte", role: "Brand Designer" },
+  { id: "t06", name: "Kai Sørensen", role: "Motion Designer" },
+  { id: "t07", name: "Marcus Ade", role: "Lead Developer" },
+  { id: "t08", name: "Lena Vogt", role: "Front-end Developer" },
+  { id: "t09", name: "Diego Marín", role: "Front-end Developer" },
+  { id: "t10", name: "Sasha Petrova", role: "Backend Developer" },
+  { id: "t11", name: "Noor El-Amin", role: "Photographer" },
+  { id: "t12", name: "Jonas Reyes", role: "Video Editor" },
+  { id: "t13", name: "Freya Lindgren", role: "Project Manager" },
+  { id: "t14", name: "Tomás Silveira", role: "Studio Manager" },
+]
