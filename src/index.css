@@ -503,7 +503,7 @@ header.nav {
 }
 /* When the full menu panel is open, the top bar merges into the same solid
    block so the trigger/logo stay legible regardless of what's behind them. */
-header.nav.nav--open { background: var(--pw-black); }
+header.nav.nav--open { background: var(--pw-orange); }
 .nav__inner { display: flex; align-items: center; justify-content: space-between; height: 76px; }
 .nav__links { display: flex; gap: 2.25rem; align-items: center; }
 .nav__link {
@@ -523,8 +523,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .nav__panel {
   position: fixed; top: 76px; left: 0; right: 0;
   transform-origin: 50% 0%;
-  background: var(--pw-black);
-  border-top: 1px solid rgba(255,255,255,0.08);
+  background: var(--pw-orange);
   padding-block: clamp(1.75rem, 2.5vw, 3rem);
   display: none;
 }
@@ -538,13 +537,13 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 }
 .nav__panel-col { display: flex; flex-direction: column; gap: 1.1rem; }
 .nav__panel-heading {
-  font-size: clamp(1.4rem, 1.8vw, 2.1rem); font-weight: 500; color: var(--pw-white);
+  font-size: clamp(1.4rem, 1.8vw, 2.1rem); font-weight: 500; color: var(--pw-black);
   transition: color .2s var(--ease-wave);
 }
-.nav__panel-heading:hover { color: var(--pw-cyan); }
+.nav__panel-heading:hover { color: var(--pw-white); }
 .nav__panel-sublinks { display: flex; flex-direction: column; gap: 0.65rem; }
-.nav__panel-sublink { font-size: 14px; color: rgba(255,255,255,0.5); transition: color .2s var(--ease-wave); }
-.nav__panel-sublink:hover { color: var(--pw-white); }
+.nav__panel-sublink { font-size: 14px; color: rgba(0,0,0,0.55); transition: color .2s var(--ease-wave); }
+.nav__panel-sublink:hover { color: var(--pw-black); }
 
 .hero {
   position: fixed; top: 0; left: 0; right: 0; height: 100svh; overflow: hidden;
@@ -1015,6 +1014,10 @@ footer { background: var(--surface-subtle); color: var(--pw-black); overflow-x: 
   width: 12px; height: 12px; border-radius: 50%;
   background: var(--pw-orange); pointer-events: none; z-index: var(--z-toast);
 }
+/* The orange nav panel would otherwise swallow the orange cursor dot
+   entirely — flagged via a class on <html> since Header (which owns the
+   open state) isn't an ancestor of CustomCursor's dot in the DOM. */
+html.nav-open .cursor-dot { background: var(--pw-black); }
 
 .grain-overlay {
   position: absolute; inset: 0; z-index: 5; pointer-events: none;

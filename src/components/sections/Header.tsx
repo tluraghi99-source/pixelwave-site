@@ -78,6 +78,14 @@ export function Header() {
     )
   }
 
+  // The custom cursor dot is brand-orange and would vanish over this same
+  // orange panel — flag it on the root element so CustomCursor's CSS (which
+  // has no other way to know the panel is open, it's a sibling not a
+  // descendant) can swap its color while the panel is up.
+  useEffect(() => {
+    document.documentElement.classList.toggle("nav-open", open)
+  }, [open])
+
   // The full-panel menu is a fixed overlay, so lock page scroll while it's
   // open on desktop (mobile's dropdown stays in normal flow, no lock needed).
   useEffect(() => {
@@ -159,7 +167,9 @@ export function Header() {
     <motion.header
       ref={headerRef}
       className={`nav ${open ? "nav--open" : ""}`}
-      data-theme={onDark || open ? "dark" : "light"}
+      // The open panel is orange, not dark, so it needs the light (black-text)
+      // scheme regardless of what onDark last sampled underneath it.
+      data-theme={open ? "light" : onDark ? "dark" : "light"}
       animate={{ y: hidden ? "-100%" : "0%" }}
       transition={{ duration: 0.4, ease: EASE_WAVE }}
     >
@@ -172,11 +182,11 @@ export function Header() {
               opacity after navigating away. */}
           {isHome ? (
             <motion.span style={{ opacity: heroLogoOpacity, display: "inline-block" }}>
-              <BrandLogo height={26} invert={onDark || open} />
+              <BrandLogo height={26} invert={!open && onDark} />
             </motion.span>
           ) : (
             <span style={{ display: "inline-block" }}>
-              <BrandLogo height={26} invert={onDark || open} />
+              <BrandLogo height={26} invert={!open && onDark} />
             </span>
           )}
         </a>
@@ -193,7 +203,7 @@ export function Header() {
         <button
           type="button"
           aria-label={open ? "Close menu" : "Open menu"}
-          className={`cursor-pointer md:hidden ${onDark || open ? "text-white" : "text-black"}`}
+          className={`cursor-pointer md:hidden ${!open && onDark ? "text-white" : "text-black"}`}
           onClick={() => setOpen((v) => !v)}
         >
           {open ? <X size={22} /> : <Menu size={22} />}
