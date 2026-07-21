@@ -177,9 +177,7 @@ export function Header() {
     <motion.header
       ref={headerRef}
       className={`nav ${open ? "nav--open" : ""}`}
-      // The open panel is orange, not dark, so it needs the light (black-text)
-      // scheme regardless of what onDark last sampled underneath it.
-      data-theme={open ? "light" : onDark ? "dark" : "light"}
+      data-theme={onDark ? "dark" : "light"}
       animate={{ y: hidden ? "-100%" : "0%" }}
       transition={{ duration: 0.4, ease: EASE_WAVE }}
     >
@@ -192,11 +190,11 @@ export function Header() {
               opacity after navigating away. */}
           {isHome ? (
             <motion.span style={{ opacity: heroLogoOpacity, display: "inline-block" }}>
-              <BrandLogo height={26} invert={!open && onDark} />
+              <BrandLogo height={26} invert={onDark} />
             </motion.span>
           ) : (
             <span style={{ display: "inline-block" }}>
-              <BrandLogo height={26} invert={!open && onDark} />
+              <BrandLogo height={26} invert={onDark} />
             </span>
           )}
         </a>
@@ -213,7 +211,7 @@ export function Header() {
         <button
           type="button"
           aria-label={open ? "Close menu" : "Open menu"}
-          className={`cursor-pointer md:hidden ${!open && onDark ? "text-white" : "text-black"}`}
+          className={`cursor-pointer md:hidden ${onDark ? "text-white" : "text-black"}`}
           onClick={() => setOpen((v) => !v)}
         >
           {open ? <X size={22} /> : <Menu size={22} />}
