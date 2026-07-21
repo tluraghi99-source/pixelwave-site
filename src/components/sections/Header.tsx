@@ -109,7 +109,16 @@ export function Header() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false)
     }
+    // The panel doesn't cover the full viewport (it hugs its own content
+    // height), so anywhere below/beside it is still "the page" as far as
+    // clicks go — close on any click landing outside the header itself.
+    // The trigger button that opened it lives inside headerRef too, so its
+    // own click isn't seen as "outside" and doesn't fight the toggle.
+    const onClickOutside = (e: MouseEvent) => {
+      if (headerRef.current && !headerRef.current.contains(e.target as Node)) setOpen(false)
+    }
     window.addEventListener("keydown", onKey)
+    window.addEventListener("mousedown", onClickOutside)
     return () => {
       if (isDesktop) {
         document.body.style.overflow = prevOverflow
@@ -117,6 +126,7 @@ export function Header() {
         if (headerRef.current) headerRef.current.style.paddingRight = prevHeaderPaddingRight
       }
       window.removeEventListener("keydown", onKey)
+      window.removeEventListener("mousedown", onClickOutside)
     }
   }, [open])
 
