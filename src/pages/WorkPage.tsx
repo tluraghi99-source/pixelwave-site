@@ -87,7 +87,7 @@ export function WorkPage() {
                       </Tag>
                     ))}
                     title={p.title}
-                    href="/work"
+                    href={`/work/${p.slug}`}
                   >
                     <span className="work__view">
                       <ScrambleText text="View project" /> <ArrowUpRight size={15} />

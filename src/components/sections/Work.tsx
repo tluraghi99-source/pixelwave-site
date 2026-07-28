@@ -84,7 +84,7 @@ function WorkTrack({ x }: { x: MotionValue<string> }) {
             ))}
             title={w.title}
             description={w.desc}
-            href="/work"
+            href={`/work/${w.slug}`}
           >
             <span className="work__view">
               <ScrambleText text="View project" /> <ArrowUpRight size={15} />
