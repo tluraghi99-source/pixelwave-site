@@ -1,5 +1,6 @@
 import { useMemo } from "react"
 import { Link, useParams } from "react-router-dom"
+import { ArrowUpRight } from "lucide-react"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Footer } from "@/components/sections/Footer"
@@ -141,6 +142,22 @@ export function ProjectPage() {
             <GalleryRow items={project.gallery.slice(4, 8)} reverse={true} />
           </RevealItem>
         </RevealGroup>
+
+        <Reveal>
+          <Link to={`/work/${nextProject.slug}`} className="project-next wrap">
+            <div>
+              <span className="project-next__label">Next project</span>
+              <span className="project-next__title">
+                {nextProject.title} <ArrowUpRight size={28} />
+              </span>
+            </div>
+            <img
+              className="project-next__thumb"
+              src={`https://picsum.photos/seed/pixellwave-${nextProject.id}-hero/400/300?grayscale`}
+              alt=""
+            />
+          </Link>
+        </Reveal>
       </main>
       <Footer />
     </>

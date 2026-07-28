@@ -776,6 +776,24 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   .project-gallery__track { animation: none; }
 }
 
+.project-next {
+  display: flex; align-items: center; justify-content: space-between; gap: 2rem;
+  padding-block: clamp(1.75rem, 3vw, 2.5rem); border-top: 1px solid var(--border-subtle);
+  text-decoration: none; color: inherit;
+}
+.project-next__label {
+  display: block; font-family: var(--font-mono-accent); font-size: 0.7rem;
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); margin-bottom: 0.5rem;
+}
+.project-next__title {
+  font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em;
+  font-size: clamp(1.5rem, 3vw, 2.25rem); display: inline-flex; align-items: center; gap: 0.75rem;
+}
+.project-next__thumb {
+  width: clamp(70px, 8vw, 110px); aspect-ratio: 4/3; object-fit: cover;
+  border-radius: 2px; flex-shrink: 0;
+}
+
 /* video-scrub+carousel pin — starts already fully open (the iris itself runs
    earlier, as a fixed overlay directly on the hero, not in here — see
    reel__reveal-overlay below) — scrubs the video to its last frame, holds it
