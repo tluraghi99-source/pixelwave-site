@@ -1,6 +1,6 @@
 import { useMemo } from "react"
 import { Link, useParams } from "react-router-dom"
-import { Reveal } from "@/components/motion/Reveal"
+import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Footer } from "@/components/sections/Footer"
 import { PROJECTS, type Project } from "@/data/work"
@@ -46,6 +46,28 @@ function HeroMedia({ media, title }: { media: MediaItem; title: string }) {
     return <video className="project-hero__media" src={media.src} autoPlay loop muted playsInline />
   }
   return <img className="project-hero__media" src={media.src} alt={title} />
+}
+
+function GalleryRow({ items, reverse }: { items: MediaItem[]; reverse: boolean }) {
+  // Duplicated once so the CSS animation can translate exactly -50% and loop
+  // seamlessly — same technique as Marquee.tsx, just plain CSS here so we can
+  // add hover-pause and a prefers-reduced-motion override (see index.css).
+  const looped = [...items, ...items]
+  return (
+    <div className="project-gallery__row">
+      <div className={`project-gallery__track${reverse ? " project-gallery__track--ltr" : ""}`}>
+        {looped.map((item, i) => (
+          <div className="project-gallery__item" key={i}>
+            {item.type === "video" ? (
+              <video src={item.src} autoPlay loop muted playsInline />
+            ) : (
+              <img src={item.src} alt="" loading="lazy" />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 export function ProjectPage() {
@@ -110,6 +132,15 @@ export function ProjectPage() {
             <p className="secbody">{project.desc}</p>
           </Reveal>
         </div>
+
+        <RevealGroup className="project-gallery" stagger={0.1}>
+          <RevealItem>
+            <GalleryRow items={project.gallery.slice(0, 4)} reverse={false} />
+          </RevealItem>
+          <RevealItem>
+            <GalleryRow items={project.gallery.slice(4, 8)} reverse={true} />
+          </RevealItem>
+        </RevealGroup>
       </main>
       <Footer />
     </>
