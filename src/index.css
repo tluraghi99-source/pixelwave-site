@@ -733,6 +733,27 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   padding: 0.5rem 0.9rem;
 }
 
+/* project detail page */
+.project-page { padding-top: 0; }
+.project-hero { position: relative; height: 50svh; overflow: hidden; background: var(--pw-neutral-10); }
+.project-hero__media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+.project-page__title {
+  font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em;
+  font-size: clamp(2.5rem, 5vw, 5rem); line-height: 1.05; margin: 0.5rem 0 0;
+}
+
+.project-credits {
+  display: flex; flex-wrap: wrap; gap: clamp(2rem, 4vw, 3.5rem);
+  padding: clamp(1.25rem, 2vw, 1.75rem) 0; margin-top: clamp(2rem, 3vw, 3rem);
+  border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.95rem;
+}
+.project-credits__label {
+  display: block; font-family: var(--font-mono-accent); font-size: 0.7rem;
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); margin-bottom: 0.35rem;
+}
+
 /* video-scrub+carousel pin — starts already fully open (the iris itself runs
    earlier, as a fixed overlay directly on the hero, not in here — see
    reel__reveal-overlay below) — scrubs the video to its last frame, holds it
@@ -1018,7 +1039,7 @@ html.nav-open .cursor-dot { background: var(--pw-black); }
 
 .grain-overlay {
   position: absolute; inset: 0; z-index: 5; pointer-events: none;
-  opacity: 0.05;
+  opacity: 0.09;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   background-size: 180px 180px;
   animation: grain-shift 8s steps(8) infinite;
