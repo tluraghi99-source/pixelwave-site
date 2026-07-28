@@ -734,7 +734,8 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 }
 
 /* project detail page */
-.project-page { padding-top: 0; }
+.project-page { padding-top: 0; background: var(--pw-black); color: var(--pw-white); }
+.project-page__not-found { padding-block: 8rem; }
 .project-hero { position: relative; height: 50svh; overflow: hidden; background: var(--pw-neutral-10); }
 .project-hero__media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
@@ -758,14 +759,24 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .project-gallery__row { overflow: hidden; margin-bottom: 0.875rem; }
 .project-gallery__row:last-child { margin-bottom: 0; }
 .project-gallery__track {
-  display: flex; gap: 0.875rem; width: max-content;
+  display: flex; width: max-content;
   animation: project-gallery-rtl 34s linear infinite;
 }
 .project-gallery__track--ltr { animation-name: project-gallery-ltr; }
+/* No gap here (or on .project-gallery__group): each .project-gallery__item
+   carries its own trailing margin instead. Flex `gap` inserts N-1 gaps for N
+   items, so a track holding 2 duplicated groups back-to-back only ever gets
+   one connecting gap for the whole loop, and translateX(-50%) — exactly half
+   the *rendered* width — lands half a gap short of one true group-period.
+   Moving the gap onto each item (N items, N trailing margins, including the
+   last one) makes every group's rendered width already include its own
+   connecting gap, so 2 groups placed flush against each other reproduce the
+   same uniform spacing at the seam, and -50% lands exactly on one period. */
+.project-gallery__group { display: flex; flex-shrink: 0; }
 .project-gallery__track:hover { animation-play-state: paused; }
 .project-gallery__item {
   height: clamp(180px, 22vw, 260px); width: clamp(260px, 30vw, 380px);
-  flex-shrink: 0; border-radius: 2px; overflow: hidden;
+  flex-shrink: 0; border-radius: 2px; overflow: hidden; margin-right: 0.875rem;
 }
 .project-gallery__item img, .project-gallery__item video {
   width: 100%; height: 100%; object-fit: cover; display: block;

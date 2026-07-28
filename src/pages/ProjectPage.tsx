@@ -14,6 +14,7 @@ interface MediaItem {
 interface ProjectWithMedia extends Project {
   hero: MediaItem
   gallery: MediaItem[]
+  thumb: string
 }
 
 // Temporary stand-in photography (Lorem Picsum) until real project imagery is
@@ -26,6 +27,7 @@ const PROJECTS_WITH_MEDIA: ProjectWithMedia[] = PROJECTS.map((p) => ({
     type: "image" as const,
     src: `https://picsum.photos/seed/pixellwave-${p.id}-g${i}/900/700?grayscale`,
   })),
+  thumb: `https://picsum.photos/seed/pixellwave-${p.id}-hero/400/300?grayscale`,
 }))
 
 // Northwind demos the video-hero path with the existing studio.mp4 asset —
@@ -42,30 +44,36 @@ function roleFor(project: ProjectWithMedia): string {
     .join(", ")
 }
 
-function HeroMedia({ media, title }: { media: MediaItem; title: string }) {
+function HeroMedia({ media }: { media: MediaItem }) {
   if (media.type === "video") {
     return <video className="project-hero__media" src={media.src} autoPlay loop muted playsInline />
   }
-  return <img className="project-hero__media" src={media.src} alt={title} />
+  return <img className="project-hero__media" src={media.src} alt="" />
 }
 
 function GalleryRow({ items, reverse }: { items: MediaItem[]; reverse: boolean }) {
   // Duplicated once so the CSS animation can translate exactly -50% and loop
-  // seamlessly — same technique as Marquee.tsx, just plain CSS here so we can
-  // add hover-pause and a prefers-reduced-motion override (see index.css).
-  const looped = [...items, ...items]
+  // seamlessly — same technique as Marquee.tsx. Each half is wrapped in its
+  // own flex group; the per-item gap lives in each item's own trailing
+  // margin (see .project-gallery__item in index.css) rather than the track's
+  // flex `gap`, so the two groups' rendered widths already include their own
+  // connecting gap and a -50% translate lands exactly on one group's width.
+  const renderItems = (keyPrefix: string) =>
+    items.map((item, i) => (
+      <div className="project-gallery__item" key={`${keyPrefix}-${i}`}>
+        {item.type === "video" ? (
+          <video src={item.src} autoPlay loop muted playsInline />
+        ) : (
+          <img src={item.src} alt="" loading="lazy" />
+        )}
+      </div>
+    ))
+
   return (
     <div className="project-gallery__row">
       <div className={`project-gallery__track${reverse ? " project-gallery__track--ltr" : ""}`}>
-        {looped.map((item, i) => (
-          <div className="project-gallery__item" key={i}>
-            {item.type === "video" ? (
-              <video src={item.src} autoPlay loop muted playsInline />
-            ) : (
-              <img src={item.src} alt="" loading="lazy" />
-            )}
-          </div>
-        ))}
+        <div className="project-gallery__group">{renderItems("a")}</div>
+        <div className="project-gallery__group" aria-hidden="true">{renderItems("b")}</div>
       </div>
     </div>
   )
@@ -85,12 +93,15 @@ export function ProjectPage() {
 
   if (!project || !nextProject) {
     return (
-      <main className="project-page" data-theme="dark">
-        <div className="wrap" style={{ paddingBlock: "8rem" }}>
-          <p className="lead">Project not found.</p>
-          <Link to="/work">Back to all projects →</Link>
-        </div>
-      </main>
+      <>
+        <main className="project-page" data-theme="dark">
+          <div className="wrap project-page__not-found">
+            <p className="lead">Project not found.</p>
+            <Link to="/work">Back to all projects →</Link>
+          </div>
+        </main>
+        <Footer />
+      </>
     )
   }
 
@@ -98,10 +109,10 @@ export function ProjectPage() {
     <>
       <main className="project-page" data-theme="dark">
         <div className="project-hero" data-screen-label="Project Hero">
-          <HeroMedia media={project.hero} title={project.title} />
+          <HeroMedia media={project.hero} />
         </div>
 
-        <div className="wrap">
+        <div className="wrap" data-screen-label="Project Info">
           <Reveal>
             <SectionLabel number={project.idx}>{roleFor(project)}</SectionLabel>
           </Reveal>
@@ -128,23 +139,19 @@ export function ProjectPage() {
               </div>
             </div>
           </Reveal>
-
-          <Reveal delay={0.2}>
-            <p className="secbody">{project.desc}</p>
-          </Reveal>
         </div>
 
-        <RevealGroup className="project-gallery" stagger={0.1}>
+        <RevealGroup className="project-gallery" stagger={0.1} data-screen-label="Project Gallery">
           <RevealItem>
-            <GalleryRow items={project.gallery.slice(0, 4)} reverse={false} />
+            <GalleryRow items={project.gallery.slice(0, Math.ceil(project.gallery.length / 2))} reverse={false} />
           </RevealItem>
           <RevealItem>
-            <GalleryRow items={project.gallery.slice(4, 8)} reverse={true} />
+            <GalleryRow items={project.gallery.slice(Math.ceil(project.gallery.length / 2))} reverse={true} />
           </RevealItem>
         </RevealGroup>
 
         <Reveal>
-          <Link to={`/work/${nextProject.slug}`} className="project-next wrap">
+          <Link to={`/work/${nextProject.slug}`} className="project-next wrap" data-screen-label="Next Project">
             <div>
               <span className="project-next__label">Next project</span>
               <span className="project-next__title">
@@ -153,7 +160,7 @@ export function ProjectPage() {
             </div>
             <img
               className="project-next__thumb"
-              src={`https://picsum.photos/seed/pixellwave-${nextProject.id}-hero/400/300?grayscale`}
+              src={nextProject.thumb}
               alt=""
             />
           </Link>

@@ -42,6 +42,7 @@ interface RevealGroupProps {
   delayChildren?: number
   once?: boolean
   amount?: number
+  "data-screen-label"?: string
 }
 
 /** Stagger container — pair with <RevealItem> children. */
@@ -52,6 +53,7 @@ export function RevealGroup({
   delayChildren = 0,
   once = true,
   amount = 0.2,
+  "data-screen-label": dataScreenLabel,
 }: RevealGroupProps) {
   const variants: Variants = {
     hidden: {},
@@ -61,6 +63,7 @@ export function RevealGroup({
   return (
     <motion.div
       className={className}
+      data-screen-label={dataScreenLabel}
       initial="hidden"
       whileInView="show"
       viewport={{ once, amount }}

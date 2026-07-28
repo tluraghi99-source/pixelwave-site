@@ -24,7 +24,7 @@ const MENU_COLUMNS = [
   {
     label: "Work",
     href: "/work",
-    links: FEATURED_WORK.map((p) => ({ label: p.title, href: "/work" })),
+    links: FEATURED_WORK.map((p) => ({ label: p.title, href: `/work/${p.slug}` })),
   },
   {
     label: "Services",
