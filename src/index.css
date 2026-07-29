@@ -755,7 +755,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .project-video-pin__inner { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 .project-video-pin__skip {
   position: absolute; z-index: 2; right: clamp(1.25rem, 2.5vw, 4rem); bottom: clamp(1.5rem, 3vw, 2.5rem);
-  padding: 0.6rem 1.25rem; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 999px;
+  padding: 0.6rem 1.25rem; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: var(--radius-control);
   background: rgba(0, 0, 0, 0.35); color: var(--pw-white); font-size: 0.8rem;
   font-family: var(--font-mono-accent);
   text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer;
