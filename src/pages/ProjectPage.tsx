@@ -1,5 +1,6 @@
-import { useMemo } from "react"
+import { useMemo, useRef } from "react"
 import { Link, useParams } from "react-router-dom"
+import { useScreenSize } from "@/components/hooks/use-screen-size"
 import { ArrowUpRight } from "lucide-react"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { Footer } from "@/components/sections/Footer"
@@ -44,6 +45,66 @@ function ProjectMeta({ year }: { year?: number }) {
       {year ? <span className="project-meta__label">{year}</span> : null}
     </div>
   )
+}
+
+function HeroMedia({ media }: { media: MediaItem }) {
+  if (media.type === "video") {
+    return <video className="project-video-media" src={media.src} autoPlay loop muted playsInline />
+  }
+  return <img className="project-video-media" src={media.src} alt="" />
+}
+
+// 220vh = VIDEO_PIN_HEIGHT_VH below, kept in sync by hand (120 hold + 100).
+// Unlike StudioFloorPlan's pin, this one needs no useScroll/useTransform at
+// all — there's no scroll-scrubbed opacity or crossfade, the video just
+// autoplays and loops in place. The sticky+height combo alone produces the
+// "locks while scrolling through, releases once the wrapper's extra height
+// runs out" behavior.
+const VIDEO_HOLD_VH = 120
+const VIDEO_PIN_HEIGHT_VH = VIDEO_HOLD_VH + 100
+
+function ProjectVideoPinned({ media }: { media: MediaItem }) {
+  const pinRef = useRef<HTMLElement>(null)
+
+  function handleSkip() {
+    const el = pinRef.current
+    if (!el) return
+    const top = el.getBoundingClientRect().top + window.scrollY + el.offsetHeight
+    window.scrollTo({ top })
+  }
+
+  return (
+    <section
+      className="project-video-pin"
+      data-screen-label="Project Video"
+      ref={pinRef}
+      style={{ height: `${VIDEO_PIN_HEIGHT_VH}vh` }}
+    >
+      <div className="project-video-pin__inner">
+        <HeroMedia media={media} />
+        <button type="button" className="project-video-pin__skip" onClick={handleSkip}>
+          Skip
+        </button>
+      </div>
+    </section>
+  )
+}
+
+/** Mobile/tablet: no pin — the video/image just renders as a plain full-width
+ *  block in normal document flow, same fallback shape every other pinned
+ *  desktop section on this site already uses (see StudioFloorPlan.tsx). */
+function ProjectVideoAmbient({ media }: { media: MediaItem }) {
+  return (
+    <div className="project-video-ambient" data-screen-label="Project Video">
+      <HeroMedia media={media} />
+    </div>
+  )
+}
+
+function ProjectVideo({ media }: { media: MediaItem }) {
+  const screenSize = useScreenSize()
+  const isDesktop = screenSize.greaterThanOrEqual("lg")
+  return isDesktop ? <ProjectVideoPinned media={media} /> : <ProjectVideoAmbient media={media} />
 }
 
 function GalleryRow({ items, reverse }: { items: MediaItem[]; reverse: boolean }) {
@@ -114,6 +175,8 @@ export function ProjectPage() {
             <p className="secbody">{project.desc}</p>
           </Reveal>
         </div>
+
+        <ProjectVideo media={project.hero} />
 
         <div className="wrap project-overview" data-screen-label="Project Overview">
           <Reveal>
