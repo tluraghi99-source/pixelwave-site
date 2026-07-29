@@ -784,7 +784,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .project-gallery__group { display: flex; flex-shrink: 0; }
 .project-gallery__track:hover { animation-play-state: paused; }
 .project-gallery__item {
-  height: clamp(180px, 22vw, 260px); width: clamp(260px, 30vw, 380px);
+  width: clamp(320px, 32vw, 520px); aspect-ratio: 1 / 1;
   flex-shrink: 0; border-radius: 2px; overflow: hidden; margin-right: 0.875rem;
 }
 .project-gallery__item img, .project-gallery__item video {
