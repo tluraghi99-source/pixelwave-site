@@ -748,7 +748,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary);
 }
 
-.project-video-pin { position: relative; height: 220vh; }
+.project-video-pin { position: relative; }
 .project-video-pin__inner { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 .project-video-pin__skip {
   position: absolute; z-index: 2; right: clamp(1.25rem, 2.5vw, 4rem); bottom: clamp(1.5rem, 3vw, 2.5rem);

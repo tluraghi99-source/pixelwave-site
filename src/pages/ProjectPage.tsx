@@ -54,7 +54,9 @@ function HeroMedia({ media }: { media: MediaItem }) {
   return <img className="project-video-media" src={media.src} alt="" />
 }
 
-// 220vh = VIDEO_PIN_HEIGHT_VH below, kept in sync by hand (120 hold + 100).
+// VIDEO_PIN_HEIGHT_VH drives the pin wrapper's height directly via an inline
+// style below (not a separately hand-synced CSS rule, unlike StudioFloorPlan's
+// .floor-pin — there's no other consumer of this number to keep in sync with).
 // Unlike StudioFloorPlan's pin, this one needs no useScroll/useTransform at
 // all — there's no scroll-scrubbed opacity or crossfade, the video just
 // autoplays and loops in place. The sticky+height combo alone produces the
