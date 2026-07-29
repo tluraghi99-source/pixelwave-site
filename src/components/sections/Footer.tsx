@@ -45,7 +45,7 @@ export function Footer() {
         </RevealGroup>
 
         <Reveal className="foot__cta-wrap" delay={0.1}>
-          <InteractiveHoverButton text="Let's chat" href="/contact" scramble={false} />
+          <InteractiveHoverButton text="Let's chat" href="/contact" />
         </Reveal>
       </div>
 

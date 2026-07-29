@@ -2,14 +2,11 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "reac
 import { ArrowRight } from "lucide-react"
 import { Link } from "react-router-dom"
 import { cn } from "@/lib/utils"
-import { ScrambleText } from "@/components/motion/ScrambleText"
 
 type CommonProps = {
   text: string
   /** Shown next to the text, slides in on hover. @default <ArrowRight /> */
   icon?: ReactNode
-  /** Text-scramble/decode hover effect on the label. @default true */
-  scramble?: boolean
   className?: string
 }
 
@@ -26,7 +23,7 @@ type LinkProps = CommonProps &
 export type InteractiveHoverButtonProps = ButtonProps | LinkProps
 
 export function InteractiveHoverButton(props: InteractiveHoverButtonProps) {
-  const { text, icon = <ArrowRight size={16} />, scramble = true, className, ...rest } = props
+  const { text, icon = <ArrowRight size={16} />, className, ...rest } = props
 
   // Color/border live in the plain-CSS `.ihb` rule (index.css), not Tailwind's
   // text-foreground/border-foreground utilities — those sit inside Tailwind's
@@ -53,11 +50,7 @@ export function InteractiveHoverButton(props: InteractiveHoverButtonProps) {
   const labelClassName = "transition-transform duration-300 group-hover:-translate-x-3"
   const content = (
     <>
-      {scramble ? (
-        <ScrambleText text={text} className={labelClassName} />
-      ) : (
-        <span className={labelClassName}>{text}</span>
-      )}
+      <span className={labelClassName}>{text}</span>
       <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 translate-x-1 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
         {icon}
       </span>

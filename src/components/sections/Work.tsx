@@ -7,7 +7,6 @@ import { Button } from "@/components/pw/Button"
 import { Card } from "@/components/pw/Card"
 import { Tag } from "@/components/pw/Tag"
 import { Reveal } from "@/components/motion/Reveal"
-import { ScrambleText } from "@/components/motion/ScrambleText"
 import { wrap } from "@/lib/motion"
 import { CircularGallery, type CircularGalleryHandle } from "@/components/ui/circular-gallery"
 import { PROJECTS } from "@/data/work"
@@ -87,7 +86,7 @@ function WorkTrack({ x }: { x: MotionValue<string> }) {
             href={`/work/${w.slug}`}
           >
             <span className="work__view">
-              <ScrambleText text="View project" /> <ArrowUpRight size={15} />
+              View project <ArrowUpRight size={15} />
             </span>
           </Card>
         </div>

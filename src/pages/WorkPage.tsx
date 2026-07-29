@@ -3,7 +3,6 @@ import { ArrowUpRight } from "lucide-react"
 import { Card } from "@/components/pw/Card"
 import { Tag } from "@/components/pw/Tag"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
-import { ScrambleText } from "@/components/motion/ScrambleText"
 import { Footer } from "@/components/sections/Footer"
 import { PixelTrail } from "@/components/ui/pixel-trail"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
@@ -90,7 +89,7 @@ export function WorkPage() {
                     href={`/work/${p.slug}`}
                   >
                     <span className="work__view">
-                      <ScrambleText text="View project" /> <ArrowUpRight size={15} />
+                      View project <ArrowUpRight size={15} />
                     </span>
                   </Card>
                 </RevealItem>

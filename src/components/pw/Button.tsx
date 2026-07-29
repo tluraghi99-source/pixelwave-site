@@ -1,6 +1,5 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react"
 import { Link } from "react-router-dom"
-import { ScrambleText } from "@/components/motion/ScrambleText"
 
 type Variant = "primary" | "secondary" | "ghost"
 type Size = "sm" | "md" | "lg"
@@ -63,7 +62,7 @@ export function Button(props: PwButtonProps) {
   const content = (
     <>
       {iconLeft ? <span className="pw-btn__icon">{iconLeft}</span> : null}
-      {typeof children === "string" ? <ScrambleText text={children} /> : children}
+      {children}
       {iconRight ? <span className="pw-btn__icon">{iconRight}</span> : null}
     </>
   )
