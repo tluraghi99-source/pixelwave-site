@@ -30,14 +30,14 @@ const PROJECTS_WITH_MEDIA: ProjectWithMedia[] = PROJECTS.map((p) => ({
   thumb: `https://picsum.photos/seed/pixellwave-${p.id}-hero/400/300?grayscale`,
 }))
 
-// Northwind demos the video-hero path with the existing studio.mp4 asset —
+// Northwind demos the video-media path with the existing studio.mp4 asset —
 // every other project stays image-only until real footage exists.
 const northwindEntry = PROJECTS_WITH_MEDIA.find((p) => p.slug === "northwind")
 if (northwindEntry) northwindEntry.hero = { type: "video", src: "/video/studio.mp4" }
 
 /** Small "Overview" label, paired with the year on its first appearance only —
- *  this page shows the same overview text twice (split by the video section
- *  Task 2 inserts between them), so the second appearance omits the year. */
+ *  this page shows the same overview text twice (split by the pinned video
+ *  section between them), so the second appearance omits the year. */
 function ProjectMeta({ year }: { year?: number }) {
   return (
     <div className="project-meta">
@@ -47,7 +47,7 @@ function ProjectMeta({ year }: { year?: number }) {
   )
 }
 
-function HeroMedia({ media }: { media: MediaItem }) {
+function ProjectMedia({ media }: { media: MediaItem }) {
   if (media.type === "video") {
     return <video className="project-video-media" src={media.src} autoPlay loop muted playsInline />
   }
@@ -83,7 +83,7 @@ function ProjectVideoPinned({ media }: { media: MediaItem }) {
       style={{ height: `${VIDEO_PIN_HEIGHT_VH}vh` }}
     >
       <div className="project-video-pin__inner">
-        <HeroMedia media={media} />
+        <ProjectMedia media={media} />
         <button type="button" className="project-video-pin__skip" onClick={handleSkip}>
           Skip
         </button>
@@ -98,7 +98,7 @@ function ProjectVideoPinned({ media }: { media: MediaItem }) {
 function ProjectVideoAmbient({ media }: { media: MediaItem }) {
   return (
     <div className="project-video-ambient" data-screen-label="Project Video">
-      <HeroMedia media={media} />
+      <ProjectMedia media={media} />
     </div>
   )
 }
@@ -166,7 +166,7 @@ export function ProjectPage() {
   return (
     <>
       <main className="project-page" data-theme="dark">
-        <div className="wrap" data-screen-label="Project Info">
+        <div className="wrap project-overview" data-screen-label="Project Info">
           <Reveal>
             <h1 className="project-page__title">{project.title}</h1>
           </Reveal>
