@@ -735,7 +735,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 
 /* project detail page */
 .project-page { padding-top: clamp(6rem, 9vw, 8rem); background: var(--pw-black); color: var(--pw-white); }
-.project-page__not-found { padding-block: 8rem; }
+.project-page__not-found { padding-block: 0 8rem; }
 
 .project-page__title {
   font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em;
@@ -750,7 +750,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 
 /* height set inline from VIDEO_PIN_HEIGHT_VH in ProjectPage.tsx (see the
    comment there for why this isn't a hand-synced CSS number like .floor-pin
-   below is) */
+   above is) */
 .project-video-pin { position: relative; }
 .project-video-pin__inner { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 .project-video-pin__skip {
