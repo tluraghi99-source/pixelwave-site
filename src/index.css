@@ -769,8 +769,12 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .project-overview { padding-block: clamp(2.5rem, 4vw, 4rem); }
 
 .project-gallery { padding: clamp(2.5rem, 4vw, 4rem) 0; }
+/* Each row sits alone inside its own RevealItem wrapper div, so it's always
+   an "only child" — a trailing :last-child { margin-bottom: 0 } would match
+   every row (not just the actual last one) and zero this out entirely.
+   Simpler to just always apply it: the harmless side effect is one extra
+   0.875rem of space before .project-gallery's own bottom padding kicks in. */
 .project-gallery__row { overflow: hidden; margin-bottom: 0.875rem; }
-.project-gallery__row:last-child { margin-bottom: 0; }
 .project-gallery__track {
   display: flex; width: max-content;
   animation: project-gallery-rtl 34s linear infinite;
