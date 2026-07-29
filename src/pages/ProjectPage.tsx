@@ -2,7 +2,6 @@ import { useMemo } from "react"
 import { Link, useParams } from "react-router-dom"
 import { ArrowUpRight } from "lucide-react"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
-import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Footer } from "@/components/sections/Footer"
 import { PROJECTS, type Project } from "@/data/work"
 
@@ -35,20 +34,16 @@ const PROJECTS_WITH_MEDIA: ProjectWithMedia[] = PROJECTS.map((p) => ({
 const northwindEntry = PROJECTS_WITH_MEDIA.find((p) => p.slug === "northwind")
 if (northwindEntry) northwindEntry.hero = { type: "video", src: "/video/studio.mp4" }
 
-// "Featured" is a highlight badge, not a service — excluded from the credits
-// bar's Role column, same exclusion WorkPage.tsx applies to its filter row.
-function roleFor(project: ProjectWithMedia): string {
-  return project.tags
-    .filter(([, label]) => label !== "Featured")
-    .map(([, label]) => label)
-    .join(", ")
-}
-
-function HeroMedia({ media }: { media: MediaItem }) {
-  if (media.type === "video") {
-    return <video className="project-hero__media" src={media.src} autoPlay loop muted playsInline />
-  }
-  return <img className="project-hero__media" src={media.src} alt="" />
+/** Small "Overview" label, paired with the year on its first appearance only —
+ *  this page shows the same overview text twice (split by the video section
+ *  Task 2 inserts between them), so the second appearance omits the year. */
+function ProjectMeta({ year }: { year?: number }) {
+  return (
+    <div className="project-meta">
+      <span className="project-meta__label">Overview</span>
+      {year ? <span className="project-meta__label">{year}</span> : null}
+    </div>
+  )
 }
 
 function GalleryRow({ items, reverse }: { items: MediaItem[]; reverse: boolean }) {
@@ -108,36 +103,24 @@ export function ProjectPage() {
   return (
     <>
       <main className="project-page" data-theme="dark">
-        <div className="project-hero" data-screen-label="Project Hero">
-          <HeroMedia media={project.hero} />
-        </div>
-
         <div className="wrap" data-screen-label="Project Info">
           <Reveal>
-            <SectionLabel number={project.idx}>{roleFor(project)}</SectionLabel>
+            <h1 className="project-page__title">{project.title}</h1>
           </Reveal>
           <Reveal delay={0.05}>
-            <h1 className="project-page__title">{project.title}</h1>
+            <ProjectMeta year={project.year} />
           </Reveal>
           <Reveal delay={0.1}>
             <p className="secbody">{project.desc}</p>
           </Reveal>
+        </div>
 
-          <Reveal delay={0.15}>
-            <div className="project-credits">
-              <div className="project-credits__item">
-                <span className="project-credits__label">Client</span>
-                {project.client}
-              </div>
-              <div className="project-credits__item">
-                <span className="project-credits__label">Year</span>
-                {project.year}
-              </div>
-              <div className="project-credits__item">
-                <span className="project-credits__label">Role</span>
-                {roleFor(project)}
-              </div>
-            </div>
+        <div className="wrap project-overview" data-screen-label="Project Overview">
+          <Reveal>
+            <ProjectMeta />
+          </Reveal>
+          <Reveal delay={0.05}>
+            <p className="secbody">{project.desc}</p>
           </Reveal>
         </div>
 
