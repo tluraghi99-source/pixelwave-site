@@ -1054,11 +1054,14 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   display: flex; flex-direction: column; justify-content: flex-end;
   padding: 0 clamp(1rem, 1.2vw, 1.25rem) 0.5rem;
 }
-.contact-page__reactive { overflow: hidden; max-width: 60%; }
 .contact-page__reactive-text {
+  display: block;
   font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(2.4rem, 8vw, 6.4rem);
   line-height: 0.94; letter-spacing: -0.02em;
+  max-width: 100%; text-wrap: balance; word-break: break-word;
   color: var(--pw-white);
+  transition: color 0.15s ease;
 }
 .contact-page__reactive.is-placeholder .contact-page__reactive-text { color: var(--pw-neutral-30); }
 

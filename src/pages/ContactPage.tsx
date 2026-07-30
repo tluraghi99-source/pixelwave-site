@@ -4,7 +4,6 @@ import { ArrowRight, Check } from "lucide-react"
 import { Input } from "@/components/pw/Input"
 import { Tag } from "@/components/pw/Tag"
 import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
-import { FitText } from "@/components/motion/FitText"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { EASE_WAVE } from "@/lib/motion"
 
@@ -89,12 +88,12 @@ export function ContactPage() {
         <h2 className="contact-page__eyebrow">{eyebrowText}</h2>
 
         <div className="contact-page__content">
-          <FitText
-            text={reactive.text}
+          <div
             className={`contact-page__reactive ${reactive.isPlaceholder ? "is-placeholder" : ""}`}
-            textClassName="contact-page__reactive-text"
             aria-hidden="true"
-          />
+          >
+            <span className="contact-page__reactive-text">{reactive.text}</span>
+          </div>
         </div>
 
         <div className="contact-page__strip">
