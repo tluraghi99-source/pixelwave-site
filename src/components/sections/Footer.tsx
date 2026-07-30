@@ -7,7 +7,7 @@ import { useScreenSize } from "@/components/hooks/use-screen-size"
 
 const SOCIALS = [
   { label: "Instagram", href: "https://www.instagram.com/pixelwave_studio/" },
-  { label: "Tiktok", href: "#" },
+  { label: "YouTube", href: "https://www.youtube.com/@PixelWaveStudio" },
   { label: "LinkedIn", href: "https://www.linkedin.com/company/pixelwavestudio/" },
 ]
 
