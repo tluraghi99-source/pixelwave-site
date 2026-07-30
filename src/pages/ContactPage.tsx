@@ -48,10 +48,11 @@ export function ContactPage() {
   // nothing here a screen reader needs that the labeled Input/Tag controls
   // don't already say, which is why the mirror stays aria-hidden.
   const firstName = name.trim().split(" ")[0] || "there"
+  const hasName = name.trim() !== ""
   const reactive = sent
     ? { text: `Thanks, ${firstName}!`, isPlaceholder: false }
     : step.key === "detail"
-      ? { text: name || "Your name", isPlaceholder: !name }
+      ? { text: hasName ? name : "Your name", isPlaceholder: !hasName }
       : step.key === "type"
         ? { text: projectType ?? "Pick a project type", isPlaceholder: projectType === null }
         : { text: timeline ?? "Pick a timeline", isPlaceholder: timeline === null }

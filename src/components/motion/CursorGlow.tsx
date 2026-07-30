@@ -21,11 +21,18 @@ export function CursorGlow({ className }: CursorGlowProps) {
 
     const mouse = { x: -9999, y: -9999 }
     let raf = 0
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
     function resize() {
       const rect = canvas!.getBoundingClientRect()
       canvas!.width = rect.width
       canvas!.height = rect.height
+      // Resizing the canvas clears its bitmap. The RAF loop repaints the
+      // next frame on the motion-enabled path, but under reduced motion
+      // there is no loop — without this, any resize after mount (window
+      // resize, orientation change, mobile URL-bar show/hide) leaves the
+      // grid permanently blank.
+      if (reduceMotion) draw()
     }
 
     function draw() {
@@ -61,17 +68,14 @@ export function CursorGlow({ className }: CursorGlowProps) {
     }
 
     resize()
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    if (reduceMotion) {
-      draw()
-    } else {
+    if (!reduceMotion) {
       const loop = () => {
         draw()
         raf = requestAnimationFrame(loop)
       }
       loop()
       window.addEventListener("mousemove", handleMove)
-      window.addEventListener("mouseleave", handleLeave)
+      document.documentElement.addEventListener("mouseleave", handleLeave)
     }
     window.addEventListener("resize", resize)
 
@@ -79,7 +83,7 @@ export function CursorGlow({ className }: CursorGlowProps) {
       cancelAnimationFrame(raf)
       window.removeEventListener("resize", resize)
       window.removeEventListener("mousemove", handleMove)
-      window.removeEventListener("mouseleave", handleLeave)
+      document.documentElement.removeEventListener("mouseleave", handleLeave)
     }
   }, [])
 
