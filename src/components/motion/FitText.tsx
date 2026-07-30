@@ -39,7 +39,7 @@ export function FitText({
         // live-reactive consumer) have a tiny natural width, so the fit ratio
         // balloons unreasonably — cap the result at a sane fraction of the
         // viewport height, same bound regardless of how short the text is.
-        const capped = Math.min(fitted, window.innerHeight * 0.5)
+        const capped = Math.min(fitted, window.innerHeight * 0.28)
         // Apply immediately: relying on the React re-render alone can no-op if the
         // computed value happens to match the previous state, leaving the DOM stuck
         // at the imperative measurement size set just above.
