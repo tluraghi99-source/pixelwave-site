@@ -6,7 +6,7 @@ import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
 
 const SOCIALS = [
-  { label: "Instagram", href: "#" },
+  { label: "Instagram", href: "https://www.instagram.com/pixelwave_studio/" },
   { label: "Tiktok", href: "#" },
   { label: "LinkedIn", href: "https://www.linkedin.com/company/pixelwavestudio/" },
 ]
