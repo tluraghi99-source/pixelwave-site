@@ -4,6 +4,8 @@ import { ArrowRight, Check } from "lucide-react"
 import { Input } from "@/components/pw/Input"
 import { Tag } from "@/components/pw/Tag"
 import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
+import { FitText } from "@/components/motion/FitText"
+import { CursorGlow } from "@/components/motion/CursorGlow"
 import { EASE_WAVE } from "@/lib/motion"
 
 const STEPS = [
@@ -41,142 +43,140 @@ export function ContactPage() {
     setStepIndex((i) => i + 1)
   }
 
+  // The giant FitText mirror and its small eyebrow both derive from the same
+  // state the real, accessible controls below already expose — there's
+  // nothing here a screen reader needs that the labeled Input/Tag controls
+  // don't already say, which is why the mirror stays aria-hidden.
+  const firstName = name.trim().split(" ")[0] || "there"
+  const reactive = sent
+    ? { text: `Thanks, ${firstName}!`, isPlaceholder: false }
+    : step.key === "detail"
+      ? { text: name || "Your name", isPlaceholder: !name }
+      : step.key === "type"
+        ? { text: projectType ?? "Pick a project type", isPlaceholder: projectType === null }
+        : { text: timeline ?? "Pick a timeline", isPlaceholder: timeline === null }
+
+  const eyebrowText = sent
+    ? "Sent"
+    : step.key === "detail"
+      ? "Tell us who you are"
+      : step.key === "type"
+        ? "What are we building"
+        : "When are you starting"
+
   return (
     <main>
       <section className="contact-page" data-theme="dark" data-screen-label="Contact">
         <div className="grain-overlay" aria-hidden="true" />
-        <div className="wrap contact-page__body">
-          <div className="contact-page__left">
-            <nav className="contact-page__steps" aria-label="Contact form steps">
-              {STEPS.map((s, i) => {
-                const state = i === stepIndex ? "active" : i < stepIndex ? "done" : "upcoming"
-                return (
-                  <button
-                    key={s.key}
-                    type="button"
-                    className={`contact-page__step contact-page__step--${state}`}
-                    disabled={i > stepIndex || sent}
-                    onClick={() => setStepIndex(i)}
-                  >
-                    {s.label}
-                  </button>
-                )
-              })}
-            </nav>
+        <CursorGlow className="contact-page__glow" />
 
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={sent ? "sent" : step.key}
-                className="contact-page__step-giant"
-                initial={{ clipPath: "inset(0 100% 0 0)" }}
-                animate={{ clipPath: "inset(0 0% 0 0)" }}
-                exit={{ clipPath: "inset(0 0 0 100%)" }}
-                transition={{ duration: 0.5, ease: EASE_WAVE }}
-              >
-                <span className="contact-page__step-giant-num">
-                  {sent ? "Sent" : `Step ${stepIndex + 1} / ${STEPS.length}`}
-                </span>
-                <h2 className="contact-page__step-giant-title">{sent ? "Thanks!" : step.label}</h2>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          <div className="contact-page__panel">
-            <AnimatePresence mode="wait">
-              {sent ? (
-                <motion.div
-                  key="sent"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, ease: EASE_WAVE }}
-                >
-                  <h2 className="contact-page__heading">
-                    <Check className="contact-page__sent-icon" size={28} />
-                    Thanks, {name.split(" ")[0] || "there"}!
-                  </h2>
-                  <p className="contact-page__lead">We'll be in touch shortly.</p>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key={step.key}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.35, ease: EASE_WAVE }}
-                >
-                  {step.key === "detail" && (
-                    <>
-                      <h2 className="contact-page__heading">Leave your details</h2>
-                      <div className="contact-page__fields">
-                        <Input
-                          label="Name"
-                          placeholder="Your name"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                        />
-                        <Input
-                          label="Email"
-                          type="email"
-                          placeholder="Mail address"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                        />
-                      </div>
-                    </>
-                  )}
-
-                  {step.key === "type" && (
-                    <>
-                      <h2 className="contact-page__heading">What are we building?</h2>
-                      <div className="contact-page__chips">
-                        {PROJECT_TYPES.map((t) => (
-                          <Tag
-                            key={t}
-                            interactive
-                            variant={projectType === t ? "orange" : "outline"}
-                            onClick={() => setProjectType(t)}
-                          >
-                            {t}
-                          </Tag>
-                        ))}
-                      </div>
-                    </>
-                  )}
-
-                  {step.key === "when" && (
-                    <>
-                      <h2 className="contact-page__heading">When are you looking to start?</h2>
-                      <div className="contact-page__chips">
-                        {TIMELINES.map((t) => (
-                          <Tag
-                            key={t}
-                            interactive
-                            variant={timeline === t ? "orange" : "outline"}
-                            onClick={() => setTimeline(t)}
-                          >
-                            {t}
-                          </Tag>
-                        ))}
-                      </div>
-                    </>
-                  )}
-
-                  <InteractiveHoverButton
-                    text={isLastStep ? "Send it our way" : "Next"}
-                    icon={<ArrowRight size={16} />}
-                    onClick={handleNext}
-                    className={`contact-page__next ${canAdvance ? "" : "contact-page__next--disabled"}`}
-                    aria-disabled={!canAdvance}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+        <div
+          className="contact-page__progress"
+          role="img"
+          aria-label={sent ? "Sent" : `Step ${stepIndex + 1} of ${STEPS.length}`}
+        >
+          {STEPS.map((s, i) => (
+            <span
+              key={s.key}
+              className={`contact-page__progress-dash ${
+                sent || i < stepIndex ? "is-done" : i === stepIndex ? "is-active" : ""
+              }`}
+            />
+          ))}
         </div>
 
-        <h2 className="contact-page__giant" aria-hidden="true">
-          Let's chat!
-        </h2>
+        <h2 className="contact-page__eyebrow">{eyebrowText}</h2>
+
+        <div className="contact-page__content">
+          <FitText
+            text={reactive.text}
+            className={`contact-page__reactive ${reactive.isPlaceholder ? "is-placeholder" : ""}`}
+            textClassName="contact-page__reactive-text"
+            aria-hidden="true"
+          />
+        </div>
+
+        <div className="contact-page__strip">
+          <AnimatePresence mode="wait">
+            {sent ? (
+              <motion.div
+                key="sent"
+                className="contact-page__sent-row"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, ease: EASE_WAVE }}
+              >
+                <Check className="contact-page__sent-icon" size={20} aria-hidden="true" />
+                <p className="contact-page__sent-msg">We'll be in touch shortly.</p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key={step.key}
+                className="contact-page__strip-row"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.35, ease: EASE_WAVE }}
+              >
+                {step.key === "detail" && (
+                  <div className="contact-page__fields">
+                    <Input
+                      label="Name"
+                      placeholder="Your name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                    <Input
+                      label="Email"
+                      type="email"
+                      placeholder="Mail address"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                )}
+
+                {step.key === "type" && (
+                  <div className="contact-page__chips">
+                    {PROJECT_TYPES.map((t) => (
+                      <Tag
+                        key={t}
+                        interactive
+                        variant={projectType === t ? "orange" : "outline"}
+                        onClick={() => setProjectType(t)}
+                      >
+                        {t}
+                      </Tag>
+                    ))}
+                  </div>
+                )}
+
+                {step.key === "when" && (
+                  <div className="contact-page__chips">
+                    {TIMELINES.map((t) => (
+                      <Tag
+                        key={t}
+                        interactive
+                        variant={timeline === t ? "orange" : "outline"}
+                        onClick={() => setTimeline(t)}
+                      >
+                        {t}
+                      </Tag>
+                    ))}
+                  </div>
+                )}
+
+                <InteractiveHoverButton
+                  text={isLastStep ? "Send it our way" : "Next"}
+                  icon={<ArrowRight size={16} />}
+                  onClick={handleNext}
+                  className={`contact-page__next ${canAdvance ? "" : "contact-page__next--disabled"}`}
+                  aria-disabled={!canAdvance}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </section>
     </main>
   )
