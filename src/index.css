@@ -1051,6 +1051,8 @@ footer { background: var(--surface-subtle); color: var(--pw-black); overflow-x: 
   padding-block: clamp(2rem, 3vw, 3.5rem);
 }
 .foot__addr { font-size: clamp(0.9rem, 0.9vw, 1.05rem); color: var(--text-secondary); justify-self: start; }
+.foot__addr a { color: inherit; transition: color var(--dur-base) var(--ease-wave); }
+.foot__addr a:hover { color: var(--pw-orange); }
 .foot__social { display: flex; gap: clamp(1.5rem, 2vw, 3rem); justify-self: center; flex-wrap: wrap; }
 .foot__social-link {
   font-size: clamp(0.9rem, 0.9vw, 1.05rem); color: var(--text-primary);

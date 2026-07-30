@@ -31,7 +31,9 @@ export function Footer() {
     <footer data-screen-label="Footer" ref={footerRef}>
       <div className="wrap foot__row">
         <Reveal className="foot__addr">
-          <span>Milano, Italia</span>
+          <a href="https://maps.app.goo.gl/xNz7W3z1U6EcBg6f7" target="_blank" rel="noopener noreferrer">
+            Milano, Italia
+          </a>
         </Reveal>
 
         <RevealGroup className="foot__social" stagger={0.06}>
