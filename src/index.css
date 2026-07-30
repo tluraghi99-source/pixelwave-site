@@ -34,6 +34,15 @@
    =========================================================================== */
 
 :root {
+  /* JS-driven (Header.tsx): set to the vanished scrollbar's width while the
+     desktop menu panel locks body scroll, 0 otherwise. Locking removes the
+     real scrollbar, which widens the layout viewport — body's own in-flow
+     content is compensated separately (body padding-right), but position:fixed
+     elements ignore that, so the header and .nav__panel both add this same
+     value to their own edge inset, canceling the widening for both in
+     lockstep. Keeps them pinned in place and in agreement with each other. */
+  --scroll-comp: 0px;
+
   /* --- Core brand --------------------------------------------------------- */
   --pw-orange: #FF5B00;
   --pw-cyan:   #00FFFF;
@@ -489,7 +498,7 @@ a { color: var(--text-link); text-decoration: none; }
    =========================================================================== */
 
 .wrap {
-  padding-left: clamp(1.25rem, 2.5vw, 4rem); padding-right: clamp(1.25rem, 2.5vw, 4rem);
+  padding-left: clamp(1rem, 1.2vw, 1.25rem); padding-right: clamp(1rem, 1.2vw, 1.25rem);
 }
 
 .sec { padding-block: clamp(4.5rem, 4.7vw, 12rem); }
@@ -500,6 +509,7 @@ a { color: var(--text-link); text-decoration: none; }
 header.nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: var(--z-header);
   background: transparent; border: none;
+  padding-right: var(--scroll-comp);
 }
 .nav__inner { display: flex; align-items: center; justify-content: space-between; height: 76px; }
 .nav__links { display: flex; gap: 2.25rem; align-items: center; }
@@ -515,10 +525,35 @@ header.nav[data-theme="light"] .nav__link {
 header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .nav__mobile { background: rgba(0,0,0,0.94); backdrop-filter: blur(14px); border-top: 1px solid rgba(255,255,255,0.1); }
 
+/* Menu button's own dark shell — always black/bordered regardless of the
+   header's light/dark theme, with a hover-triggered pixel-grid glow (reused
+   PixelTrail, tinted lime) sampled from a reference recording. Square
+   corners deliberately kept (no border-radius) to match the site's
+   brutalist, all-zero-radius convention. */
+.nav__menu-btn {
+  position: relative; overflow: hidden;
+  background: var(--pw-black);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: border-color var(--dur-base) var(--ease-wave);
+}
+.nav__menu-btn:hover { border-color: rgba(255,255,255,0.2); }
+.nav__menu-btn-grid { z-index: 0; }
+.nav__menu-btn-pixel {
+  background: #c9dc28;
+  box-shadow: 0 0 8px 2px rgba(201,220,40,0.7);
+}
+.nav__menu-btn .ihb, .nav__menu-btn .ihb:hover { border-color: transparent; color: #fff; }
+
 /* Desktop menu panel — a compact dropdown that hugs its own content height
    (not a full-screen takeover), opened like a window shade from the top. */
 .nav__panel {
-  position: fixed; top: 76px; left: 0; right: 0;
+  position: fixed; top: 76px;
+  /* Both sides carry --scroll-comp, even though only the right edge of the
+     viewport actually moves when the scrollbar vanishes — matching it on the
+     left too keeps the panel's own margins symmetric at every instant, at the
+     cost of the left edge making that same small, animation-masked nudge. */
+  left: calc(clamp(1rem, 1.2vw, 1.25rem) + var(--scroll-comp));
+  right: calc(clamp(1rem, 1.2vw, 1.25rem) + var(--scroll-comp));
   transform-origin: 50% 0%;
   background: var(--pw-orange);
   padding-block: clamp(1.75rem, 2.5vw, 3rem);
@@ -839,7 +874,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
    document flow), so the video's iris opens in place from the very first
    pixel of scroll with zero scroll-driven translation of its own; it hands
    off to .reel__inner the instant the iris finishes (HERO_REVEAL_END). */
-.reel__reveal-overlay { position: fixed; inset: 0; overflow: hidden; }
+.reel__reveal-overlay { position: fixed; inset: 0; overflow: hidden; pointer-events: none; }
 /* Sits between the video and .reel__content (z-index 2) — no explicit
    z-index of its own needed, default stacking already puts it above the
    plain-positioned video but below the explicitly-layered content. */
