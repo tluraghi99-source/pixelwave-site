@@ -5,6 +5,7 @@ import { Menu, X } from "lucide-react"
 import { Button } from "@/components/pw/Button"
 import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
 import { BrandLogo } from "@/components/pw/Logo"
+import { PixelTrail } from "@/components/ui/pixel-trail"
 import { EASE_WAVE, HERO_CROSSFADE_RATIO, HERO_NAV_HIDE_AFTER, HERO_REVEAL_END, HERO_REVEAL_START } from "@/lib/motion"
 import { SERVICES } from "@/data/services"
 import { PROJECTS } from "@/data/work"
@@ -93,17 +94,18 @@ export function Header() {
     const isDesktop = window.innerWidth >= 768
     const prevOverflow = document.body.style.overflow
     const prevPaddingRight = document.body.style.paddingRight
-    const prevHeaderPaddingRight = headerRef.current?.style.paddingRight ?? ""
     if (isDesktop) {
-      // Locking overflow removes the scrollbar, which widens the viewport and
-      // shifts everything right-aligned — including the fixed header, which
-      // pads independently since body padding doesn't reach position:fixed
-      // elements. Compensate both by the scrollbar's own width.
+      // Locking overflow removes the scrollbar, widening the layout viewport.
+      // Body's own in-flow content is compensated the standard way (padding
+      // matching the vanished scrollbar's width), but position:fixed elements
+      // (header, .nav__panel) ignore body padding — they read the same width
+      // via the --scroll-comp CSS var instead (index.css), so both cancel the
+      // widening and stay pinned in place, in lockstep with each other.
       const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
       document.body.style.overflow = "hidden"
       if (scrollbarWidth > 0) {
         document.body.style.paddingRight = `${scrollbarWidth}px`
-        if (headerRef.current) headerRef.current.style.paddingRight = `${scrollbarWidth}px`
+        document.documentElement.style.setProperty("--scroll-comp", `${scrollbarWidth}px`)
       }
     }
     const onKey = (e: KeyboardEvent) => {
@@ -123,7 +125,7 @@ export function Header() {
       if (isDesktop) {
         document.body.style.overflow = prevOverflow
         document.body.style.paddingRight = prevPaddingRight
-        if (headerRef.current) headerRef.current.style.paddingRight = prevHeaderPaddingRight
+        document.documentElement.style.setProperty("--scroll-comp", "0px")
       }
       window.removeEventListener("keydown", onKey)
       window.removeEventListener("mousedown", onClickOutside)
@@ -199,13 +201,21 @@ export function Header() {
           )}
         </a>
 
-        <InteractiveHoverButton
-          text={open ? "Close" : "Menu"}
-          icon={open ? <X size={16} /> : <Menu size={16} />}
-          aria-label={open ? "Close menu" : "Open menu"}
-          className="hidden text-foreground md:inline-flex border-none pl-2 pr-6"
-          onClick={() => setOpen((v) => !v)}
-        />
+        <div className="nav__menu-btn hidden md:block">
+          <PixelTrail
+            pixelSize={10}
+            fadeDuration={600}
+            className="nav__menu-btn-grid"
+            pixelClassName="nav__menu-btn-pixel"
+          />
+          <InteractiveHoverButton
+            text={open ? "Close" : "Menu"}
+            icon={open ? <X size={16} /> : <Menu size={16} />}
+            aria-label={open ? "Close menu" : "Open menu"}
+            className="relative z-10 border-none bg-transparent text-foreground"
+            onClick={() => setOpen((v) => !v)}
+          />
+        </div>
 
         <button
           type="button"
