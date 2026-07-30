@@ -35,11 +35,16 @@ export function FitText({
         container.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
       if (naturalWidth > 0 && contentWidth > 0) {
         const fitted = (measureFontSize * contentWidth) / naturalWidth
+        // Very short strings (a single typed character, mid-keystroke on a
+        // live-reactive consumer) have a tiny natural width, so the fit ratio
+        // balloons unreasonably — cap the result at a sane fraction of the
+        // viewport height, same bound regardless of how short the text is.
+        const capped = Math.min(fitted, window.innerHeight * 0.5)
         // Apply immediately: relying on the React re-render alone can no-op if the
         // computed value happens to match the previous state, leaving the DOM stuck
         // at the imperative measurement size set just above.
-        el.style.fontSize = `${fitted}px`
-        setFontSize(fitted)
+        el.style.fontSize = `${capped}px`
+        setFontSize(capped)
       }
     }
 
