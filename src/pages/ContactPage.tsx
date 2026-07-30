@@ -85,9 +85,8 @@ export function ContactPage() {
           ))}
         </div>
 
-        <h2 className="contact-page__eyebrow">{eyebrowText}</h2>
-
         <div className="contact-page__content">
+          <h2 className="contact-page__eyebrow">{eyebrowText}</h2>
           <div
             className={`contact-page__reactive ${reactive.isPlaceholder ? "is-placeholder" : ""}`}
             aria-hidden="true"
