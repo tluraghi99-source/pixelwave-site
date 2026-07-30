@@ -1070,6 +1070,13 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 .contact-page__strip-row { display: flex; align-items: flex-end; gap: 1.5rem; flex-wrap: wrap; }
+.contact-page__back {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: none; border: none; padding: 0.625rem 0; cursor: pointer;
+  font-family: var(--font-text); font-size: 0.85rem; color: var(--text-secondary);
+  transition: color var(--dur-base) var(--ease-wave);
+}
+.contact-page__back:hover { color: var(--pw-white); }
 .contact-page .pw-input { background: var(--surface-raised); border-color: transparent; }
 .contact-page .pw-field__label { display: none; }
 .contact-page__fields { display: flex; gap: 1rem; flex: 1 1 auto; flex-wrap: wrap; }

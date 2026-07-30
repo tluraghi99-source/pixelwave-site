@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { ArrowRight, Check } from "lucide-react"
+import { ArrowLeft, ArrowRight, Check } from "lucide-react"
 import { Input } from "@/components/pw/Input"
 import { Tag } from "@/components/pw/Tag"
 import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
@@ -40,6 +40,10 @@ export function ContactPage() {
       return
     }
     setStepIndex((i) => i + 1)
+  }
+
+  function handleBack() {
+    setStepIndex((i) => Math.max(0, i - 1))
   }
 
   // The giant FitText mirror and its small eyebrow both derive from the same
@@ -117,6 +121,13 @@ export function ContactPage() {
                 exit={{ opacity: 0, y: -12 }}
                 transition={{ duration: 0.35, ease: EASE_WAVE }}
               >
+                {stepIndex > 0 && (
+                  <button type="button" className="contact-page__back" onClick={handleBack}>
+                    <ArrowLeft size={14} aria-hidden="true" />
+                    Back
+                  </button>
+                )}
+
                 {step.key === "detail" && (
                   <div className="contact-page__fields">
                     <Input
