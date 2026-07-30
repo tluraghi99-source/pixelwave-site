@@ -8,7 +8,7 @@ import { useScreenSize } from "@/components/hooks/use-screen-size"
 const SOCIALS = [
   { label: "Instagram", href: "#" },
   { label: "Tiktok", href: "#" },
-  { label: "LinkedIn", href: "#" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/pixelwavestudio/" },
 ]
 
 export function Footer() {
@@ -37,13 +37,22 @@ export function Footer() {
         </Reveal>
 
         <RevealGroup className="foot__social" stagger={0.06}>
-          {SOCIALS.map((s) => (
-            <RevealItem key={s.label}>
-              <a className="foot__social-link" href={s.href}>
-                {s.label}
-              </a>
-            </RevealItem>
-          ))}
+          {SOCIALS.map((s) => {
+            // Real profile URLs open in a new tab, like the address link
+            // above — the "#" placeholders (not live yet) stay inert.
+            const isExternal = s.href.startsWith("http")
+            return (
+              <RevealItem key={s.label}>
+                <a
+                  className="foot__social-link"
+                  href={s.href}
+                  {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                >
+                  {s.label}
+                </a>
+              </RevealItem>
+            )
+          })}
         </RevealGroup>
 
         <Reveal className="foot__cta-wrap" delay={0.1}>
