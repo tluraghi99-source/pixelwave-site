@@ -1131,11 +1131,20 @@ footer { position: relative; isolation: isolate; background: var(--surface-subtl
    PixellWave — motion primitives (preloader, scroll progress, split-text, marquee)
    =========================================================================== */
 
-.preloader { position: fixed; inset: 0; z-index: var(--z-modal); background: var(--pw-black); overflow: hidden; }
+/* background is JS-driven (Preloader.tsx) — starts solid black (matching the
+   grid's own initially-black tiles) and fades out in step with the tiles'
+   late dissolve stage, so real page content shows through the gaps instead
+   of this container's own opaque layer. */
+.preloader { position: fixed; inset: 0; z-index: var(--z-modal); overflow: hidden; }
 .pixel-resolve-grid { position: absolute; inset: 0; display: grid; }
 .pixel-resolve-grid__tile { background: var(--pw-black); }
+.preloader__badge {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2;
+  width: 56px; height: 56px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.4);
+  display: flex; align-items: center; justify-content: center;
+}
 .preloader__pct {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1;
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, calc(-50% + 48px)); z-index: 1;
   font-family: var(--font-mono-accent); font-weight: 600; font-size: clamp(1.75rem, 3vw, 2.5rem);
   color: var(--pw-white); letter-spacing: -0.02em;
 }

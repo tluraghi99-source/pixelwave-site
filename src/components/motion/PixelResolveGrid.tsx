@@ -3,25 +3,34 @@ import { useMotionValueEvent } from "framer-motion"
 import type { MotionValue } from "framer-motion"
 import { useDimensions } from "@/components/hooks/use-debounced-dimensions"
 
+type Stage = "pending" | "colored" | "dissolved"
+
 interface Tile {
   el: HTMLDivElement
-  threshold: number
-  resolved: boolean
+  colorThreshold: number
+  dissolveThreshold: number
+  stage: Stage
 }
 
 interface PixelResolveGridProps {
-  /** 0–100. Any tile whose own threshold is <= this value flips to white. */
+  /** 0–100. Each tile turns solid orange once progress crosses its own
+   *  colorThreshold, then fades to fully transparent once progress crosses
+   *  its own later dissolveThreshold — revealing whatever real content sits
+   *  behind the grid, not just a matching solid color. */
   progress: MotionValue<number>
   /** Square tile size in px. @default 24 */
   tileSize?: number
   className?: string
 }
 
-/** Full-bleed grid of square pixels, all starting black, each independently
- *  flipping to white once `progress` crosses its own randomly-assigned
- *  threshold. Tiles are plain DOM nodes mutated directly (not React state)
- *  since a full-viewport 24px grid is thousands of nodes — same approach
- *  already used by PixelTrail for a similarly-sized grid in this codebase. */
+/** Full-bleed grid of square pixels, all starting black. Each tile
+ *  independently turns accent orange, then later dissolves to fully
+ *  transparent, at its own randomly-assigned pair of thresholds as
+ *  `progress` climbs — a two-stage "fill in, then reveal" resolve rather
+ *  than a single flip. Tiles are plain DOM nodes mutated directly (not React
+ *  state) since a full-viewport 24px grid is thousands of nodes — same
+ *  approach already used by PixelTrail for a similarly-sized grid in this
+ *  codebase. */
 export function PixelResolveGrid({ progress, tileSize = 24, className }: PixelResolveGridProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const dimensions = useDimensions(containerRef)
@@ -45,22 +54,37 @@ export function PixelResolveGrid({ progress, tileSize = 24, className }: PixelRe
       el.className = "pixel-resolve-grid__tile"
       // Square-root of a uniform sample — low thresholds are sparse (slow
       // start), thresholds bunch up near 100 (rapid finish), no spatial
-      // pattern to which tile resolves when.
-      const threshold = Math.pow(Math.random(), 0.5) * 100
-      const resolved = threshold <= current
-      if (resolved) el.style.background = "var(--pw-white)"
+      // pattern to which tile resolves when. dissolveThreshold is always
+      // later than colorThreshold (a further, independent random pick
+      // within the remaining budget up to 100), so every tile spends real
+      // time as solid orange before it dissolves.
+      const colorThreshold = Math.pow(Math.random(), 0.5) * 100
+      const dissolveThreshold = colorThreshold + Math.random() * (100 - colorThreshold)
+      let stage: Stage = "pending"
+      if (dissolveThreshold <= current) {
+        stage = "dissolved"
+        el.style.background = "transparent"
+      } else if (colorThreshold <= current) {
+        stage = "colored"
+        el.style.background = "var(--pw-orange)"
+      }
       container.appendChild(el)
-      tiles.push({ el, threshold, resolved })
+      tiles.push({ el, colorThreshold, dissolveThreshold, stage })
     }
     tilesRef.current = tiles
   }, [cols, rows, tileSize, progress])
 
   useMotionValueEvent(progress, "change", (latest) => {
     for (const tile of tilesRef.current) {
-      if (!tile.resolved && tile.threshold <= latest) {
-        tile.resolved = true
+      if (tile.stage === "pending" && tile.colorThreshold <= latest) {
+        tile.stage = "colored"
         if (!reducedMotion) tile.el.style.transition = "background-color .35s ease"
-        tile.el.style.background = "var(--pw-white)"
+        tile.el.style.background = "var(--pw-orange)"
+      }
+      if (tile.stage === "colored" && tile.dissolveThreshold <= latest) {
+        tile.stage = "dissolved"
+        if (!reducedMotion) tile.el.style.transition = "background-color .35s ease"
+        tile.el.style.background = "transparent"
       }
     }
   })

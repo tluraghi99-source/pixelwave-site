@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react"
+import { motion, useTransform } from "framer-motion"
 import { PixelResolveGrid } from "@/components/motion/PixelResolveGrid"
+import { BrandLogo } from "@/components/pw/Logo"
 import { useLoadProgress } from "@/components/hooks/use-load-progress"
 
 const SEEN_KEY = "pw-intro-seen"
@@ -34,6 +36,16 @@ export function Preloader({ onReveal }: PreloaderProps) {
 
   const { progress, displayPercent } = useLoadProgress({ onReveal: handleReveal, enabled: !alreadySeen })
 
+  // The grid's own tiles provide full opaque coverage at the start (each one
+  // still solid black), so the container itself only needs its own black
+  // backdrop as a safety net for the brief window before the grid's tiles
+  // mount — then it fades out in step with the tiles' own late dissolve, so
+  // real page content shows through the gaps instead of this solid layer.
+  const containerBg = useTransform(progress, [0, 80, 100], ["#000000", "#000000", "rgba(0,0,0,0)"])
+  // Fades in once the grid is meaningfully filled in, matching the point in
+  // the reference recording where its own center mark appears.
+  const badgeOpacity = useTransform(progress, [35, 55], [0, 1])
+
   useEffect(() => {
     if (alreadySeen) onReveal()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -42,9 +54,12 @@ export function Preloader({ onReveal }: PreloaderProps) {
   if (alreadySeen || hidden) return null
 
   return (
-    <div className="preloader">
+    <motion.div className="preloader" style={{ backgroundColor: containerBg }}>
       <PixelResolveGrid progress={progress} />
+      <motion.div className="preloader__badge" style={{ opacity: badgeOpacity }} aria-hidden="true">
+        <BrandLogo variant="icon" height={28} />
+      </motion.div>
       <span className="preloader__pct">{displayPercent}%</span>
-    </div>
+    </motion.div>
   )
 }
