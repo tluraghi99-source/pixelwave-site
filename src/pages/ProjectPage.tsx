@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
 import { ArrowUpRight } from "lucide-react"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
+import { CursorGlow } from "@/components/motion/CursorGlow"
 import { Footer } from "@/components/sections/Footer"
 import { PROJECTS, type Project } from "@/data/work"
 
@@ -166,53 +167,59 @@ export function ProjectPage() {
   return (
     <>
       <main className="project-page" data-theme="dark">
-        <div className="wrap project-overview" data-screen-label="Project Info">
-          <Reveal>
-            <h1 className="project-page__title">{project.title}</h1>
-          </Reveal>
-          <Reveal delay={0.05}>
-            <ProjectMeta year={project.year} />
-          </Reveal>
-          <Reveal delay={0.1}>
-            <p className="secbody">{project.desc}</p>
-          </Reveal>
+        <div className="project-page__hero-glow">
+          <CursorGlow className="cursor-glow" variant="dark" glow />
+          <div className="wrap project-overview" data-screen-label="Project Info">
+            <Reveal>
+              <h1 className="project-page__title">{project.title}</h1>
+            </Reveal>
+            <Reveal delay={0.05}>
+              <ProjectMeta year={project.year} />
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p className="secbody">{project.desc}</p>
+            </Reveal>
+          </div>
         </div>
 
         <ProjectVideo media={project.hero} />
 
-        <div className="wrap project-overview" data-screen-label="Project Overview">
+        <div className="project-page__body-glow">
+          <CursorGlow className="cursor-glow" variant="dark" glow={false} />
+          <div className="wrap project-overview" data-screen-label="Project Overview">
+            <Reveal>
+              <ProjectMeta />
+            </Reveal>
+            <Reveal delay={0.05}>
+              <p className="secbody">{project.desc}</p>
+            </Reveal>
+          </div>
+
+          <RevealGroup className="project-gallery" stagger={0.1} data-screen-label="Project Gallery">
+            <RevealItem>
+              <GalleryRow items={project.gallery.slice(0, Math.ceil(project.gallery.length / 2))} reverse={false} />
+            </RevealItem>
+            <RevealItem>
+              <GalleryRow items={project.gallery.slice(Math.ceil(project.gallery.length / 2))} reverse={true} />
+            </RevealItem>
+          </RevealGroup>
+
           <Reveal>
-            <ProjectMeta />
-          </Reveal>
-          <Reveal delay={0.05}>
-            <p className="secbody">{project.desc}</p>
+            <Link to={`/work/${nextProject.slug}`} className="project-next wrap" data-screen-label="Next Project">
+              <div>
+                <span className="project-next__label">Next project</span>
+                <span className="project-next__title">
+                  {nextProject.title} <ArrowUpRight size={28} />
+                </span>
+              </div>
+              <img
+                className="project-next__thumb"
+                src={nextProject.thumb}
+                alt=""
+              />
+            </Link>
           </Reveal>
         </div>
-
-        <RevealGroup className="project-gallery" stagger={0.1} data-screen-label="Project Gallery">
-          <RevealItem>
-            <GalleryRow items={project.gallery.slice(0, Math.ceil(project.gallery.length / 2))} reverse={false} />
-          </RevealItem>
-          <RevealItem>
-            <GalleryRow items={project.gallery.slice(Math.ceil(project.gallery.length / 2))} reverse={true} />
-          </RevealItem>
-        </RevealGroup>
-
-        <Reveal>
-          <Link to={`/work/${nextProject.slug}`} className="project-next wrap" data-screen-label="Next Project">
-            <div>
-              <span className="project-next__label">Next project</span>
-              <span className="project-next__title">
-                {nextProject.title} <ArrowUpRight size={28} />
-              </span>
-            </div>
-            <img
-              className="project-next__thumb"
-              src={nextProject.thumb}
-              alt=""
-            />
-          </Link>
-        </Reveal>
       </main>
       <Footer />
     </>
