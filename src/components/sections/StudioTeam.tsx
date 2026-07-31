@@ -1,5 +1,6 @@
 import { RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { TEAM } from "@/data/team"
+import { CursorGlow } from "@/components/motion/CursorGlow"
 
 // Temporary stand-in photography (Lorem Picsum) until real team photos are
 // ready — same posture as Work.tsx's GALLERY_ITEMS. Two seeds per person so
@@ -39,6 +40,7 @@ function TeamCard({ member }: { member: (typeof TEAM_WITH_PHOTOS)[number] }) {
 export function StudioTeam() {
   return (
     <section className="studio-team" data-theme="dark" data-screen-label="Studio Team">
+      <CursorGlow className="cursor-glow" variant="dark" glow={false} />
       <div className="wrap">
         <RevealGroup className="team-grid" stagger={0.05} amount={0.05}>
           {TEAM_WITH_PHOTOS.map((m) => (

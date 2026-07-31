@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from "framer-motion"
 import type { MotionValue } from "framer-motion"
 import { RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
+import { CursorGlow } from "@/components/motion/CursorGlow"
 
 // Bright lines read as the primary statement; mid/dim lines are de-emphasized
 // supporting copy — matches the wireframe's white-to-grey graduated look.
@@ -60,6 +61,7 @@ function StudioIntroScrubbed() {
   return (
     <section className="studio-intro" data-theme="dark" data-screen-label="Studio Intro" ref={sectionRef}>
       <div className="grain-overlay" aria-hidden="true" />
+      <CursorGlow className="cursor-glow" variant="dark" glow />
       <div className="studio-intro__hero" aria-hidden="true" />
       <div className="wrap">
         {/* First line is always visible, unanimated — the section sits at the
@@ -87,6 +89,7 @@ function StudioIntroAmbient() {
   return (
     <section className="studio-intro" data-theme="dark" data-screen-label="Studio Intro">
       <div className="grain-overlay" aria-hidden="true" />
+      <CursorGlow className="cursor-glow" variant="dark" glow />
       <div className="studio-intro__hero" aria-hidden="true" />
       <RevealGroup className="wrap" stagger={0.08}>
         {INTRO_LINES.map((line) => (

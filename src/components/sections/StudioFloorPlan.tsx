@@ -3,6 +3,7 @@ import { cubicBezier, motion, useScroll, useTransform } from "framer-motion"
 import { EASE_WAVE } from "@/lib/motion"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
 import { Reveal } from "@/components/motion/Reveal"
+import { CursorGlow } from "@/components/motion/CursorGlow"
 
 // How long each floor stays fully visible before/after the crossfade, and how
 // long the crossfade itself takes, in the same vh-budget style as
@@ -108,6 +109,7 @@ function StudioFloorPinned() {
     >
       <div className="floor-pin__inner">
         <div className="grain-overlay" aria-hidden="true" />
+        <CursorGlow className="cursor-glow" variant="dark" glow={false} />
         <div className="wrap floor-plan">
           <motion.div className="floor-plan__layer" style={{ opacity: floor1Opacity }}>
             <span className="floor-plan__label">Ground Floor</span>
@@ -130,6 +132,7 @@ function StudioFloorAmbient() {
   return (
     <section className="studio-floor-ambient" data-theme="dark" data-screen-label="Studio Floor Plan">
       <div className="grain-overlay" aria-hidden="true" />
+      <CursorGlow className="cursor-glow" variant="dark" glow={false} />
       <div className="wrap">
         <Reveal>
           <div className="floor-plan__layer floor-plan__layer--ambient">

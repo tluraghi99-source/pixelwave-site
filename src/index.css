@@ -623,7 +623,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 /* Studio page (src/pages/StudioPage.tsx) — dark throughout. */
 .studio-page { background: var(--pw-black); }
 
-.studio-intro { padding-bottom: clamp(2rem, 4vw, 3rem); }
+.studio-intro { position: relative; padding-bottom: clamp(2rem, 4vw, 3rem); }
 /* Same role as WorkPage's .work-hero: an empty spacer pushing the real
    content down to start at the vertical midpoint of the viewport. */
 .studio-intro__hero { height: 50svh; }
@@ -635,7 +635,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .studio-intro__line--mid { color: var(--pw-neutral-70); }
 .studio-intro__line--dim { color: var(--pw-neutral-50); }
 
-.studio-team { padding-block: clamp(3rem, 6vw, 6rem); }
+.studio-team { position: relative; padding-block: clamp(3rem, 6vw, 6rem); }
 .team-grid {
   display: grid; grid-template-columns: repeat(4, 1fr);
   gap: clamp(1.25rem, 2vw, 2rem);
@@ -699,7 +699,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .floor-block__right { fill: var(--pw-neutral-10); stroke: var(--pw-white); stroke-width: 1; }
 .floor-block__label { font-family: var(--font-mono-accent); font-size: 11px; fill: var(--text-secondary); }
 
-.studio-floor-ambient { padding-block: clamp(3rem, 6vw, 6rem); }
+.studio-floor-ambient { position: relative; padding-block: clamp(3rem, 6vw, 6rem); }
 .studio-floor-ambient .floor-plan__layer--ambient {
   position: static;
   display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
