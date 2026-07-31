@@ -592,7 +592,6 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   background: var(--surface-page);
   margin-top: 130svh;
 }
-.hero__trail-pixel { background: var(--pw-grey); }
 .hero__bigmark {
   position: absolute; z-index: 2;
   left: clamp(1rem, 4vw, 3rem); bottom: clamp(1.5rem, 5vw, 4rem);
@@ -1175,6 +1174,14 @@ html.nav-open .cursor-dot { background: var(--pw-black); }
 @media (prefers-reduced-motion: reduce) {
   .grain-overlay { animation: none; }
 }
+
+/* Shared positioning for every CursorGlow usage outside the Contact page
+   (which keeps its own dedicated .contact-page__glow, predating this
+   class). Negative z-index means it paints between its nearest positioned
+   ancestor's own background and that ancestor's normal in-flow content —
+   ordinary static content above it needs no z-index of its own to stay on
+   top, so this composes into any section without further layering work. */
+.cursor-glow { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
 .split-text__mask { display: inline-block; overflow: hidden; vertical-align: top; }
 .split-text__word { display: inline-block; will-change: transform; }

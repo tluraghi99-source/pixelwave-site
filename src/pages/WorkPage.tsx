@@ -4,8 +4,7 @@ import { Card } from "@/components/pw/Card"
 import { Tag } from "@/components/pw/Tag"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { Footer } from "@/components/sections/Footer"
-import { PixelTrail } from "@/components/ui/pixel-trail"
-import { useScreenSize } from "@/components/hooks/use-screen-size"
+import { CursorGlow } from "@/components/motion/CursorGlow"
 import { PROJECTS } from "@/data/work"
 
 // "Featured" is a highlight badge, not a category, so it's excluded from the filter row.
@@ -14,7 +13,6 @@ const FILTER_TAGS = Array.from(
 ).filter((label) => label !== "Featured")
 
 export function WorkPage() {
-  const screenSize = useScreenSize()
   const [activeTags, setActiveTags] = useState<Set<string>>(new Set())
 
   function toggleTag(tag: string) {
@@ -37,13 +35,7 @@ export function WorkPage() {
       <main>
         <section className="sec work-page" data-screen-label="All Work">
           <div className="work-hero" data-screen-label="Work Hero">
-            <PixelTrail
-              pixelSize={screenSize.lessThan("md") ? 20 : 32}
-              fadeDuration={1500}
-              delay={0}
-              className="z-0"
-              pixelClassName="hero__trail-pixel"
-            />
+            <CursorGlow className="cursor-glow" variant="light" glow />
           </div>
           <div className="wrap">
             <div className="work-page__head">
