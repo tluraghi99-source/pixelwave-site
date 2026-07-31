@@ -2,6 +2,7 @@ import { useState } from "react"
 import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Tag } from "@/components/pw/Tag"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
+import { CursorGlow } from "@/components/motion/CursorGlow"
 import { SERVICES } from "@/data/services"
 
 // Temporary stand-in photography (Lorem Picsum) until real service imagery is
@@ -74,6 +75,7 @@ export function Services() {
   return (
     <section id="services" className="sec sec--dark" data-theme="dark" data-screen-label="Services">
       <div className="grain-overlay" aria-hidden="true" />
+      <CursorGlow className="cursor-glow" variant="dark" glow={false} />
       <div className="wrap">
         <Reveal>
           <SectionLabel number="02">Services</SectionLabel>

@@ -1090,7 +1090,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   .contact-page__strip-row { gap: 1rem; }
 }
 
-footer { background: var(--surface-subtle); color: var(--pw-black); overflow-x: hidden; }
+footer { position: relative; background: var(--surface-subtle); color: var(--pw-black); overflow-x: hidden; }
 
 .foot__row {
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1.5rem;

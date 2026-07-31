@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { motion, useMotionValue, useSpring } from "framer-motion"
 import { Marquee } from "@/components/motion/Marquee"
+import { CursorGlow } from "@/components/motion/CursorGlow"
 
 const ITEMS = ["Web Design", "Brand Identity", "Motion", "Development", "Design Systems"]
 
@@ -24,6 +25,7 @@ export function TickerStrip() {
 
   return (
     <div className="ticker" data-theme="dark" aria-hidden="true">
+      <CursorGlow className="cursor-glow" variant="dark" glow={false} />
       <Marquee speed={34}>
         {ITEMS.map((item, i) => (
           <motion.span className="ticker__item" key={item} style={{ rotate: springRotate }}>
