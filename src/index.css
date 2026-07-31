@@ -503,7 +503,7 @@ a { color: var(--text-link); text-decoration: none; }
 
 .sec { padding-block: clamp(4.5rem, 4.7vw, 12rem); }
 .sec--tint { background: var(--surface-subtle); }
-.sec--dark { position: relative; background: var(--pw-black); color: var(--pw-white); }
+.sec--dark { position: relative; isolation: isolate; background: var(--pw-black); color: var(--pw-white); }
 .sec--dark .secbody { color: rgba(255,255,255,0.66); }
 
 header.nav {
@@ -579,6 +579,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 
 .hero {
   position: fixed; top: 0; left: 0; right: 0; height: 100svh; overflow: hidden;
+  isolation: isolate;
   background: var(--pw-white); color: var(--pw-black);
   z-index: 0;
 }
@@ -609,7 +610,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .video-scrub--ambient { height: 70vh; }
 
 /* ticker */
-.ticker { position: relative; padding-block: clamp(1.5rem, 2vw, 3rem); background: var(--pw-black); }
+.ticker { position: relative; isolation: isolate; padding-block: clamp(1.5rem, 2vw, 3rem); background: var(--pw-black); }
 .ticker__item {
   display: inline-flex; align-items: center; gap: clamp(2rem, 2.6vw, 4rem);
   font-family: var(--font-display); font-weight: 600; font-size: clamp(4rem, 4.7vw, 8rem);
@@ -623,7 +624,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 /* Studio page (src/pages/StudioPage.tsx) — dark throughout. */
 .studio-page { background: var(--pw-black); }
 
-.studio-intro { position: relative; padding-bottom: clamp(2rem, 4vw, 3rem); }
+.studio-intro { position: relative; isolation: isolate; padding-bottom: clamp(2rem, 4vw, 3rem); }
 /* Same role as WorkPage's .work-hero: an empty spacer pushing the real
    content down to start at the vertical midpoint of the viewport. */
 .studio-intro__hero { height: 50svh; }
@@ -635,7 +636,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .studio-intro__line--mid { color: var(--pw-neutral-70); }
 .studio-intro__line--dim { color: var(--pw-neutral-50); }
 
-.studio-team { position: relative; padding-block: clamp(3rem, 6vw, 6rem); }
+.studio-team { position: relative; isolation: isolate; padding-block: clamp(3rem, 6vw, 6rem); }
 .team-grid {
   display: grid; grid-template-columns: repeat(4, 1fr);
   gap: clamp(1.25rem, 2vw, 2rem);
@@ -675,6 +676,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .floor-pin { position: relative; height: 300vh; }
 .floor-pin__inner {
   position: sticky; top: 0; height: 100svh; overflow: hidden;
+  isolation: isolate;
   background: var(--pw-black);
   display: flex; align-items: center;
 }
@@ -699,7 +701,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .floor-block__right { fill: var(--pw-neutral-10); stroke: var(--pw-white); stroke-width: 1; }
 .floor-block__label { font-family: var(--font-mono-accent); font-size: 11px; fill: var(--text-secondary); }
 
-.studio-floor-ambient { position: relative; padding-block: clamp(3rem, 6vw, 6rem); }
+.studio-floor-ambient { position: relative; isolation: isolate; padding-block: clamp(3rem, 6vw, 6rem); }
 .studio-floor-ambient .floor-plan__layer--ambient {
   position: static;
   display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
@@ -720,12 +722,12 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
    The hero block below supplies that space itself (flush to the very top,
    under the transparent header — same as the homepage hero) rather than
    this being blank padding. */
-.work-page { padding-top: 0; }
+.work-page { position: relative; isolation: isolate; padding-top: 0; }
 /* Same visual language as the homepage's Hero (interactive pixel-trail),
    just static — there's no header logo to dock into on this page, so no
    scroll-driven shrink/handoff, and it sits in normal flow, not pinned. */
 .work-hero {
-  position: relative; height: 50svh; overflow: hidden;
+  position: relative; isolation: isolate; height: 50svh; overflow: hidden;
   background: var(--pw-white); color: var(--pw-black);
 }
 .work-page__head {
@@ -771,8 +773,8 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 /* Starts at the vertical midpoint of the viewport, same convention as
    .work-hero on /work and .studio-intro__hero on /studio. */
 .project-page { padding-top: 50svh; background: var(--pw-black); color: var(--pw-white); }
-.project-page__hero-glow { position: relative; }
-.project-page__body-glow { position: relative; }
+.project-page__hero-glow { position: relative; isolation: isolate; }
+.project-page__body-glow { position: relative; isolation: isolate; }
 .project-page__not-found { padding-block: 0 8rem; }
 
 .project-page__title {
@@ -1092,7 +1094,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   .contact-page__strip-row { gap: 1rem; }
 }
 
-footer { position: relative; background: var(--surface-subtle); color: var(--pw-black); overflow-x: hidden; }
+footer { position: relative; isolation: isolate; background: var(--surface-subtle); color: var(--pw-black); overflow-x: hidden; }
 
 .foot__row {
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1.5rem;
@@ -1182,7 +1184,14 @@ html.nav-open .cursor-dot { background: var(--pw-black); }
    class). Negative z-index means it paints between its nearest positioned
    ancestor's own background and that ancestor's normal in-flow content —
    ordinary static content above it needs no z-index of its own to stay on
-   top, so this composes into any section without further layering work. */
+   top, so this composes into any section without further layering work.
+   This only works if the host element itself forms a new stacking context
+   (e.g. via `isolation: isolate`, or `position: fixed`/`sticky` which form
+   one on their own) — `position: relative` alone (z-index: auto) does NOT
+   create a stacking context, so without one the canvas escapes to the
+   nearest ancestor that does and paints below THAT ancestor's background
+   instead, becoming invisible. Every host rule below must carry
+   `isolation: isolate` (or equivalent) alongside its `position`. */
 .cursor-glow { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
 .split-text__mask { display: inline-block; overflow: hidden; vertical-align: top; }
