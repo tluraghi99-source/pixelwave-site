@@ -643,6 +643,12 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   padding-block: clamp(2.5rem, 3vw, 5rem);
 }
 .client-logos__row + .client-logos__row { margin-top: clamp(1.5rem, 2vw, 2rem); }
+/* Marquee translates its track by exactly one group's width to loop
+   seamlessly — with only 5 sparse items per row, a group is narrower than
+   the viewport at most desktop sizes, leaving a blank gap each cycle.
+   min-width: 100vw (not 100%, which would resolve against the track's own
+   max-content width and collapse) forces every group to at least
+   viewport-width, and space-around spreads the sparse items across it. */
 .client-logos__row .marquee__group { min-width: 100vw; justify-content: space-around; }
 .client-logos__item {
   display: inline-block;
