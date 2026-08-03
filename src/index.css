@@ -651,14 +651,13 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
    viewport-width, and space-around spreads the sparse items across it. */
 .client-logos__row .marquee__group { min-width: 100vw; justify-content: space-around; }
 .client-logos__item {
-  display: inline-block;
-  font-family: var(--font-display); font-weight: 600; letter-spacing: 0.02em;
-  font-size: clamp(1.1rem, 1.6vw, 1.5rem);
-  color: var(--pw-neutral-60);
-  padding-right: clamp(2rem, 2.6vw, 4rem); white-space: nowrap;
-  transition: color var(--dur-base) var(--ease-wave);
+  display: block;
+  height: clamp(1.5rem, 2.2vw, 2rem); width: auto;
+  padding-right: clamp(2rem, 2.6vw, 4rem);
+  opacity: 0.5;
+  transition: opacity var(--dur-base) var(--ease-wave);
 }
-.client-logos__item:hover { color: var(--pw-white); }
+.client-logos__item:hover { opacity: 1; }
 
 /* Studio page (src/pages/StudioPage.tsx) — dark throughout. */
 .studio-page { background: var(--pw-black); }
