@@ -54,6 +54,9 @@ export function Header() {
   const [onDark, setOnDark] = useState(true)
   const lastY = useRef(0)
   const headerRef = useRef<HTMLElement>(null)
+  const scrollLockedRef = useRef(false)
+  const prevOverflowRef = useRef("")
+  const prevPaddingRightRef = useRef("")
   const { scrollY } = useScroll()
   const vh = typeof window !== "undefined" ? window.innerHeight : 900
   const { pathname } = useLocation()
@@ -89,24 +92,30 @@ export function Header() {
 
   // The full-panel menu is a fixed overlay, so lock page scroll while it's
   // open on desktop (mobile's dropdown stays in normal flow, no lock needed).
+  // Releasing the lock happens in releaseScrollLock (called from
+  // AnimatePresence's onExitComplete below), NOT in this effect's own
+  // cleanup — the exit animation runs for 0.5s after `open` already flips to
+  // false, and restoring the scrollbar that early snapped the still-visible,
+  // still-animating panel's width mid-transition.
   useEffect(() => {
     if (!open) return
     const isDesktop = window.innerWidth >= 768
-    const prevOverflow = document.body.style.overflow
-    const prevPaddingRight = document.body.style.paddingRight
-    if (isDesktop) {
+    if (isDesktop && !scrollLockedRef.current) {
       // Locking overflow removes the scrollbar, widening the layout viewport.
       // Body's own in-flow content is compensated the standard way (padding
       // matching the vanished scrollbar's width), but position:fixed elements
       // (header, .nav__panel) ignore body padding — they read the same width
       // via the --scroll-comp CSS var instead (index.css), so both cancel the
       // widening and stay pinned in place, in lockstep with each other.
+      prevOverflowRef.current = document.body.style.overflow
+      prevPaddingRightRef.current = document.body.style.paddingRight
       const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
       document.body.style.overflow = "hidden"
       if (scrollbarWidth > 0) {
         document.body.style.paddingRight = `${scrollbarWidth}px`
         document.documentElement.style.setProperty("--scroll-comp", `${scrollbarWidth}px`)
       }
+      scrollLockedRef.current = true
     }
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false)
@@ -122,15 +131,18 @@ export function Header() {
     window.addEventListener("keydown", onKey)
     window.addEventListener("mousedown", onClickOutside)
     return () => {
-      if (isDesktop) {
-        document.body.style.overflow = prevOverflow
-        document.body.style.paddingRight = prevPaddingRight
-        document.documentElement.style.setProperty("--scroll-comp", "0px")
-      }
       window.removeEventListener("keydown", onKey)
       window.removeEventListener("mousedown", onClickOutside)
     }
   }, [open])
+
+  function releaseScrollLock() {
+    if (!scrollLockedRef.current) return
+    document.body.style.overflow = prevOverflowRef.current
+    document.body.style.paddingRight = prevPaddingRightRef.current
+    document.documentElement.style.setProperty("--scroll-comp", "0px")
+    scrollLockedRef.current = false
+  }
 
   // Same HERO_REVEAL_START/END window as Hero's own revealProgress and
   // WorkReel's video iris — independently computed here off the identical
@@ -227,7 +239,7 @@ export function Header() {
         </button>
       </div>
 
-      <AnimatePresence>
+      <AnimatePresence onExitComplete={releaseScrollLock}>
         {open && (
           <motion.div
             key="nav-panel"

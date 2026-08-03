@@ -548,11 +548,12 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
    (not a full-screen takeover), opened like a window shade from the top. */
 .nav__panel {
   position: fixed; top: 76px;
-  /* Both sides carry --scroll-comp, even though only the right edge of the
-     viewport actually moves when the scrollbar vanishes — matching it on the
-     left too keeps the panel's own margins symmetric at every instant, at the
-     cost of the left edge making that same small, animation-masked nudge. */
-  left: calc(clamp(1rem, 1.2vw, 1.25rem) + var(--scroll-comp));
+  /* Only the right edge of the viewport actually moves when the scrollbar
+     vanishes, so only the right inset carries --scroll-comp — matching
+     header.nav's own left/right treatment exactly, so the panel's edges stay
+     aligned with the logo/menu-button margins above it instead of drifting
+     inward on the left while open. */
+  left: clamp(1rem, 1.2vw, 1.25rem);
   right: calc(clamp(1rem, 1.2vw, 1.25rem) + var(--scroll-comp));
   transform-origin: 50% 0%;
   background: var(--pw-orange);
