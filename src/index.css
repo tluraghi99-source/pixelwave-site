@@ -605,8 +605,9 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .hero__bigmark {
   position: absolute; z-index: 2;
   /* Matches .wrap's own left margin so this bleeds in from the same edge
-     every other section's content (nav logo included) aligns to. */
-  left: clamp(1rem, 1.2vw, 1.25rem); bottom: clamp(1.5rem, 5vw, 4rem);
+     every other section's content (nav logo included) aligns to — bottom
+     carries the same value so both insets match. */
+  left: clamp(1rem, 1.2vw, 1.25rem); bottom: clamp(1rem, 1.2vw, 1.25rem);
 }
 .hero__bigmark-img {
   display: block; width: 75vw; height: auto;
