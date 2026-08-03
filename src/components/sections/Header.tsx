@@ -7,7 +7,6 @@ import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
 import { BrandLogo } from "@/components/pw/Logo"
 import { PixelTrail } from "@/components/ui/pixel-trail"
 import { EASE_WAVE, HERO_CROSSFADE_RATIO, HERO_NAV_HIDE_AFTER, HERO_REVEAL_END, HERO_REVEAL_START } from "@/lib/motion"
-import { SERVICES } from "@/data/services"
 import { PROJECTS } from "@/data/work"
 
 // "Work" goes to the dedicated /work page (like the carousel's "All projects"
@@ -30,7 +29,7 @@ const MENU_COLUMNS = [
   {
     label: "Services",
     href: "#services",
-    links: SERVICES.map((s) => ({ label: s.name, href: "#services" })),
+    links: [] as { label: string; href: string }[],
   },
   {
     label: "Studio",
