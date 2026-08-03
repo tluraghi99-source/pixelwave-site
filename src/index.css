@@ -633,6 +633,26 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .ticker__dot { width: clamp(10px, 0.6vw, 16px); height: clamp(10px, 0.6vw, 16px); border-radius: 50%; background: var(--pw-neutral-80); }
 .ticker__dot--orange { background: var(--pw-orange); }
 
+/* client logo wall — two Marquee rows scrolling opposite directions,
+   between .ticker and Services. Dark like both neighbors; isolation:
+   isolate is required here because .cursor-glow relies on z-index: -1,
+   which only works if this element establishes its own stacking context. */
+.client-logos {
+  position: relative; isolation: isolate;
+  background: var(--pw-black);
+  padding-block: clamp(2.5rem, 3vw, 5rem);
+}
+.client-logos__row + .client-logos__row { margin-top: clamp(1.5rem, 2vw, 2rem); }
+.client-logos__item {
+  display: inline-block;
+  font-family: var(--font-display); font-weight: 600; letter-spacing: 0.02em;
+  font-size: clamp(1.1rem, 1.6vw, 1.5rem);
+  color: var(--pw-neutral-60);
+  padding-right: clamp(2rem, 2.6vw, 4rem); white-space: nowrap;
+  transition: color var(--dur-base) var(--ease-wave);
+}
+.client-logos__item:hover { color: var(--pw-white); }
+
 /* Studio page (src/pages/StudioPage.tsx) — dark throughout. */
 .studio-page { background: var(--pw-black); }
 
