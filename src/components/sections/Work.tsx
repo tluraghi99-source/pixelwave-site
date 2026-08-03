@@ -3,7 +3,6 @@ import { motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useT
 import type { MotionValue } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
 import { SectionLabel } from "@/components/pw/SectionLabel"
-import { Button } from "@/components/pw/Button"
 import { Card } from "@/components/pw/Card"
 import { Tag } from "@/components/pw/Tag"
 import { Reveal } from "@/components/motion/Reveal"
@@ -124,11 +123,6 @@ export function WorkHeading(): ReactNode {
           <p className="lead">Recent waves.</p>
         </Reveal>
       </div>
-      <Reveal delay={0.15}>
-        <Button variant="secondary" href="/work">
-          All projects
-        </Button>
-      </Reveal>
     </div>
   )
 }
