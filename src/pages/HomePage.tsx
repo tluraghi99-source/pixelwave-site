@@ -19,8 +19,8 @@ export function HomePage() {
         <main>
           <WorkReel />
           <TickerStrip />
-          <ClientLogos />
           <Services />
+          <ClientLogos />
         </main>
         <Footer />
       </div>
