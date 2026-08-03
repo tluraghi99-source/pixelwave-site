@@ -3,9 +3,11 @@ import { Marquee } from "@/components/motion/Marquee"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { CLIENTS } from "@/data/clients"
 
-const MID = Math.ceil(CLIENTS.length / 2)
-const ROW_ONE = CLIENTS.slice(0, MID)
-const ROW_TWO = CLIENTS.slice(MID)
+// Every row repeats the full roster rather than splitting it in half —
+// denser than one logo per client, but all items are the same placeholder
+// image anyway, so there's nothing lost by showing each row twice as many.
+const ROW_ONE = CLIENTS
+const ROW_TWO = CLIENTS
 
 // No real client logo files exist yet — every item shows our own wordmark
 // as a repeated placeholder graphic, standing in for a future per-client

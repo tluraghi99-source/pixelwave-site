@@ -653,8 +653,8 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .client-logos__item {
   display: block;
   height: clamp(1.5rem, 2.2vw, 2rem); width: auto;
-  padding-right: clamp(2rem, 2.6vw, 4rem);
-  opacity: 0.5;
+  padding-right: clamp(0.75rem, 1vw, 1.5rem);
+  opacity: 0.3;
   transition: opacity var(--dur-base) var(--ease-wave);
 }
 .client-logos__item:hover { opacity: 1; }
