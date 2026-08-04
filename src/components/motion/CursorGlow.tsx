@@ -18,6 +18,10 @@ interface CursorGlowProps {
 
 const CELL = 26
 const RADIUS = 190
+/** How long after the cursor stops moving the glow takes to fully fade back
+ *  to the plain baseline grid — the glow only ever appears while the mouse
+ *  is actively in motion, not as a static highlight sitting at rest. */
+const IDLE_FADE_MS = 450
 
 /** Ambient background layer — a faint dot grid, optionally glowing the
  *  site's accent orange near the cursor. Purely decorative (aria-hidden, no
@@ -33,6 +37,10 @@ export function CursorGlow({ className, variant = "dark", glow = true }: CursorG
     if (!canvas || !ctx) return
 
     const mouse = { x: -9999, y: -9999 }
+    // Never set on mount, only by real movement — starts at -Infinity so the
+    // very first frame (before any mousemove) computes as fully idle rather
+    // than a stale "just moved" glow.
+    let lastMoveTime = -Infinity
     let raf = 0
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     const baseline = variant === "light" ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)"
@@ -57,6 +65,12 @@ export function CursorGlow({ className, variant = "dark", glow = true }: CursorG
       const w = canvas!.width
       const h = canvas!.height
       ctx!.clearRect(0, 0, w, h)
+      // Full strength the instant the cursor moves, fading linearly back to
+      // 0 (plain baseline dots, regardless of distance to the last known
+      // position) once it's been idle for IDLE_FADE_MS — the glow reads as
+      // something the motion itself produces, not a fixed spotlight.
+      const idleFor = performance.now() - lastMoveTime
+      const activeFactor = Math.max(0, 1 - idleFor / IDLE_FADE_MS)
       const cols = Math.ceil(w / CELL)
       const rows = Math.ceil(h / CELL)
       for (let i = 0; i < cols; i++) {
@@ -66,7 +80,7 @@ export function CursorGlow({ className, variant = "dark", glow = true }: CursorG
           const dx = cx - mouse.x
           const dy = cy - mouse.y
           const dist = Math.sqrt(dx * dx + dy * dy)
-          const t = Math.max(0, 1 - dist / RADIUS)
+          const t = Math.max(0, 1 - dist / RADIUS) * activeFactor
           const size = 2 + t * 3
           ctx!.fillStyle = t > 0.02 ? `rgba(255,91,0,${(0.08 + t * 0.85).toFixed(3)})` : baseline
           ctx!.fillRect(cx - size / 2, cy - size / 2, size, size)
@@ -78,10 +92,12 @@ export function CursorGlow({ className, variant = "dark", glow = true }: CursorG
       const rect = canvas!.getBoundingClientRect()
       mouse.x = e.clientX - rect.left
       mouse.y = e.clientY - rect.top
+      lastMoveTime = performance.now()
     }
     function handleLeave() {
       mouse.x = -9999
       mouse.y = -9999
+      lastMoveTime = -Infinity
     }
 
     resize()
