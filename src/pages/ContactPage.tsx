@@ -5,6 +5,7 @@ import { Input } from "@/components/pw/Input"
 import { Tag } from "@/components/pw/Tag"
 import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
 import { CursorGlow } from "@/components/motion/CursorGlow"
+import { CursorHint } from "@/components/motion/CursorHint"
 import { EASE_WAVE } from "@/lib/motion"
 
 const STEPS = [
@@ -73,6 +74,7 @@ export function ContactPage() {
       <section className="contact-page" data-theme="dark" data-screen-label="Contact">
         <div className="grain-overlay" aria-hidden="true" />
         <CursorGlow className="contact-page__glow" />
+        <CursorHint />
 
         <div
           className="contact-page__progress"

@@ -1232,6 +1232,20 @@ footer { position: relative; isolation: isolate; background: var(--surface-subtl
    open state) isn't an ancestor of CustomCursor's dot in the DOM. */
 html.nav-open .cursor-dot { background: var(--pw-black); }
 
+.cursor-hint {
+  position: fixed; top: 0; left: 0; pointer-events: none; z-index: var(--z-toast);
+  font-family: var(--font-text); font-size: 1.05rem; font-weight: 500;
+  color: var(--pw-orange); white-space: nowrap;
+  animation: cursor-hint-glow 2.6s ease-in-out infinite;
+}
+@keyframes cursor-hint-glow {
+  0%, 100% { text-shadow: 0 0 6px rgba(255, 91, 0, 0.25); }
+  50% { text-shadow: 0 0 16px rgba(255, 91, 0, 0.75); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cursor-hint { animation: none; text-shadow: 0 0 10px rgba(255, 91, 0, 0.5); }
+}
+
 .grain-overlay {
   position: absolute; inset: 0; z-index: 5; pointer-events: none;
   opacity: 0.09;
