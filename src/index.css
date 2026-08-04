@@ -1234,16 +1234,28 @@ html.nav-open .cursor-dot { background: var(--pw-black); }
 
 .cursor-hint {
   position: fixed; top: 0; left: 0; pointer-events: none; z-index: var(--z-toast);
+}
+.cursor-hint__inner {
+  display: inline-block;
   font-family: var(--font-text); font-size: 1.05rem; font-weight: 500;
   color: var(--pw-orange); white-space: nowrap;
-  animation: cursor-hint-glow 2.6s ease-in-out infinite;
 }
+.cursor-hint__inner--glow { animation: cursor-hint-glow 2.6s ease-in-out infinite; }
 @keyframes cursor-hint-glow {
   0%, 100% { text-shadow: 0 0 6px rgba(255, 91, 0, 0.25); }
   50% { text-shadow: 0 0 16px rgba(255, 91, 0, 0.75); }
 }
+/* Bobs up and down in place — the motion itself stands in for the
+   scrolling gesture the text is suggesting, rather than pointing at it
+   with an arrow/chevron. */
+.cursor-hint__inner--bounce { animation: cursor-hint-bounce 1.2s ease-in-out infinite; }
+@keyframes cursor-hint-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .cursor-hint { animation: none; text-shadow: 0 0 10px rgba(255, 91, 0, 0.5); }
+  .cursor-hint__inner--glow { animation: none; text-shadow: 0 0 10px rgba(255, 91, 0, 0.5); }
+  .cursor-hint__inner--bounce { animation: none; }
 }
 
 .grain-overlay {

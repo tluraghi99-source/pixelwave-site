@@ -1,14 +1,30 @@
 import { useEffect, useState } from "react"
 import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion"
 
-/** How long the hint stays up before fading, regardless of mouse movement. */
-const VISIBLE_MS = 3500
+/** How long the hint stays up before fading, regardless of mouse movement
+ *  (or of scroll, on the `dismissOnScroll` path — a safety net in case the
+ *  visitor never actually scrolls). */
+const DEFAULT_AUTO_HIDE_MS = 3500
 
-/** Small "Let's chat" label that trails the cursor on arrival, fine-pointer
- *  (desktop) only — a one-time nudge toward the page's own purpose, not a
- *  persistent nag. Fades on a fixed timer rather than on first move, so it
+interface CursorHintProps {
+  text: string
+  /** "glow" breathes an orange text-shadow (Contact's "Let's chat" nudge);
+   *  "bounce" bobs the text up and down instead, to mimic scroll motion
+   *  (Hero's "Scroll" nudge). */
+  variant?: "glow" | "bounce"
+  /** @default 3500 */
+  autoHideMs?: number
+  /** Also dismiss the instant the page actually scrolls, in addition to the
+   *  autoHideMs fallback — appropriate when the hint's own text is itself
+   *  the action being suggested. */
+  dismissOnScroll?: boolean
+}
+
+/** Small text label that trails the cursor on arrival, fine-pointer (desktop)
+ *  only — a one-time nudge, not a persistent nag. Fades on a fixed timer
+ *  (and optionally on first scroll) rather than on first mouse move, so it
  *  reads even if the visitor's mouse is already resting somewhere. */
-export function CursorHint() {
+export function CursorHint({ text, variant = "glow", autoHideMs = DEFAULT_AUTO_HIDE_MS, dismissOnScroll = false }: CursorHintProps) {
   const [enabled, setEnabled] = useState(false)
   const [visible, setVisible] = useState(true)
   const x = useMotionValue(-200)
@@ -35,13 +51,18 @@ export function CursorHint() {
       x.set(e.clientX + 18)
       y.set(e.clientY - 12)
     }
+    function handleScroll() {
+      setVisible(false)
+    }
     window.addEventListener("mousemove", handleMove)
-    const timer = setTimeout(() => setVisible(false), VISIBLE_MS)
+    if (dismissOnScroll) window.addEventListener("scroll", handleScroll, { passive: true })
+    const timer = setTimeout(() => setVisible(false), autoHideMs)
     return () => {
       window.removeEventListener("mousemove", handleMove)
+      if (dismissOnScroll) window.removeEventListener("scroll", handleScroll)
       clearTimeout(timer)
     }
-  }, [enabled, x, y])
+  }, [enabled, x, y, autoHideMs, dismissOnScroll])
 
   if (!enabled) return null
 
@@ -57,7 +78,7 @@ export function CursorHint() {
           transition={{ duration: 0.4 }}
           aria-hidden="true"
         >
-          Let's chat
+          <span className={`cursor-hint__inner cursor-hint__inner--${variant}`}>{text}</span>
         </motion.span>
       )}
     </AnimatePresence>

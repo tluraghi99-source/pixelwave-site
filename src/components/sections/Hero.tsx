@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from "framer-motion"
 import logoWordmark from "@/assets/logo-wordmark.svg"
 import { EASE_WAVE, HERO_CROSSFADE_RATIO, HERO_REVEAL_END, HERO_REVEAL_START } from "@/lib/motion"
 import { CursorGlow } from "@/components/motion/CursorGlow"
+import { CursorHint } from "@/components/motion/CursorHint"
 
 interface HeroProps {
   introDone: boolean
@@ -81,6 +82,7 @@ export function Hero({ introDone }: HeroProps) {
           section before building the real site-wide version. */}
       <div className="grain-overlay" aria-hidden="true" />
       <CursorGlow className="cursor-glow" variant="light" glow />
+      {introDone && <CursorHint text="Scroll" variant="bounce" autoHideMs={6000} dismissOnScroll />}
 
       <motion.div
         ref={wrapRef}

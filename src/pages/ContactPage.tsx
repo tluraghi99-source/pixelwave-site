@@ -74,7 +74,7 @@ export function ContactPage() {
       <section className="contact-page" data-theme="dark" data-screen-label="Contact">
         <div className="grain-overlay" aria-hidden="true" />
         <CursorGlow className="contact-page__glow" />
-        <CursorHint />
+        <CursorHint text="Let's chat" />
 
         <div
           className="contact-page__progress"
