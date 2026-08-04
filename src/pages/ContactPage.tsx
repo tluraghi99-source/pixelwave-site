@@ -21,7 +21,7 @@ export function ContactPage() {
   const [stepIndex, setStepIndex] = useState(0)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
-  const [projectType, setProjectType] = useState<string | null>(null)
+  const [projectTypes, setProjectTypes] = useState<string[]>([])
   const [timeline, setTimeline] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
 
@@ -31,7 +31,7 @@ export function ContactPage() {
     step.key === "detail"
       ? name.trim() !== "" && email.trim() !== ""
       : step.key === "type"
-        ? projectType !== null
+        ? projectTypes.length > 0
         : timeline !== null
 
   function handleNext() {
@@ -47,6 +47,10 @@ export function ContactPage() {
     setStepIndex((i) => Math.max(0, i - 1))
   }
 
+  function toggleProjectType(t: string) {
+    setProjectTypes((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]))
+  }
+
   // The giant FitText mirror and its small eyebrow both derive from the same
   // state the real, accessible controls below already expose — there's
   // nothing here a screen reader needs that the labeled Input/Tag controls
@@ -58,7 +62,7 @@ export function ContactPage() {
     : step.key === "detail"
       ? { text: hasName ? name : "Your name", isPlaceholder: !hasName }
       : step.key === "type"
-        ? { text: projectType ?? "Pick a project type", isPlaceholder: projectType === null }
+        ? { text: projectTypes.length > 0 ? projectTypes.join(" + ") : "Pick a project type", isPlaceholder: projectTypes.length === 0 }
         : { text: timeline ?? "Pick a timeline", isPlaceholder: timeline === null }
 
   const eyebrowText = sent
@@ -154,8 +158,8 @@ export function ContactPage() {
                       <Tag
                         key={t}
                         interactive
-                        variant={projectType === t ? "orange" : "outline"}
-                        onClick={() => setProjectType(t)}
+                        variant={projectTypes.includes(t) ? "orange" : "outline"}
+                        onClick={() => toggleProjectType(t)}
                       >
                         {t}
                       </Tag>
