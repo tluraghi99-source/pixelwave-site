@@ -1136,7 +1136,11 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   padding: 1.75rem clamp(1rem, 1.2vw, 1.25rem) 2.25rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
-.contact-page__strip-row { display: flex; align-items: flex-end; gap: 1.5rem; flex-wrap: wrap; }
+/* baseline (not flex-end) so the Back button's text lines up with the tag
+   chips' own text — .pw-tag's underline styling (padding-bottom + border)
+   sits below its text, so bottom-aligning boxes left the chip text sitting
+   visibly higher than "Back". */
+.contact-page__strip-row { display: flex; align-items: baseline; gap: 1.5rem; flex-wrap: wrap; }
 .contact-page__back {
   display: inline-flex; align-items: center; gap: 0.4rem;
   background: none; border: none; padding: 0.625rem 0; cursor: pointer;
