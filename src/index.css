@@ -1126,6 +1126,9 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   font-size: clamp(2.4rem, 8vw, 6.4rem);
   line-height: 0.94; letter-spacing: -0.02em;
   max-width: 100%; text-wrap: balance; word-break: break-word;
+  /* Preserves the explicit "\n" formatProjectTypes inserts after every
+     third selected project type, on top of the usual natural wrapping. */
+  white-space: pre-line;
   color: var(--pw-white);
   transition: color 0.15s ease;
 }

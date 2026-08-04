@@ -17,6 +17,16 @@ const STEPS = [
 const PROJECT_TYPES = ["Web Design", "Brand Identity", "Motion", "Development"]
 const TIMELINES = ["ASAP", "1–3 months", "3–6 months", "Not sure yet"]
 
+/** Joins selected types with " + ", breaking to a new line after every third
+ *  one so a long selection doesn't run into a single unwieldy line. */
+function formatProjectTypes(types: string[]): string {
+  const lines: string[] = []
+  for (let i = 0; i < types.length; i += 3) {
+    lines.push(types.slice(i, i + 3).join(" + "))
+  }
+  return lines.join("\n")
+}
+
 export function ContactPage() {
   const [stepIndex, setStepIndex] = useState(0)
   const [name, setName] = useState("")
@@ -62,7 +72,7 @@ export function ContactPage() {
     : step.key === "detail"
       ? { text: hasName ? name : "Your name", isPlaceholder: !hasName }
       : step.key === "type"
-        ? { text: projectTypes.length > 0 ? projectTypes.join(" + ") : "Pick a project type", isPlaceholder: projectTypes.length === 0 }
+        ? { text: projectTypes.length > 0 ? formatProjectTypes(projectTypes) : "Pick a project type", isPlaceholder: projectTypes.length === 0 }
         : { text: timeline ?? "Pick a timeline", isPlaceholder: timeline === null }
 
   const eyebrowText = sent
