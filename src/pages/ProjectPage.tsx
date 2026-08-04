@@ -171,12 +171,17 @@ export function ProjectPage() {
           <CursorGlow className="cursor-glow" variant="dark" glow />
           <div className="wrap project-overview" data-screen-label="Project Info">
             <Reveal>
-              <h1 className="project-page__title">{project.title}</h1>
+              <Link to="/work" className="project-back">
+                ← All projects
+              </Link>
             </Reveal>
             <Reveal delay={0.05}>
-              <ProjectMeta year={project.year} />
+              <h1 className="project-page__title">{project.title}</h1>
             </Reveal>
             <Reveal delay={0.1}>
+              <ProjectMeta year={project.year} />
+            </Reveal>
+            <Reveal delay={0.15}>
               <p className="secbody">{project.desc}</p>
             </Reveal>
           </div>
