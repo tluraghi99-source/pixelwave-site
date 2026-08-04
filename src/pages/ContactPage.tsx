@@ -12,6 +12,7 @@ const STEPS = [
   { key: "detail", label: "Detail" },
   { key: "type", label: "Project type" },
   { key: "when", label: "When" },
+  { key: "review", label: "Review" },
 ] as const
 
 const PROJECT_TYPES = ["Web Design", "Brand Identity", "Motion", "Development"]
@@ -42,7 +43,9 @@ export function ContactPage() {
       ? name.trim() !== "" && email.trim() !== ""
       : step.key === "type"
         ? projectTypes.length > 0
-        : timeline !== null
+        : step.key === "when"
+          ? timeline !== null
+          : true
 
   function handleNext() {
     if (!canAdvance) return
@@ -73,7 +76,9 @@ export function ContactPage() {
       ? { text: hasName ? name : "Your name", isPlaceholder: !hasName }
       : step.key === "type"
         ? { text: projectTypes.length > 0 ? formatProjectTypes(projectTypes) : "Pick a project type", isPlaceholder: projectTypes.length === 0 }
-        : { text: timeline ?? "Pick a timeline", isPlaceholder: timeline === null }
+        : step.key === "when"
+          ? { text: timeline ?? "Pick a timeline", isPlaceholder: timeline === null }
+          : { text: "Look good?", isPlaceholder: false }
 
   const eyebrowText = sent
     ? "Sent"
@@ -81,7 +86,9 @@ export function ContactPage() {
       ? "Tell us who you are"
       : step.key === "type"
         ? "What are we building"
-        : "When are you starting"
+        : step.key === "when"
+          ? "When are you starting"
+          : "Review your details"
 
   return (
     <main>
@@ -189,6 +196,28 @@ export function ContactPage() {
                         {t}
                       </Tag>
                     ))}
+                  </div>
+                )}
+
+                {step.key === "review" && (
+                  <div className="contact-page__recap">
+                    <button type="button" className="contact-page__recap-row" onClick={() => setStepIndex(0)}>
+                      <span className="contact-page__recap-label">Name &amp; email</span>
+                      <span className="contact-page__recap-value">
+                        {name} · {email}
+                      </span>
+                      <span className="contact-page__recap-edit">Edit</span>
+                    </button>
+                    <button type="button" className="contact-page__recap-row" onClick={() => setStepIndex(1)}>
+                      <span className="contact-page__recap-label">Project type</span>
+                      <span className="contact-page__recap-value">{projectTypes.join(", ")}</span>
+                      <span className="contact-page__recap-edit">Edit</span>
+                    </button>
+                    <button type="button" className="contact-page__recap-row" onClick={() => setStepIndex(2)}>
+                      <span className="contact-page__recap-label">Timeline</span>
+                      <span className="contact-page__recap-value">{timeline}</span>
+                      <span className="contact-page__recap-edit">Edit</span>
+                    </button>
                   </div>
                 )}
 
