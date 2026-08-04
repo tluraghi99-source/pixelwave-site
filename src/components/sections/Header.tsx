@@ -37,7 +37,7 @@ const MENU_COLUMNS = [
     links: [] as { label: string; href: string }[],
   },
   {
-    label: "Contact",
+    label: "Let's chat",
     href: "/contact",
     links: [
       { label: "Instagram", href: "#" },
