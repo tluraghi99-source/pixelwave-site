@@ -634,13 +634,20 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .ticker__dot--orange { background: var(--pw-orange); }
 
 /* client logo wall — two Marquee rows scrolling opposite directions,
-   between .ticker and Services. Dark like both neighbors; isolation:
+   after Services and before Footer. Dark like Services; isolation:
    isolate is required here because .cursor-glow relies on z-index: -1,
-   which only works if this element establishes its own stacking context. */
+   which only works if this element establishes its own stacking context.
+   Bottom padding reuses .sec's own bottom-padding formula (rather than
+   matching padding-top) so the gap down into Footer reads the same as
+   the gap Services' own bottom padding creates coming in from above —
+   Footer's own top padding is much smaller than .sec's, so mirroring
+   just padding-top left this section visibly tighter against Footer
+   than it was against Services. */
 .client-logos {
   position: relative; isolation: isolate;
   background: var(--pw-black);
-  padding-block: clamp(2.5rem, 3vw, 5rem);
+  padding-top: clamp(2.5rem, 3vw, 5rem);
+  padding-bottom: clamp(4.5rem, 4.7vw, 12rem);
 }
 .client-logos__row + .client-logos__row { margin-top: clamp(1.5rem, 2vw, 2rem); }
 /* Marquee translates its track by exactly one group's width to loop
