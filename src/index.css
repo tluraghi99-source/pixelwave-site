@@ -675,7 +675,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .studio-intro__hero { height: 50svh; }
 .studio-intro__line {
   font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em;
-  font-size: clamp(6rem, 14vw, 13rem); line-height: 1.05; margin: 0;
+  font-size: clamp(1.75rem, 3.4vw, 3.25rem); line-height: 1.15; margin: 0;
 }
 /* Marker-highlight treatment: black text on a flat orange block, sized to
    the text rather than the line's own full width — box-decoration-break
@@ -689,20 +689,11 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .studio-team { position: relative; isolation: isolate; padding-block: clamp(3rem, 6vw, 6rem); }
 .team-grid {
   display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: clamp(1.25rem, 2vw, 2rem);
+  gap: 0;
 }
-/* A loose, not-quite-uniform rhythm — every 3rd/4th card drops down slightly
-   so the grid doesn't read as a rigid spreadsheet, echoing the reference's
-   staggered layout without needing literal empty cells tied to a specific
-   headcount. */
-.team-grid > *:nth-child(4n+2) { margin-top: clamp(1rem, 2.5vw, 2.5rem); }
-.team-grid > *:nth-child(4n) { margin-top: clamp(0.5rem, 1.5vw, 1.5rem); }
 @media (max-width: 1024px) { .team-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 768px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 480px) {
-  .team-grid { grid-template-columns: 1fr; }
-  .team-grid > *:nth-child(4n+2), .team-grid > *:nth-child(4n) { margin-top: 0; }
-}
+@media (max-width: 480px) { .team-grid { grid-template-columns: 1fr; } }
 
 /* Each card sits on a flat color block (--card-color) with the photo
    tinted toward it (mix-blend-mode: color keeps the photo's own luminance/
@@ -713,7 +704,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 
 .team-card__media {
   position: relative; aspect-ratio: 4 / 5; overflow: hidden;
-  border-radius: 4px; background: var(--card-color);
+  background: var(--card-color);
 }
 .team-card__photo {
   position: absolute; inset: 0; width: 100%; height: 100%;
