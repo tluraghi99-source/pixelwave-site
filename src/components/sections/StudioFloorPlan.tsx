@@ -24,28 +24,29 @@ function clampedProgress(v: number, start: number, end: number) {
   return Math.min(1, Math.max(0, (v - start) / (end - start)))
 }
 
-// Traced directly off the studio's own updated vector floor plan
-// (Senza titolo-2.svg), not redrawn from a photo — every coordinate below is
-// that file's, just translated so each floor's own top-left corner sits at
-// (0,0). Both floors share the exact same building envelope (285.6 × up to
-// 246.1, top edge a single diagonal the full width, no flat segment) since
-// it's the same building, one floor stacked on the other. The stairs wall
-// and landing differ per floor (the notch sits low on Ground, high on
-// Underground), so those stay separate rather than shared.
-const OUTLINE = "M0,246.1 L0,0 L285.6,64.8 L285.6,246.1 Z"
+// Traced off the studio's own vector floor plans. The building outline is
+// portrait, not landscape (200.3 wide × up to 360.5 tall, confirmed against
+// floor.svg — the earlier landscape version was wrong), shared by both
+// floors since it's the same building, one floor stacked on the other. The
+// stairs wall and landing differ per floor (the notch sits low on Ground,
+// high on Underground), so those stay separate rather than shared. Interior
+// layout (room proportions, furniture) carries over from the landscape
+// version, scaled onto this corrected outline rather than re-derived from
+// scratch, since only the outline itself changed.
+const OUTLINE = "M0,360.5 L0,0 L200.3,94.9 L200.3,360.5 Z"
 
 /** Short stepped strokes standing in for a staircase, at the source file's
- *  own tread spacing (~7.3 apart) — count and span differ per floor. */
+ *  own tread spacing — count and span differ per floor. */
 function Treads({ startY, count }: { startY: number; count: number }) {
   const treads = []
   for (let i = 0; i < count; i++) {
-    const y = startY + i * 7.3
-    treads.push(<line key={i} x1="244.6" y1={y} x2="285.6" y2={y} className="floor-section__tread" />)
+    const y = startY + i * 10.7
+    treads.push(<line key={i} x1="171.6" y1={y} x2="200.3" y2={y} className="floor-section__tread" />)
   }
   return <>{treads}</>
 }
 
-/** A ring of small chairs around a table, at the source file's own radius. */
+/** A ring of small chairs around a table. */
 function Chairs({ positions }: { positions: [number, number][] }) {
   return (
     <>
@@ -58,65 +59,64 @@ function Chairs({ positions }: { positions: [number, number][] }) {
 
 function GroundFloorSVG() {
   return (
-    <svg viewBox="-15 -15 320 300" className="floor-plan__svg">
+    <svg viewBox="-15 -15 230 420" className="floor-plan__svg">
       <path d={OUTLINE} className="floor-section__outline" />
-      <line x1="107.7" y1="24.4" x2="107.7" y2="246.1" className="floor-section__divider" />
-      <path d="M244.6,55.4 L244.6,210.4 L285.6,210.4" className="floor-section__divider" />
-      <line x1="244.6" y1="105.3" x2="285.6" y2="105.3" className="floor-section__divider" />
+      <line x1="75.5" y1="35.7" x2="75.5" y2="360.5" className="floor-section__divider" />
+      <path d="M171.6,81.1 L171.6,308.2 L200.3,308.2" className="floor-section__divider" />
+      <line x1="171.6" y1="154.2" x2="200.3" y2="154.2" className="floor-section__divider" />
       {/* A window mullion at the edge of Open Space, as in the source */}
-      <line x1="70.2" y1="16.6" x2="70.2" y2="67.9" className="floor-section__detail" />
+      <line x1="49.2" y1="24.3" x2="49.2" y2="99.5" className="floor-section__detail" />
       {/* A hatched nook at the top of Meeting Room, as textured in the source */}
-      <path d="M0,52.4 L107.6,76.7 L107.6,106 L0,106 Z" className="floor-section__hatch" />
+      <path d="M0,76.8 L75.5,112.3 L75.5,155.3 L0,155.3 Z" className="floor-section__hatch" />
       {/* Meeting Room — a round table with six chairs */}
-      <rect x="36.6" y="137.7" width="34.4" height="58" rx="6.9" className="floor-section__detail" />
-      <Chairs positions={[[28.9, 155.5], [28.9, 178], [78.7, 155.5], [53.8, 130.8], [53.8, 202.7], [78.7, 178]]} />
+      <rect x="25.7" y="201.7" width="24.1" height="85" rx="7" className="floor-section__detail" />
+      <Chairs positions={[[20.3, 227.8], [20.3, 260.7], [55.2, 227.8], [37.7, 191.6], [37.7, 296.9], [55.2, 260.7]]} />
       {/* Open Space — the dominant zone: a six-part table with six chairs, plus the two tilted openings near the roofline */}
-      <polygon points="167,38.5 163.4,54.5 107.6,42 111.2,25.9" className="floor-section__detail" />
-      <polygon points="228.4,51.9 224.8,67.9 169,55.3 172.6,39.3" className="floor-section__detail" />
-      <rect x="150.6" y="98.6" width="25.4" height="42.9" className="floor-section__detail floor-section__detail--accent" />
-      <rect x="176.1" y="98.6" width="25.4" height="42.9" className="floor-section__detail floor-section__detail--accent" />
-      <rect x="150.6" y="141.5" width="25.4" height="42.9" className="floor-section__detail floor-section__detail--accent" />
-      <rect x="176.1" y="141.5" width="25.4" height="42.9" className="floor-section__detail floor-section__detail--accent" />
-      <rect x="150.6" y="184.4" width="25.4" height="42.9" className="floor-section__detail floor-section__detail--accent" />
-      <rect x="176.1" y="184.4" width="25.4" height="42.9" className="floor-section__detail floor-section__detail--accent" />
-      <Chairs positions={[[142.8, 120], [209.4, 120], [142.8, 163], [209.4, 163], [142.8, 205.9], [209.4, 205.9]]} />
+      <polygon points="117.1,56.4 114.6,79.8 75.5,61.5 78,37.9" className="floor-section__detail" />
+      <polygon points="160.2,76 157.7,99.5 118.5,81 121.1,57.6" className="floor-section__detail" />
+      <rect x="105.6" y="144.4" width="17.8" height="62.8" className="floor-section__detail floor-section__detail--accent" />
+      <rect x="105.6" y="207.3" width="17.8" height="62.8" className="floor-section__detail floor-section__detail--accent" />
+      <rect x="105.6" y="270.1" width="17.8" height="62.8" className="floor-section__detail floor-section__detail--accent" />
+      <rect x="123.5" y="144.4" width="17.8" height="62.8" className="floor-section__detail floor-section__detail--accent" />
+      <rect x="123.5" y="207.3" width="17.8" height="62.8" className="floor-section__detail floor-section__detail--accent" />
+      <rect x="123.5" y="270.1" width="17.8" height="62.8" className="floor-section__detail floor-section__detail--accent" />
+      <Chairs positions={[[100.2, 175.8], [146.9, 175.8], [100.2, 238.8], [146.9, 238.8], [100.2, 301.6], [146.9, 301.6]]} />
       {/* Stairs */}
-      <Treads startY={108.9} count={14} />
-      <text x="54" y="266" textAnchor="middle" className="floor-section__zone-label">Meeting Room</text>
-      <text x="176" y="266" textAnchor="middle" className="floor-section__zone-label">Open Space</text>
-      <text x="265" y="266" textAnchor="middle" className="floor-section__zone-label">Stairs</text>
+      <Treads startY={159.5} count={14} />
+      <text x="37.9" y="389.6" textAnchor="middle" className="floor-section__zone-label">Meeting Room</text>
+      <text x="123.5" y="389.6" textAnchor="middle" className="floor-section__zone-label">Open Space</text>
+      <text x="185.9" y="389.6" textAnchor="middle" className="floor-section__zone-label">Stairs</text>
     </svg>
   )
 }
 
 function LowerFloorSVG() {
   return (
-    <svg viewBox="-15 -15 320 300" className="floor-plan__svg">
+    <svg viewBox="-15 -15 230 420" className="floor-plan__svg">
       <path d={OUTLINE} className="floor-section__outline" />
-      <path d="M244.6,245.6 L244.6,123 L285.6,123" className="floor-section__divider" />
-      <line x1="244.6" y1="125.7" x2="244.6" y2="96.5" className="floor-section__divider" />
+      <path d="M171.6,359.7 L171.6,180.2 L200.3,180.2" className="floor-section__divider" />
+      <line x1="171.6" y1="184.1" x2="171.6" y2="141.3" className="floor-section__divider" />
       {/* Limbo Set and Chill Area share one open room — no wall between them,
           just furniture groupings, matching the source file. */}
-      <rect x="0" y="28.5" width="18.1" height="63.4" className="floor-section__detail" />
+      <rect x="0" y="41.7" width="12.7" height="92.9" className="floor-section__detail" />
       {/* Chill Area — a sectional sofa with two end pieces, and two round
-          armchairs — traced at the source file's own footprint (it runs the
-          full x93–207 span, not a small centered block). */}
-      <rect x="93.5" y="28.4" width="106.7" height="85" className="floor-section__detail floor-section__detail--accent" />
-      <rect x="102.5" y="30.7" width="23.2" height="21.7" className="floor-section__detail floor-section__detail--accent" />
-      <rect x="187.3" y="49.4" width="19.4" height="20.7" className="floor-section__detail floor-section__detail--accent" />
-      <circle cx="94.5" cy="66.9" r="16" className="floor-section__detail floor-section__detail--accent" />
-      <circle cx="207.6" cy="82.9" r="16" className="floor-section__detail floor-section__detail--accent" />
+          armchairs, up near the roofline */}
+      <rect x="65.6" y="41.6" width="74.8" height="124.5" className="floor-section__detail floor-section__detail--accent" />
+      <rect x="71.9" y="45" width="16.3" height="31.8" className="floor-section__detail floor-section__detail--accent" />
+      <rect x="131.4" y="72.4" width="13.6" height="30.3" className="floor-section__detail floor-section__detail--accent" />
+      <circle cx="66.3" cy="98" r="16" className="floor-section__detail floor-section__detail--accent" />
+      <circle cx="145.6" cy="121.4" r="16" className="floor-section__detail floor-section__detail--accent" />
       {/* Limbo Set — a curved corner bench and a low table */}
-      <path d="M114,137.6 L27,137.6 Q6.8,137.6 6.8,157.8 L6.8,204.8 Q6.8,225 27,225 L114,225 Z" className="floor-section__detail" />
-      <rect x="0" y="116.1" width="100.2" height="13.8" className="floor-section__detail" />
-      <line x1="0" y1="232.3" x2="244.6" y2="232.3" className="floor-section__divider" />
+      <path d="M80,201.5 L18.9,201.5 Q4.8,201.5 4.8,231.1 L4.8,300 Q4.8,329.6 18.9,329.6 L80,329.6 Z" className="floor-section__detail" />
+      <rect x="0" y="170.1" width="70.3" height="20.2" className="floor-section__detail" />
+      <line x1="0" y1="340.3" x2="171.6" y2="340.3" className="floor-section__divider" />
       {/* A small side table near the stairs */}
-      <rect x="215.1" y="149.6" width="29.5" height="63.4" className="floor-section__detail" />
+      <rect x="150.9" y="219.1" width="20.7" height="92.9" className="floor-section__detail" />
       {/* Stairs */}
-      <Treads startY={130.3} count={16} />
-      <text x="100" y="266" textAnchor="middle" className="floor-section__zone-label">Limbo Set</text>
-      <text x="140" y="10" textAnchor="middle" className="floor-section__zone-label">Chill Area</text>
-      <text x="265" y="266" textAnchor="middle" className="floor-section__zone-label">Stairs</text>
+      <Treads startY={190.9} count={16} />
+      <text x="70.1" y="389.6" textAnchor="middle" className="floor-section__zone-label">Limbo Set</text>
+      <text x="98.2" y="14.6" textAnchor="middle" className="floor-section__zone-label">Chill Area</text>
+      <text x="185.9" y="389.6" textAnchor="middle" className="floor-section__zone-label">Stairs</text>
     </svg>
   )
 }

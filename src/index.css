@@ -725,20 +725,29 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   background: var(--pw-black);
   display: flex; align-items: center;
 }
-.floor-plan { position: relative; width: 100%; min-height: 66vh; padding-block: clamp(2.5rem, 5vw, 5rem); }
+.floor-plan { position: relative; width: 100%; min-height: 86vh; padding-block: clamp(2.5rem, 5vw, 5rem); }
+/* Row, not column: the plan is portrait (taller than wide) now, so putting
+   the label beside it instead of stacked above frees the full pinned height
+   for the plan itself rather than splitting it between label and drawing.
+   Higher-specificity .floor-plan__layer--ambient rule below still overrides
+   this back to a column for the mobile/tablet fallback. */
 .floor-plan__layer {
   position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.5rem;
+  display: flex; flex-direction: row; align-items: center; justify-content: center; gap: clamp(2rem, 4vw, 4rem);
 }
 .floor-plan__label {
   font-family: var(--font-mono-accent); font-size: 0.8rem;
   text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary);
 }
-/* flex-shrink: 0 matters here — .floor-plan__layer is a flex column with a
-   fixed-height box (the pinned viewport), so without it the flex algorithm
-   would compress the svg's height alone to fit, warping the isometric
-   shapes instead of just scaling them down. */
-.floor-plan__svg { width: 100%; max-width: clamp(700px, 58vw, 1050px); height: auto; flex-shrink: 0; }
+/* Portrait viewBox now (taller than wide), so it has to be capped by
+   max-height, not just max-width, or it overflows the pinned viewport's
+   fixed height — width: auto/height: auto plus both max- constraints lets
+   the browser fit to whichever axis is tighter while keeping the aspect
+   ratio, same idea as object-fit: contain. flex-shrink: 0 still matters:
+   .floor-plan__layer is a flex row in a fixed-height box (the pinned
+   viewport), so without it the flex algorithm would compress the svg's
+   height alone to fit, warping the shapes instead of just scaling them. */
+.floor-plan__svg { width: auto; height: auto; max-width: min(46vw, 720px); max-height: 82vh; flex-shrink: 0; }
 
 .floor-section__outline { fill: none; stroke: var(--pw-white); stroke-width: 2; }
 .floor-section__divider { stroke: var(--pw-white); stroke-width: 1.5; opacity: 0.5; }
