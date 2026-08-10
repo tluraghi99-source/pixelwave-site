@@ -73,19 +73,23 @@ function GroundFloorSVG() {
       <line x1="49.2" y1="11.6" x2="49.2" y2="47.6" className="floor-section__detail" />
       {/* A hatched nook at the top of Meeting Room, as textured in the source */}
       <path d="M0,36.8 L75.5,53.8 L75.5,74.4 L0,74.4 Z" className="floor-section__hatch" />
-      {/* Meeting Room — a round table with six chairs, sitting deeper in the room now there's more depth to it */}
-      <rect x="25.7" y="226.6" width="24.1" height="40.7" rx="4.8" className="floor-section__detail" />
-      <Chairs positions={[[20.3, 239.1], [20.3, 254.9], [55.2, 239.1], [37.7, 221.8], [37.7, 272.2], [55.2, 254.9]]} />
-      {/* Open Space — the dominant zone: a six-part table with six chairs, plus the two tilted openings near the roofline */}
+      {/* Meeting Room — a round table with six chairs. Position derived from
+          the source file's real relative depth in the room (its table sits
+          ~59% of the way down), not guessed. */}
+      <rect x="16.4" y="173.1" width="42.7" height="72" rx="4.6" className="floor-section__detail" />
+      <Chairs positions={[[6.8, 195.2], [6.8, 223.1], [68.7, 195.2], [37.7, 164.5], [37.7, 253.8], [68.7, 223.1]]} />
+      {/* Open Space — the dominant zone: a six-part table with six chairs at
+          the same real relative depth as the Meeting Room table, plus the
+          two tilted openings near the roofline */}
       <polygon points="117.1,27 114.6,38.2 75.5,29.5 78,18.2" className="floor-section__detail" />
       <polygon points="160.2,36.4 157.7,47.6 118.5,38.8 121.1,27.6" className="floor-section__detail" />
-      <rect x="105.6" y="199.2" width="17.8" height="30.1" className="floor-section__detail floor-section__detail--accent" />
-      <rect x="105.6" y="229.3" width="17.8" height="30.1" className="floor-section__detail floor-section__detail--accent" />
-      <rect x="105.6" y="259.4" width="17.8" height="30.1" className="floor-section__detail floor-section__detail--accent" />
-      <rect x="123.5" y="199.2" width="17.8" height="30.1" className="floor-section__detail floor-section__detail--accent" />
-      <rect x="123.5" y="229.3" width="17.8" height="30.1" className="floor-section__detail floor-section__detail--accent" />
-      <rect x="123.5" y="259.4" width="17.8" height="30.1" className="floor-section__detail floor-section__detail--accent" />
-      <Chairs positions={[[100.2, 214.2], [146.9, 214.2], [100.2, 244.3], [146.9, 244.3], [100.2, 274.4], [146.9, 274.4]]} />
+      <rect x="92" y="129.2" width="31.6" height="53.3" className="floor-section__detail floor-section__detail--accent" />
+      <rect x="123.5" y="129.2" width="31.6" height="53.3" className="floor-section__detail floor-section__detail--accent" />
+      <rect x="92" y="182.4" width="31.6" height="53.3" className="floor-section__detail floor-section__detail--accent" />
+      <rect x="123.5" y="182.4" width="31.6" height="53.3" className="floor-section__detail floor-section__detail--accent" />
+      <rect x="92" y="235.7" width="31.6" height="53.3" className="floor-section__detail floor-section__detail--accent" />
+      <rect x="123.5" y="235.7" width="31.6" height="53.3" className="floor-section__detail floor-section__detail--accent" />
+      <Chairs positions={[[82.2, 155.8], [164.9, 155.8], [82.2, 209.1], [164.9, 209.1], [82.2, 262.4], [164.9, 262.4]]} />
       {/* Stairs — a longer run now the building's taller */}
       <Treads startY={140} count={20} step={9} />
       <text x="37.9" y="345" textAnchor="middle" className="floor-section__zone-label">Meeting Room</text>

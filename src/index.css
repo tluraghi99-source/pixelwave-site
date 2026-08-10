@@ -739,15 +739,13 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   font-family: var(--font-mono-accent); font-size: 0.8rem;
   text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary);
 }
-/* Portrait viewBox now (taller than wide), so it has to be capped by
-   max-height, not just max-width, or it overflows the pinned viewport's
-   fixed height — width: auto/height: auto plus both max- constraints lets
-   the browser fit to whichever axis is tighter while keeping the aspect
-   ratio, same idea as object-fit: contain. flex-shrink: 0 still matters:
+/* Portrait viewBox (taller than wide) — capped by max-height only, no
+   max-width, so it's free to grow as wide as its own aspect ratio wants;
+   height: auto keeps it proportional. flex-shrink: 0 still matters:
    .floor-plan__layer is a flex row in a fixed-height box (the pinned
    viewport), so without it the flex algorithm would compress the svg's
    height alone to fit, warping the shapes instead of just scaling them. */
-.floor-plan__svg { width: auto; height: auto; max-width: min(46vw, 720px); max-height: 82vh; flex-shrink: 0; }
+.floor-plan__svg { width: auto; height: auto; max-height: 82vh; flex-shrink: 0; }
 
 .floor-section__outline { fill: none; stroke: var(--pw-white); stroke-width: 2; }
 .floor-section__divider { stroke: var(--pw-white); stroke-width: 1.5; opacity: 0.5; }
