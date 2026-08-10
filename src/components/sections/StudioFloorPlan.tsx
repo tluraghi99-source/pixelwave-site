@@ -98,10 +98,14 @@ function LowerFloorSVG() {
       {/* Limbo Set and Chill Area share one open room — no wall between them,
           just furniture groupings, matching the source file. */}
       <rect x="0" y="28.5" width="18.1" height="63.4" className="floor-section__detail" />
-      {/* Chill Area — a sofa and two rounded armchairs, tucked near the roofline */}
-      <rect x="100" y="35" width="95" height="30" rx="6" className="floor-section__detail floor-section__detail--accent" />
-      <circle cx="95" cy="70" r="15" className="floor-section__detail floor-section__detail--accent" />
-      <circle cx="185" cy="95" r="12" className="floor-section__detail floor-section__detail--accent" />
+      {/* Chill Area — a sectional sofa with two end pieces, and two round
+          armchairs — traced at the source file's own footprint (it runs the
+          full x93–207 span, not a small centered block). */}
+      <rect x="93.5" y="28.4" width="106.7" height="85" className="floor-section__detail floor-section__detail--accent" />
+      <rect x="102.5" y="30.7" width="23.2" height="21.7" className="floor-section__detail floor-section__detail--accent" />
+      <rect x="187.3" y="49.4" width="19.4" height="20.7" className="floor-section__detail floor-section__detail--accent" />
+      <circle cx="94.5" cy="66.9" r="16" className="floor-section__detail floor-section__detail--accent" />
+      <circle cx="207.6" cy="82.9" r="16" className="floor-section__detail floor-section__detail--accent" />
       {/* Limbo Set — a curved corner bench and a low table */}
       <path d="M114,137.6 L27,137.6 Q6.8,137.6 6.8,157.8 L6.8,204.8 Q6.8,225 27,225 L114,225 Z" className="floor-section__detail" />
       <rect x="0" y="116.1" width="100.2" height="13.8" className="floor-section__detail" />
