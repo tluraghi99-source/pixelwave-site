@@ -701,6 +701,9 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .team-card--orange { --card-color: var(--pw-orange); --card-text: var(--pw-white); }
 .team-card--neutral { --card-color: var(--pw-neutral-20); --card-text: var(--pw-white); }
 .team-card--white { --card-color: var(--pw-white); --card-text: var(--pw-black); }
+/* A deliberate empty beat in the grid — slightly lighter than the page's
+   own pure black so it still reads as a card, not a missing image. */
+.team-card--blank { --card-color: var(--pw-neutral-10); }
 
 .team-card__media {
   position: relative; aspect-ratio: 4 / 5; overflow: hidden;
