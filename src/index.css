@@ -1328,24 +1328,14 @@ html.nav-open .cursor-dot { background: var(--pw-black); }
   .cursor-hint__inner--bounce { animation: none; }
 }
 
+/* Static texture only — no shift/jitter animation (that read as a moving
+   shape on dark sections rather than a settled grain texture; removed). */
 .grain-overlay {
   position: absolute; inset: 0; z-index: 5; pointer-events: none;
   opacity: 0.09;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   background-size: 180px 180px;
-  animation: grain-shift 8s steps(8) infinite;
   mix-blend-mode: overlay;
-}
-@keyframes grain-shift {
-  0%   { transform: translate(0, 0); }
-  20%  { transform: translate(-3%, 2%); }
-  40%  { transform: translate(2%, -4%); }
-  60%  { transform: translate(-2%, 3%); }
-  80%  { transform: translate(3%, -2%); }
-  100% { transform: translate(0, 0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .grain-overlay { animation: none; }
 }
 
 /* Shared positioning for every CursorGlow usage outside the Contact page
