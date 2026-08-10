@@ -149,7 +149,6 @@ function WorkReelPinned() {
           <VideoScrubbed progress={videoProgress} />
           <motion.div className="reel__blackout" style={{ opacity: blackoutOpacity }} />
           <motion.div className="reel__content" data-theme="dark" style={{ pointerEvents }}>
-            <div className="grain-overlay" aria-hidden="true" />
             <motion.div className="wrap" style={{ opacity: contentOpacity, y: headingY }}>
               <WorkHeading />
             </motion.div>

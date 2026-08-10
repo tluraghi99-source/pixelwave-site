@@ -78,9 +78,6 @@ export function Hero({ introDone }: HeroProps) {
 
   return (
     <section className="hero" data-screen-label="Hero">
-      {/* Demo only — previewing the grain-effect spec's look on a light
-          section before building the real site-wide version. */}
-      <div className="grain-overlay" aria-hidden="true" />
       <CursorGlow className="cursor-glow" variant="light" glow />
       {introDone && <CursorHint text="Scroll" variant="bounce" autoHideMs={6000} dismissOnScroll />}
 

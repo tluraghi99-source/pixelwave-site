@@ -152,7 +152,6 @@ function StudioFloorPinned() {
       ref={pinRef}
     >
       <div className="floor-pin__inner">
-        <div className="grain-overlay" aria-hidden="true" />
         <CursorGlow className="cursor-glow" variant="dark" glow={false} />
         <div className="wrap floor-plan">
           <motion.div className="floor-plan__layer" style={{ opacity: floor1Opacity }}>
@@ -175,7 +174,6 @@ function StudioFloorPinned() {
 function StudioFloorAmbient() {
   return (
     <section className="studio-floor-ambient" data-theme="dark" data-screen-label="Studio Floor Plan">
-      <div className="grain-overlay" aria-hidden="true" />
       <CursorGlow className="cursor-glow" variant="dark" glow={false} />
       <div className="wrap">
         <Reveal>

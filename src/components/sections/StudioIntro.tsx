@@ -60,7 +60,6 @@ function StudioIntroScrubbed() {
 
   return (
     <section className="studio-intro" data-theme="dark" data-screen-label="Studio Intro" ref={sectionRef}>
-      <div className="grain-overlay" aria-hidden="true" />
       <CursorGlow className="cursor-glow" variant="dark" glow />
       <div className="studio-intro__hero" aria-hidden="true" />
       <div className="wrap">
@@ -84,7 +83,6 @@ function StudioIntroScrubbed() {
 function StudioIntroAmbient() {
   return (
     <section className="studio-intro" data-theme="dark" data-screen-label="Studio Intro">
-      <div className="grain-overlay" aria-hidden="true" />
       <CursorGlow className="cursor-glow" variant="dark" glow />
       <div className="studio-intro__hero" aria-hidden="true" />
       <RevealGroup className="wrap" stagger={0.08}>

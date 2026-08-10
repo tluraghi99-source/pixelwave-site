@@ -74,7 +74,6 @@ export function Services() {
 
   return (
     <section id="services" className="sec sec--dark" data-theme="dark" data-screen-label="Services">
-      <div className="grain-overlay" aria-hidden="true" />
       <CursorGlow className="cursor-glow" variant="dark" glow={false} />
       <div className="wrap">
         <Reveal>
