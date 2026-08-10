@@ -61,19 +61,15 @@ function FloorBlock({ gridX, gridY, label, accent }: Room) {
 }
 
 const FLOOR_1_ROOMS: Room[] = [
-  { gridX: 0, gridY: 0, label: "RECEPTION" },
-  { gridX: 1, gridY: 0, label: "LOUNGE" },
-  { gridX: 2, gridY: 0, label: "STUDIO FLOOR", accent: true },
-  { gridX: 0, gridY: 1, label: "DESKS A" },
-  { gridX: 1, gridY: 1, label: "MEETING ROOM" },
+  { gridX: 0, gridY: 0, label: "MEETING ROOM" },
+  { gridX: 1, gridY: 0, label: "OPEN SPACE", accent: true },
+  { gridX: 2, gridY: 0, label: "STAIRS" },
 ]
 
 const FLOOR_2_ROOMS: Room[] = [
-  { gridX: 0, gridY: 0, label: "DESKS B" },
-  { gridX: 1, gridY: 0, label: "FOCUS ROOM" },
-  { gridX: 2, gridY: 0, label: "ROOF TERRACE", accent: true },
-  { gridX: 0, gridY: 1, label: "MEETING ROOM B" },
-  { gridX: 1, gridY: 1, label: "ARCHIVE" },
+  { gridX: 0, gridY: 0, label: "LIMBO SET", accent: true },
+  { gridX: 1, gridY: 0, label: "CHILL AREA" },
+  { gridX: 2, gridY: 0, label: "STAIRS" },
 ]
 
 function FloorSVG({ rooms }: { rooms: Room[] }) {
@@ -116,7 +112,7 @@ function StudioFloorPinned() {
             <FloorSVG rooms={FLOOR_1_ROOMS} />
           </motion.div>
           <motion.div className="floor-plan__layer" style={{ opacity: floor2Opacity }}>
-            <span className="floor-plan__label">Upper Floor</span>
+            <span className="floor-plan__label">Floor Below</span>
             <FloorSVG rooms={FLOOR_2_ROOMS} />
           </motion.div>
         </div>
