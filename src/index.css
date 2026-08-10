@@ -745,6 +745,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .floor-section__detail { fill: none; stroke: var(--text-secondary); stroke-width: 1; opacity: 0.6; }
 .floor-section__detail--accent { stroke: var(--pw-orange); opacity: 0.9; }
 .floor-section__tread { stroke: var(--text-secondary); stroke-width: 1; opacity: 0.6; }
+.floor-section__hatch { fill: var(--pw-white); opacity: 0.08; stroke: var(--text-secondary); stroke-width: 1; }
 .floor-section__zone-label {
   font-family: var(--font-mono-accent); font-size: 11px;
   text-transform: uppercase; letter-spacing: 0.05em; fill: var(--text-secondary);

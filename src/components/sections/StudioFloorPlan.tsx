@@ -30,12 +30,12 @@ function clampedProgress(v: number, start: number, end: number) {
 // layout. Bespoke per floor (not data-driven) since the two shapes only
 // differ in their internal zones/details, not worth a generic layout system
 // for just two illustrations.
-const OUTLINE = "M60,280 L60,40 L260,40 L580,170 L580,280 Z"
-// Where the cut-corner nook (Stairs, on both floors) starts — the diagonal's
-// y-value at this x, used to anchor the divider and the treads/chill detail
-// against the sloped wall instead of a plain vertical.
-const NOOK_X = 430
-const NOOK_TOP_Y = 109
+const OUTLINE = "M60,280 L60,40 L195,40 L580,110 L580,280 Z"
+// Where the Stairs nook starts — same x on both floors since a stairwell has
+// to line up between them — and the diagonal's y-value there, used to anchor
+// the divider and treads against the sloped wall instead of a plain vertical.
+const NOOK_X = 510
+const NOOK_TOP_Y = 97
 
 /** Short stepped strokes standing in for a staircase, climbing from
  *  (x1,y1) to (x2,y2) — used in the cut-corner nook on both floors. */
@@ -54,17 +54,20 @@ function GroundFloorSVG() {
   return (
     <svg viewBox="20 0 640 320" className="floor-plan__svg">
       <path d={OUTLINE} className="floor-section__outline" />
-      <line x1="190" y1="40" x2="190" y2="280" className="floor-section__divider" />
+      <line x1="250" y1="40" x2="250" y2="280" className="floor-section__divider" />
       <line x1={NOOK_X} y1={NOOK_TOP_Y} x2={NOOK_X} y2="280" className="floor-section__divider" />
-      {/* Meeting Room — a doorway opening */}
-      <rect x="105" y="150" width="50" height="90" className="floor-section__detail" />
-      {/* Open Space — the dominant zone, a tall opening reading as its own volume */}
-      <rect x="275" y="80" width="70" height="170" className="floor-section__detail floor-section__detail--accent" />
+      {/* A small structural nook in the corner, hatched in the original sketch */}
+      <path d="M60,110 L140,110 L60,150 Z" className="floor-section__hatch" />
+      {/* Meeting Room — a round table */}
+      <rect x="110" y="170" width="70" height="70" rx="18" className="floor-section__detail" />
+      {/* Open Space — the dominant zone: a long table, plus the small opening near the roofline */}
+      <rect x="310" y="70" width="90" height="20" className="floor-section__detail" />
+      <rect x="330" y="140" width="60" height="110" className="floor-section__detail floor-section__detail--accent" />
       {/* Stairs, tucked into the cut corner */}
-      <Treads x1={450} y1={262} x2={560} y2={180} />
-      <text x="125" y="300" textAnchor="middle" className="floor-section__zone-label">Meeting Room</text>
-      <text x="310" y="300" textAnchor="middle" className="floor-section__zone-label">Open Space</text>
-      <text x="505" y="300" textAnchor="middle" className="floor-section__zone-label">Stairs</text>
+      <Treads x1={545} y1={262} x2={545} y2={185} count={5} />
+      <text x="155" y="300" textAnchor="middle" className="floor-section__zone-label">Meeting Room</text>
+      <text x="380" y="300" textAnchor="middle" className="floor-section__zone-label">Open Space</text>
+      <text x="545" y="300" textAnchor="middle" className="floor-section__zone-label">Stairs</text>
     </svg>
   )
 }
@@ -74,17 +77,20 @@ function LowerFloorSVG() {
     <svg viewBox="20 0 640 320" className="floor-plan__svg">
       <path d={OUTLINE} className="floor-section__outline" />
       <line x1={NOOK_X} y1={NOOK_TOP_Y} x2={NOOK_X} y2="280" className="floor-section__divider" />
-      {/* Limbo Set — a shooting-set stand-in: a bench and two low seats */}
-      <rect x="110" y="90" width="160" height="14" className="floor-section__detail" />
-      <circle cx="220" cy="180" r="16" className="floor-section__detail" />
-      <circle cx="300" cy="170" r="14" className="floor-section__detail" />
-      {/* Chill Area — a small nook right at the cut corner */}
-      <rect x="455" y="75" width="90" height="45" className="floor-section__detail floor-section__detail--accent" />
-      {/* Stairs, below the Chill Area in the same corner */}
-      <Treads x1={450} y1={262} x2={555} y2={195} count={4} />
-      <text x="190" y="300" textAnchor="middle" className="floor-section__zone-label">Limbo Set</text>
-      <text x="500" y="65" textAnchor="middle" className="floor-section__zone-label">Chill Area</text>
-      <text x="505" y="300" textAnchor="middle" className="floor-section__zone-label">Stairs</text>
+      {/* Limbo Set and Chill Area share one open room — no wall between them,
+          just two furniture groupings, matching the sketch. */}
+      <rect x="75" y="90" width="18" height="110" className="floor-section__detail" />
+      {/* Chill Area — a low sofa with two ottomans */}
+      <rect x="180" y="95" width="140" height="34" rx="8" className="floor-section__detail floor-section__detail--accent" />
+      <circle cx="165" cy="112" r="14" className="floor-section__detail floor-section__detail--accent" />
+      <circle cx="335" cy="112" r="14" className="floor-section__detail floor-section__detail--accent" />
+      {/* Limbo Set — a curved corner bench */}
+      <path d="M95,270 L95,215 Q95,180 130,180 L245,180" className="floor-section__detail" />
+      {/* Stairs, in the same corner nook as the ground floor above */}
+      <Treads x1={545} y1={262} x2={545} y2={185} count={5} />
+      <text x="150" y="300" textAnchor="middle" className="floor-section__zone-label">Limbo Set</text>
+      <text x="250" y="70" textAnchor="middle" className="floor-section__zone-label">Chill Area</text>
+      <text x="545" y="300" textAnchor="middle" className="floor-section__zone-label">Stairs</text>
     </svg>
   )
 }
