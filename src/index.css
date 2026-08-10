@@ -677,26 +677,47 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em;
   font-size: clamp(6rem, 14vw, 13rem); line-height: 1.05; margin: 0;
 }
-.studio-intro__line--bright { color: var(--pw-white); }
-.studio-intro__line--mid { color: var(--pw-neutral-70); }
-.studio-intro__line--dim { color: var(--pw-neutral-50); }
+/* Marker-highlight treatment: black text on a flat orange block, sized to
+   the text rather than the line's own full width — box-decoration-break
+   keeps that true even if a line ever wraps onto two rows. */
+.studio-intro__mark {
+  display: inline-block;
+  background: var(--pw-orange); color: var(--pw-black);
+  padding: 0 0.15em; box-decoration-break: clone; -webkit-box-decoration-break: clone;
+}
 
 .studio-team { position: relative; isolation: isolate; padding-block: clamp(3rem, 6vw, 6rem); }
 .team-grid {
   display: grid; grid-template-columns: repeat(4, 1fr);
   gap: clamp(1.25rem, 2vw, 2rem);
 }
+/* A loose, not-quite-uniform rhythm — every 3rd/4th card drops down slightly
+   so the grid doesn't read as a rigid spreadsheet, echoing the reference's
+   staggered layout without needing literal empty cells tied to a specific
+   headcount. */
+.team-grid > *:nth-child(4n+2) { margin-top: clamp(1rem, 2.5vw, 2.5rem); }
+.team-grid > *:nth-child(4n) { margin-top: clamp(0.5rem, 1.5vw, 1.5rem); }
 @media (max-width: 1024px) { .team-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 768px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 480px) { .team-grid { grid-template-columns: 1fr; } }
+@media (max-width: 480px) {
+  .team-grid { grid-template-columns: 1fr; }
+  .team-grid > *:nth-child(4n+2), .team-grid > *:nth-child(4n) { margin-top: 0; }
+}
+
+/* Each card sits on a flat color block (--card-color) with the photo
+   tinted toward it (mix-blend-mode: color keeps the photo's own luminance/
+   detail, just recolors its hue), rather than a plain grayscale crop. */
+.team-card--orange { --card-color: var(--pw-orange); --card-text: var(--pw-white); }
+.team-card--neutral { --card-color: var(--pw-neutral-20); --card-text: var(--pw-white); }
+.team-card--white { --card-color: var(--pw-white); --card-text: var(--pw-black); }
 
 .team-card__media {
   position: relative; aspect-ratio: 4 / 5; overflow: hidden;
-  border-radius: 4px; background: var(--pw-neutral-10);
+  border-radius: 4px; background: var(--card-color);
 }
 .team-card__photo {
   position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; filter: grayscale(1); display: block;
+  object-fit: cover; display: block;
   transition: opacity 0.4s var(--ease-wave);
 }
 .team-card__photo--base { opacity: 1; }
@@ -708,11 +729,25 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 @media (hover: hover) {
   .team-card:hover .team-card__photo--hover { opacity: 1; }
 }
-.team-card__body { padding-top: 0.75rem; display: flex; flex-direction: column; gap: 0.15rem; }
-.team-card__name { font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: var(--pw-white); }
+.team-card__tint {
+  position: absolute; inset: 0; background: var(--card-color);
+  mix-blend-mode: color; opacity: 0.6; pointer-events: none;
+}
+.team-card__scrim {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 45%);
+}
+.team-card--white .team-card__scrim {
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.75), transparent 45%);
+}
+.team-card__caption {
+  position: absolute; left: 0.9rem; right: 0.9rem; bottom: 0.8rem;
+  display: flex; flex-direction: column; gap: 0.15rem;
+}
+.team-card__name { font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: var(--card-text); }
 .team-card__role {
-  font-family: var(--font-mono-accent); font-size: 0.7rem;
-  text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);
+  font-family: var(--font-mono-accent); font-size: 0.68rem;
+  text-transform: uppercase; letter-spacing: 0.05em; color: var(--card-text); opacity: 0.75;
 }
 
 /* Studio floor plan pin — 300vh = PIN_HEIGHT_VH in StudioFloorPlan.tsx, kept

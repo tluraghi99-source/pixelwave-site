@@ -5,23 +5,23 @@ import { RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 
-// Bright lines read as the primary statement; mid/dim lines are de-emphasized
-// supporting copy — matches the wireframe's white-to-grey graduated look.
-// This color weight is permanent; the reveal itself (below) is separate.
+// Every line gets the same marker-highlight treatment (orange block, black
+// text) — no more bright/mid/dim tone grading. The reveal itself (below) is
+// unchanged, just what's being revealed.
 const INTRO_LINES = [
-  { text: "We're fourteen people", tone: "bright" },
-  { text: "working out of two floors —", tone: "bright" },
-  { text: "no open-plan pretending, no ping-pong table.", tone: "mid" },
-  { text: "Just a place built for the work.", tone: "dim" },
+  "We're fourteen people",
+  "working out of two floors —",
+  "no open-plan pretending, no ping-pong table.",
+  "Just a place built for the work.",
 ] as const
 
 function IntroLine({
-  line,
+  text,
   index,
   total,
   progress,
 }: {
-  line: (typeof INTRO_LINES)[number]
+  text: string
   index: number
   total: number
   progress: MotionValue<number>
@@ -39,8 +39,8 @@ function IntroLine({
   const y = useTransform(progress, (v) => 32 * (1 - Math.min(1, Math.max(0, (v - start) / (end - start)))))
 
   return (
-    <motion.p className={`studio-intro__line studio-intro__line--${line.tone}`} style={{ opacity, y }}>
-      {line.text}
+    <motion.p className="studio-intro__line" style={{ opacity, y }}>
+      <mark className="studio-intro__mark">{text}</mark>
     </motion.p>
   )
 }
@@ -68,15 +68,11 @@ function StudioIntroScrubbed() {
             very top of the page with no scroll runway before it, so scrubbing
             it in too would leave the page reading as blank until the user
             scrolls. The remaining lines still scrub in as before. */}
-        <p className={`studio-intro__line studio-intro__line--${INTRO_LINES[0].tone}`}>{INTRO_LINES[0].text}</p>
-        {INTRO_LINES.slice(1).map((line, i) => (
-          <IntroLine
-            key={line.text}
-            line={line}
-            index={i}
-            total={INTRO_LINES.length - 1}
-            progress={scrollYProgress}
-          />
+        <p className="studio-intro__line">
+          <mark className="studio-intro__mark">{INTRO_LINES[0]}</mark>
+        </p>
+        {INTRO_LINES.slice(1).map((text, i) => (
+          <IntroLine key={text} text={text} index={i} total={INTRO_LINES.length - 1} progress={scrollYProgress} />
         ))}
       </div>
     </section>
@@ -92,9 +88,11 @@ function StudioIntroAmbient() {
       <CursorGlow className="cursor-glow" variant="dark" glow />
       <div className="studio-intro__hero" aria-hidden="true" />
       <RevealGroup className="wrap" stagger={0.08}>
-        {INTRO_LINES.map((line) => (
-          <RevealItem key={line.text}>
-            <p className={`studio-intro__line studio-intro__line--${line.tone}`}>{line.text}</p>
+        {INTRO_LINES.map((text) => (
+          <RevealItem key={text}>
+            <p className="studio-intro__line">
+              <mark className="studio-intro__mark">{text}</mark>
+            </p>
           </RevealItem>
         ))}
       </RevealGroup>
