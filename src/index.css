@@ -676,6 +676,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .studio-intro__line {
   font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em;
   font-size: clamp(1.75rem, 3.4vw, 3.25rem); line-height: 1.15; margin: 0;
+  max-width: 46ch;
 }
 /* Marker-highlight treatment: black text on a flat orange block, sized to
    the text rather than the line's own full width — box-decoration-break
