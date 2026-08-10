@@ -24,60 +24,61 @@ function clampedProgress(v: number, start: number, end: number) {
   return Math.min(1, Math.max(0, (v - start) / (end - start)))
 }
 
-const BLOCK_W = 200
-const BLOCK_H = 100
+// Both floors share the same real footprint: a room with a mono-pitch roof
+// (full height on the left, sloping down to a lower eave on the right),
+// traced from the studio's own hand-drawn floor plan sketch rather than an
+// invented isometric layout. Bespoke per floor (not data-driven) since the
+// two shapes only differ in their internal zones/details, not worth a
+// generic layout system for just two illustrations.
+const OUTLINE = "M60,280 L60,40 L420,40 L600,140 L600,280 Z"
 
-interface Room {
-  gridX: number
-  gridY: number
-  label: string
-  accent?: boolean
+/** Short stepped strokes standing in for a staircase, climbing from
+ *  (x1,y1) to (x2,y2) — used under the sloped-roof zone on both floors. */
+function Treads({ x1, y1, x2, y2, count = 5 }: { x1: number; y1: number; x2: number; y2: number; count?: number }) {
+  const treads = []
+  for (let i = 0; i < count; i++) {
+    const t = i / (count - 1)
+    const cx = x1 + (x2 - x1) * t
+    const cy = y1 + (y2 - y1) * t
+    treads.push(<line key={i} x1={cx - 22} y1={cy} x2={cx + 22} y2={cy} className="floor-section__tread" />)
+  }
+  return <>{treads}</>
 }
 
-/** One isometric room block: a diamond top face plus two side faces, placed
- *  on a standard 2:1 isometric grid (gridX/gridY are grid units, not pixels). */
-function FloorBlock({ gridX, gridY, label, accent }: Room) {
-  const x = (gridX - gridY) * (BLOCK_W / 2)
-  const y = (gridX + gridY) * (BLOCK_H / 2)
+function GroundFloorSVG() {
   return (
-    <g transform={`translate(${x}, ${y})`}>
-      <polygon
-        points={`0,${BLOCK_H / 2} ${BLOCK_W / 2},0 ${BLOCK_W},${BLOCK_H / 2} ${BLOCK_W / 2},${BLOCK_H}`}
-        className={`floor-block__top${accent ? " floor-block__top--accent" : ""}`}
-      />
-      <polygon
-        points={`0,${BLOCK_H / 2} ${BLOCK_W / 2},${BLOCK_H} ${BLOCK_W / 2},${BLOCK_H * 1.6} 0,${BLOCK_H * 1.1}`}
-        className="floor-block__left"
-      />
-      <polygon
-        points={`${BLOCK_W},${BLOCK_H / 2} ${BLOCK_W / 2},${BLOCK_H} ${BLOCK_W / 2},${BLOCK_H * 1.6} ${BLOCK_W},${BLOCK_H * 1.1}`}
-        className="floor-block__right"
-      />
-      <text x={BLOCK_W / 2} y={BLOCK_H / 2 + 5} textAnchor="middle" className="floor-block__label">
-        {label}
-      </text>
-    </g>
+    <svg viewBox="20 0 640 320" className="floor-plan__svg">
+      <path d={OUTLINE} className="floor-section__outline" />
+      <line x1="220" y1="40" x2="220" y2="280" className="floor-section__divider" />
+      <line x1="420" y1="40" x2="420" y2="280" className="floor-section__divider" />
+      {/* Meeting Room — a doorway opening */}
+      <rect x="115" y="150" width="60" height="100" className="floor-section__detail" />
+      {/* Open Space — a taller opening, reading as the room's own volume */}
+      <rect x="280" y="80" width="80" height="180" className="floor-section__detail floor-section__detail--accent" />
+      {/* Stairs, climbing under the sloped roof */}
+      <Treads x1={440} y1={262} x2={580} y2={165} />
+      <text x="140" y="300" textAnchor="middle" className="floor-section__zone-label">Meeting Room</text>
+      <text x="320" y="300" textAnchor="middle" className="floor-section__zone-label">Open Space</text>
+      <text x="510" y="300" textAnchor="middle" className="floor-section__zone-label">Stairs</text>
+    </svg>
   )
 }
 
-const FLOOR_1_ROOMS: Room[] = [
-  { gridX: 0, gridY: 0, label: "MEETING ROOM" },
-  { gridX: 1, gridY: 0, label: "OPEN SPACE", accent: true },
-  { gridX: 2, gridY: 0, label: "STAIRS" },
-]
-
-const FLOOR_2_ROOMS: Room[] = [
-  { gridX: 0, gridY: 0, label: "LIMBO SET", accent: true },
-  { gridX: 1, gridY: 0, label: "CHILL AREA" },
-  { gridX: 2, gridY: 0, label: "STAIRS" },
-]
-
-function FloorSVG({ rooms }: { rooms: Room[] }) {
+function LowerFloorSVG() {
   return (
-    <svg viewBox="-150 -50 550 400" className="floor-plan__svg">
-      {rooms.map((r) => (
-        <FloorBlock key={r.label} {...r} />
-      ))}
+    <svg viewBox="20 0 640 320" className="floor-plan__svg">
+      <path d={OUTLINE} className="floor-section__outline" />
+      <line x1="420" y1="40" x2="420" y2="280" className="floor-section__divider" />
+      {/* Limbo Set — a shooting-set stand-in: a low bench and a stool */}
+      <rect x="110" y="225" width="140" height="16" className="floor-section__detail" />
+      <circle cx="330" cy="245" r="18" className="floor-section__detail" />
+      {/* Chill Area — a small nook tucked under the eave */}
+      <rect x="480" y="70" width="90" height="55" className="floor-section__detail floor-section__detail--accent" />
+      {/* Stairs, climbing up to meet the Chill Area */}
+      <Treads x1={440} y1={262} x2={560} y2={180} count={4} />
+      <text x="180" y="300" textAnchor="middle" className="floor-section__zone-label">Limbo Set</text>
+      <text x="525" y="145" textAnchor="middle" className="floor-section__zone-label">Chill Area</text>
+      <text x="500" y="300" textAnchor="middle" className="floor-section__zone-label">Stairs</text>
     </svg>
   )
 }
@@ -109,11 +110,11 @@ function StudioFloorPinned() {
         <div className="wrap floor-plan">
           <motion.div className="floor-plan__layer" style={{ opacity: floor1Opacity }}>
             <span className="floor-plan__label">Ground Floor</span>
-            <FloorSVG rooms={FLOOR_1_ROOMS} />
+            <GroundFloorSVG />
           </motion.div>
           <motion.div className="floor-plan__layer" style={{ opacity: floor2Opacity }}>
             <span className="floor-plan__label">Floor Below</span>
-            <FloorSVG rooms={FLOOR_2_ROOMS} />
+            <LowerFloorSVG />
           </motion.div>
         </div>
       </div>
@@ -133,13 +134,13 @@ function StudioFloorAmbient() {
         <Reveal>
           <div className="floor-plan__layer floor-plan__layer--ambient">
             <span className="floor-plan__label">Ground Floor</span>
-            <FloorSVG rooms={FLOOR_1_ROOMS} />
+            <GroundFloorSVG />
           </div>
         </Reveal>
         <Reveal delay={0.1}>
           <div className="floor-plan__layer floor-plan__layer--ambient">
-            <span className="floor-plan__label">Upper Floor</span>
-            <FloorSVG rooms={FLOOR_2_ROOMS} />
+            <span className="floor-plan__label">Floor Below</span>
+            <LowerFloorSVG />
           </div>
         </Reveal>
       </div>
