@@ -53,6 +53,18 @@ function Treads({ x1, y1, x2, y2, count = 5 }: { x1: number; y1: number; x2: num
   return <>{treads}</>
 }
 
+/** A ring of small chairs around a table, as drawn in the sketch for both
+ *  the Meeting Room and Open Space tables. */
+function Chairs({ positions }: { positions: [number, number][] }) {
+  return (
+    <>
+      {positions.map(([cx, cy], i) => (
+        <circle key={i} cx={cx} cy={cy} r="7" className="floor-section__detail" />
+      ))}
+    </>
+  )
+}
+
 function GroundFloorSVG() {
   return (
     <svg viewBox="0 0 700 520" className="floor-plan__svg">
@@ -61,11 +73,17 @@ function GroundFloorSVG() {
       <line x1={NOOK_X} y1={NOOK_TOP_Y} x2={NOOK_X} y2="460" className="floor-section__divider" />
       {/* A small structural nook in the corner, hatched in the original sketch */}
       <path d="M60,155 L170,155 L60,215 Z" className="floor-section__hatch" />
-      {/* Meeting Room — a round table */}
-      <rect x="125" y="300" width="110" height="110" rx="28" className="floor-section__detail" />
-      {/* Open Space — the dominant zone: a long table, plus the small opening near the roofline */}
-      <rect x="366" y="137" width="125" height="40" className="floor-section__detail" />
-      <rect x="366" y="249" width="125" height="170" className="floor-section__detail floor-section__detail--accent" />
+      {/* Meeting Room — a round table with six chairs, and a low seat in the corner */}
+      <rect x="126" y="330" width="70" height="100" rx="35" className="floor-section__detail" />
+      <Chairs positions={[[161, 310], [110, 350], [110, 410], [212, 350], [212, 410], [161, 450]]} />
+      <path d="M75,395 Q65,410 75,425 Q90,435 100,420 Q95,400 75,395 Z" className="floor-section__detail" />
+      {/* Open Space — the dominant zone: a long table with six chairs, plus the small opening near the roofline */}
+      <rect x="350" y="140" width="100" height="35" className="floor-section__detail" />
+      <rect x="350" y="250" width="100" height="170" className="floor-section__detail floor-section__detail--accent" />
+      <line x1="400" y1="250" x2="400" y2="420" className="floor-section__detail floor-section__detail--accent" />
+      <line x1="350" y1="307" x2="450" y2="307" className="floor-section__detail floor-section__detail--accent" />
+      <line x1="350" y1="364" x2="450" y2="364" className="floor-section__detail floor-section__detail--accent" />
+      <Chairs positions={[[330, 265], [470, 265], [330, 335], [470, 335], [330, 405], [470, 405]]} />
       {/* Stairs, tucked into the cut corner */}
       <Treads x1={577} y1={440} x2={577} y2={200} count={6} />
       <text x="161" y="480" textAnchor="middle" className="floor-section__zone-label">Meeting Room</text>
@@ -83,12 +101,16 @@ function LowerFloorSVG() {
       {/* Limbo Set and Chill Area share one open room — no wall between them,
           just two furniture groupings, matching the sketch. */}
       <rect x="76" y="104" width="34" height="152" className="floor-section__detail" />
-      {/* Chill Area — a low sofa with two ottomans */}
-      <rect x="176" y="120" width="265" height="60" rx="14" className="floor-section__detail floor-section__detail--accent" />
-      <circle cx="160" cy="150" r="24" className="floor-section__detail floor-section__detail--accent" />
-      <circle cx="460" cy="150" r="24" className="floor-section__detail floor-section__detail--accent" />
-      {/* Limbo Set — a curved corner bench */}
+      {/* Chill Area — a low sofa with two rounded armchairs */}
+      <rect x="176" y="120" width="180" height="55" className="floor-section__detail floor-section__detail--accent" />
+      <path d="M148,148 Q133,148 133,163 Q133,178 148,178 Q163,178 163,163 Q163,148 148,148 Z" className="floor-section__detail floor-section__detail--accent" />
+      <path d="M384,148 Q369,148 369,163 Q369,178 384,178 Q399,178 399,163 Q399,148 384,148 Z" className="floor-section__detail floor-section__detail--accent" />
+      {/* Limbo Set — a curved corner bench, a low table, and a rug edge */}
       <path d="M100,440 L100,350 Q100,300 160,300 L340,300" className="floor-section__detail" />
+      <rect x="110" y="255" width="160" height="16" className="floor-section__detail" />
+      <line x1="290" y1="240" x2="345" y2="270" className="floor-section__detail" />
+      {/* A small side table near the stairs */}
+      <rect x="478" y="314" width="58" height="120" className="floor-section__detail" />
       {/* Stairs, in the same corner nook as the ground floor above */}
       <Treads x1={577} y1={440} x2={577} y2={200} count={6} />
       <text x="150" y="480" textAnchor="middle" className="floor-section__zone-label">Limbo Set</text>
@@ -128,7 +150,7 @@ function StudioFloorPinned() {
             <GroundFloorSVG />
           </motion.div>
           <motion.div className="floor-plan__layer" style={{ opacity: floor2Opacity }}>
-            <span className="floor-plan__label">Floor Below</span>
+            <span className="floor-plan__label">Underground Floor</span>
             <LowerFloorSVG />
           </motion.div>
         </div>
@@ -154,7 +176,7 @@ function StudioFloorAmbient() {
         </Reveal>
         <Reveal delay={0.1}>
           <div className="floor-plan__layer floor-plan__layer--ambient">
-            <span className="floor-plan__label">Floor Below</span>
+            <span className="floor-plan__label">Underground Floor</span>
             <LowerFloorSVG />
           </div>
         </Reveal>

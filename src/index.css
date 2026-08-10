@@ -740,12 +740,12 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
    shapes instead of just scaling them down. */
 .floor-plan__svg { width: 100%; max-width: clamp(700px, 58vw, 1050px); height: auto; flex-shrink: 0; }
 
-.floor-section__outline { fill: none; stroke: var(--pw-white); stroke-width: 1.5; }
-.floor-section__divider { stroke: var(--pw-white); stroke-width: 1; opacity: 0.3; }
-.floor-section__detail { fill: none; stroke: var(--text-secondary); stroke-width: 1; opacity: 0.6; }
-.floor-section__detail--accent { stroke: var(--pw-orange); opacity: 0.9; }
-.floor-section__tread { stroke: var(--text-secondary); stroke-width: 1; opacity: 0.6; }
-.floor-section__hatch { fill: var(--pw-white); opacity: 0.08; stroke: var(--text-secondary); stroke-width: 1; }
+.floor-section__outline { fill: none; stroke: var(--pw-white); stroke-width: 2; }
+.floor-section__divider { stroke: var(--pw-white); stroke-width: 1.5; opacity: 0.5; }
+.floor-section__detail { fill: none; stroke: var(--pw-white); stroke-width: 1.5; opacity: 0.85; }
+.floor-section__detail--accent { stroke: var(--pw-orange); opacity: 1; }
+.floor-section__tread { stroke: var(--pw-white); stroke-width: 1.5; opacity: 0.85; }
+.floor-section__hatch { fill: var(--pw-white); fill-opacity: 0.1; stroke: var(--pw-white); stroke-width: 1.5; stroke-opacity: 0.85; }
 .floor-section__zone-label {
   font-family: var(--font-mono-accent); font-size: 11px;
   text-transform: uppercase; letter-spacing: 0.05em; fill: var(--text-secondary);
