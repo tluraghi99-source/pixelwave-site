@@ -4,6 +4,7 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { FitText } from "@/components/motion/FitText"
 import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
 import { CursorGlow } from "@/components/motion/CursorGlow"
+import { ClientLogos } from "@/components/sections/ClientLogos"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
 
 const SOCIALS = [
@@ -31,6 +32,7 @@ export function Footer() {
   return (
     <footer data-screen-label="Footer" ref={footerRef}>
       <CursorGlow className="cursor-glow" variant="light" glow={false} />
+      <ClientLogos />
       <div className="wrap foot__row">
         <Reveal className="foot__addr">
           <a href="https://maps.app.goo.gl/xNz7W3z1U6EcBg6f7" target="_blank" rel="noopener noreferrer">
