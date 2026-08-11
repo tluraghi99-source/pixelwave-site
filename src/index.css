@@ -675,16 +675,17 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .studio-intro__hero { height: 50svh; }
 .studio-intro__line {
   font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em;
-  font-size: clamp(1.75rem, 3.4vw, 3.25rem); line-height: 1.15; margin: 0;
-  max-width: 46ch;
+  font-size: clamp(2.5rem, 5.2vw, 5.5rem); line-height: 1.12; margin: 0;
+  max-width: 46ch; margin-inline: auto; text-align: center;
+  color: var(--pw-white);
 }
-/* Marker-highlight treatment: black text on a flat orange block, sized to
-   the text rather than the line's own full width — box-decoration-break
-   keeps that true even if a line ever wraps onto two rows. */
-.studio-intro__mark {
-  display: inline-block;
-  background: var(--pw-orange); color: var(--pw-black);
-  padding: 0 0.15em; box-decoration-break: clone; -webkit-box-decoration-break: clone;
+/* Per-word hover instead of a static highlight — each word is its own
+   inline span so :hover can target just that one, not the whole sentence. */
+.studio-intro__word {
+  transition: color 0.25s var(--ease-wave);
+}
+.studio-intro__word:hover {
+  color: var(--pw-orange);
 }
 
 .studio-team { position: relative; isolation: isolate; padding-block: clamp(3rem, 6vw, 6rem); }
