@@ -1045,7 +1045,12 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   transition: color var(--dur-slow) var(--ease-wave), transform var(--dur-slow) var(--ease-wave);
 }
 .svc-row__num { flex-shrink: 0; }
-.svc-row__name { flex: 1; }
+/* min-width: 0 overrides the flex-item default (min-width: auto), which
+   otherwise refuses to shrink below the longest unbroken word's rendered
+   width — at this row's big display font size, a name like "Development"
+   was wider than the whole row on mobile and blew out the page's horizontal
+   bounds, cutting off the fixed header's mobile menu button. */
+.svc-row__name { flex: 1; min-width: 0; overflow-wrap: break-word; }
 .svc-row--open .svc-row__num,
 .svc-row--open .svc-row__name { color: var(--pw-orange); transform: translateX(10px); }
 
