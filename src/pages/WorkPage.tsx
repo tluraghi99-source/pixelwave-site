@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react"
+import { motion } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
 import { Card } from "@/components/pw/Card"
 import { Tag } from "@/components/pw/Tag"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { Footer } from "@/components/sections/Footer"
 import { CursorGlow } from "@/components/motion/CursorGlow"
+import { EASE_WAVE } from "@/lib/motion"
 import { PROJECTS } from "@/data/work"
 
 // "Featured" is a highlight badge, not a category, so it's excluded from the filter row.
@@ -72,6 +74,13 @@ export function WorkPage() {
                     onClick={() => setMode("category")}
                   >
                     Category
+                    {mode === "category" && (
+                      <motion.span
+                        className="work-page__mode-tab-underline"
+                        layoutId="work-page__mode-tab-underline"
+                        transition={{ duration: 0.3, ease: EASE_WAVE }}
+                      />
+                    )}
                   </button>
                   <button
                     type="button"
@@ -81,6 +90,13 @@ export function WorkPage() {
                     onClick={() => setMode("client")}
                   >
                     Client
+                    {mode === "client" && (
+                      <motion.span
+                        className="work-page__mode-tab-underline"
+                        layoutId="work-page__mode-tab-underline"
+                        transition={{ duration: 0.3, ease: EASE_WAVE }}
+                      />
+                    )}
                   </button>
                 </div>
 
