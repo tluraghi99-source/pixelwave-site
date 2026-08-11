@@ -12,8 +12,15 @@ const FILTER_TAGS = Array.from(
   new Set(PROJECTS.flatMap((p) => p.tags.map(([, label]) => label)))
 ).filter((label) => label !== "Featured")
 
+// Alphabetical (unlike FILTER_TAGS' insertion order) — categories are a
+// small curated set where order doesn't matter; clients are the dimension
+// expected to grow, so alphabetical keeps a long list scannable.
+const FILTER_CLIENTS = Array.from(new Set(PROJECTS.map((p) => p.client))).sort()
+
 export function WorkPage() {
+  const [mode, setMode] = useState<"category" | "client">("category")
   const [activeTags, setActiveTags] = useState<Set<string>>(new Set())
+  const [activeClient, setActiveClient] = useState<string | null>(null)
 
   function toggleTag(tag: string) {
     setActiveTags((prev) => {
@@ -24,11 +31,23 @@ export function WorkPage() {
     })
   }
 
-  // Empty selection shows everything; otherwise OR-match any selected tag.
+  // Single-select: picking a client is a lookup ("show me X's work"), not a
+  // facet you stack with other clients — clicking the active one clears it.
+  function selectClient(client: string) {
+    setActiveClient((prev) => (prev === client ? null : client))
+  }
+
+  // Each mode keeps its own selection independently — switching tabs never
+  // clears the other dimension's picks, only the active mode's selection
+  // actually drives the grid below.
   const visibleProjects = useMemo(() => {
-    if (activeTags.size === 0) return PROJECTS
-    return PROJECTS.filter((p) => p.tags.some(([, label]) => activeTags.has(label)))
-  }, [activeTags])
+    if (mode === "category") {
+      if (activeTags.size === 0) return PROJECTS
+      return PROJECTS.filter((p) => p.tags.some(([, label]) => activeTags.has(label)))
+    }
+    if (!activeClient) return PROJECTS
+    return PROJECTS.filter((p) => p.client === activeClient)
+  }, [mode, activeTags, activeClient])
 
   return (
     <>
