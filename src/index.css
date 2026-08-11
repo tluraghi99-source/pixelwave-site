@@ -895,6 +895,15 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 }
 .work-page__filter:hover { color: var(--text-primary); }
 .work-page__filter.is-active { color: var(--accent-primary); }
+.work-page__filter-block { display: flex; flex-direction: column; align-items: flex-end; gap: 0.6rem; }
+.work-page__mode-toggle { display: flex; gap: 1.25rem; }
+.work-page__mode-tab {
+  font-size: 13px; font-weight: 700; color: var(--text-tertiary); cursor: pointer;
+  padding-bottom: 3px; border-bottom: 2px solid transparent;
+  transition: color .2s var(--ease-wave), border-color .2s var(--ease-wave);
+}
+.work-page__mode-tab:hover { color: var(--text-primary); }
+.work-page__mode-tab.is-active { color: var(--text-primary); border-bottom-color: var(--accent-primary); }
 .work-grid {
   display: grid; grid-template-columns: repeat(2, 1fr);
   /* Matches .wrap's own left/right padding, so the gap between cards reads

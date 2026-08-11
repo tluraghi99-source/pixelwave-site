@@ -62,18 +62,57 @@ export function WorkPage() {
               <Reveal delay={0.1}>
                 <p className="lead">All projects.</p>
               </Reveal>
-              <Reveal delay={0.15} className="work-page__filters">
-                {FILTER_TAGS.map((tag) => (
+              <Reveal delay={0.15} className="work-page__filter-block">
+                <div className="work-page__mode-toggle" role="tablist">
                   <button
-                    key={tag}
                     type="button"
-                    className={`work-page__filter ${activeTags.has(tag) ? "is-active" : ""}`}
-                    aria-pressed={activeTags.has(tag)}
-                    onClick={() => toggleTag(tag)}
+                    role="tab"
+                    aria-selected={mode === "category"}
+                    className={`work-page__mode-tab ${mode === "category" ? "is-active" : ""}`}
+                    onClick={() => setMode("category")}
                   >
-                    {tag}
+                    Category
                   </button>
-                ))}
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={mode === "client"}
+                    className={`work-page__mode-tab ${mode === "client" ? "is-active" : ""}`}
+                    onClick={() => setMode("client")}
+                  >
+                    Client
+                  </button>
+                </div>
+
+                {mode === "category" ? (
+                  <div className="work-page__filters">
+                    {FILTER_TAGS.map((tag) => (
+                      <button
+                        key={tag}
+                        type="button"
+                        className={`work-page__filter ${activeTags.has(tag) ? "is-active" : ""}`}
+                        aria-pressed={activeTags.has(tag)}
+                        onClick={() => toggleTag(tag)}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="work-page__filters">
+                    {FILTER_CLIENTS.map((client) => (
+                      <button
+                        key={client}
+                        type="button"
+                        className={`work-page__filter ${activeClient === client ? "is-active" : ""}`}
+                        aria-pressed={activeClient === client}
+                        onClick={() => selectClient(client)}
+                      >
+                        {client}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </Reveal>
             </div>
 
