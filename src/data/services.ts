@@ -28,7 +28,11 @@ export const SERVICES = [
   },
   {
     num: "04",
-    name: "Development",
+    // Soft hyphen (U+00AD) gives the browser a sane break point on narrow
+    // screens — this one word is wider than the whole row at the display
+    // font size, and without it the fallback break lands mid-letter
+    // ("Developm/ent") instead of at a syllable ("Develop-ment").
+    name: "Develop­ment",
     desc: "Fast, resilient front-ends built directly from the design system — no gap between what's designed and what ships.",
     tagCols: [
       ["Front-end", "Headless"],

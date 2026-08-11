@@ -1050,7 +1050,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
    width — at this row's big display font size, a name like "Development"
    was wider than the whole row on mobile and blew out the page's horizontal
    bounds, cutting off the fixed header's mobile menu button. */
-.svc-row__name { flex: 1; min-width: 0; overflow-wrap: break-word; }
+.svc-row__name { flex: 1; min-width: 0; overflow-wrap: break-word; hyphens: auto; }
 .svc-row--open .svc-row__num,
 .svc-row--open .svc-row__name { color: var(--pw-orange); transform: translateX(10px); }
 
