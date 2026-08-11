@@ -897,7 +897,9 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .work-page__filter.is-active { color: var(--accent-primary); }
 .work-grid {
   display: grid; grid-template-columns: repeat(2, 1fr);
-  gap: clamp(1.5rem, 2vw, 3rem); margin-top: clamp(2.5rem, 3vw, 4rem);
+  /* Matches .wrap's own left/right padding, so the gap between cards reads
+     the same as the page's outer margin. */
+  gap: clamp(1rem, 1.2vw, 1.25rem); margin-top: clamp(2.5rem, 3vw, 4rem);
 }
 @media (max-width: 640px) { .work-grid { grid-template-columns: 1fr; } }
 /* Landscape crop instead of the shared .pw-card's tall 3/4 default, and the
