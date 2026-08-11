@@ -896,6 +896,13 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .work-page__filter:hover { color: var(--text-primary); }
 .work-page__filter.is-active { color: var(--accent-primary); }
 .work-page__filter-block { display: flex; flex-direction: column; align-items: flex-end; gap: 0.6rem; }
+/* Mobile: the head wraps to a single column (title, then this block, then
+   the pill row), so right-aligning just the toggle read as a stray
+   zig-zag against the title and pills on either side of it, both flush
+   left. Left-align it too so the whole stack shares one edge. */
+@media (max-width: 767px) {
+  .work-page__filter-block { align-items: flex-start; }
+}
 .work-page__mode-toggle { display: flex; gap: 1.25rem; }
 .work-page__mode-tab {
   position: relative;
