@@ -652,7 +652,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .client-logos__row .marquee__group { min-width: 100vw; justify-content: space-around; }
 .client-logos__item {
   padding-right: clamp(1.5rem, 2vw, 2.5rem);
-  opacity: 0.45;
+  opacity: 0.32;
   transition: opacity var(--dur-base) var(--ease-wave);
 }
 .client-logos__item:hover { opacity: 1; }
@@ -665,7 +665,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
    reads as one consistent mark (see data/clients.ts for why a few keep
    their real colors instead). */
 .client-logos__item--logo {
-  display: block; height: clamp(1.5rem, 2.2vw, 2rem); width: auto;
+  display: block; height: clamp(2rem, 2.9vw, 2.75rem); width: auto;
   filter: brightness(0);
 }
 .client-logos__item--color { filter: none; }
