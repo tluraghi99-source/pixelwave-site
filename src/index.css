@@ -652,7 +652,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .client-logos__row .marquee__group { min-width: 100vw; justify-content: space-around; }
 .client-logos__item {
   padding-right: clamp(1.5rem, 2vw, 2.5rem);
-  opacity: 0.32;
+  opacity: 0.22;
   transition: opacity var(--dur-base) var(--ease-wave);
 }
 .client-logos__item:hover { opacity: 1; }
