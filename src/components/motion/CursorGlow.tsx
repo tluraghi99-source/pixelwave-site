@@ -110,11 +110,22 @@ export function CursorGlow({ className, variant = "dark", glow = true }: CursorG
       window.addEventListener("mousemove", handleMove)
       document.documentElement.addEventListener("mouseleave", handleLeave)
     }
-    window.addEventListener("resize", resize)
+    // A window "resize" event alone misses cases where the canvas's own
+    // rendered size changes without the window itself resizing — a fixed
+    // 100svh host settling after the preloader, a mobile URL bar
+    // collapsing, any parent layout shift. When that happens the bitmap
+    // (canvas.width/height, used for the dot grid's own coordinate math)
+    // goes stale while the CSS box (canvas.getBoundingClientRect(), used
+    // for the real cursor position) keeps tracking the true size — the two
+    // drift out of sync, and the glow only lines up with the cursor in
+    // whatever region the stale bitmap still covers. ResizeObserver watches
+    // the canvas's actual box directly, so it catches all of those cases.
+    const observer = new ResizeObserver(resize)
+    observer.observe(canvas)
 
     return () => {
       cancelAnimationFrame(raf)
-      window.removeEventListener("resize", resize)
+      observer.disconnect()
       window.removeEventListener("mousemove", handleMove)
       document.documentElement.removeEventListener("mouseleave", handleLeave)
     }
