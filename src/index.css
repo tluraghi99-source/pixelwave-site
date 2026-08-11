@@ -654,6 +654,13 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .video-scrub__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .video-scrub__tint { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.4); }
 .video-scrub--ambient { height: 70vh; }
+/* Mobile/tablet: once you scroll to it, the video pins full-screen and the
+   carousel section right after it (.work-ambient, margin-top pulled up by
+   the same amount) slides up over it — same "pin then get covered" effect
+   as the desktop version, without that version's scroll-scrubbed cost. */
+@media (max-width: 1023px) {
+  .video-scrub--ambient { position: sticky; top: 0; height: 100svh; z-index: 0; }
+}
 
 /* ticker */
 .ticker { position: relative; isolation: isolate; padding-block: clamp(1.5rem, 2vw, 3rem); background: var(--pw-black); }
@@ -837,6 +844,20 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 
 .lead { font-family: var(--font-display); font-weight: 600; font-size: clamp(2rem, 1.6vw, 4.5rem); line-height: 1.05; letter-spacing: -0.02em; margin: 1.25rem 0 0; text-wrap: balance; }
 .secbody { font-size: 1.125rem; line-height: 1.5; color: var(--text-secondary); max-width: 52ch; margin: 1.25rem 0 0; }
+
+/* Mobile/tablet: plain normal-flow section, no offset — the video ahead of
+   it is what's sticky (see .video-scrub--ambient above), so it naturally
+   stays pinned full-screen while this section's own top scrolls up from
+   below and covers it. position: relative + a solid background are what
+   make that covering actually happen: a static (non-positioned) element
+   paints below a sticky one regardless of DOM order, and a transparent one
+   would let the pinned video show through its gaps. */
+@media (max-width: 1023px) {
+  .work-ambient {
+    position: relative; z-index: 1;
+    background: var(--surface-page);
+  }
+}
 
 .work__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap; }
 .work__carousel { overflow: hidden; width: 100%; margin-top: 3rem; cursor: grab; }
