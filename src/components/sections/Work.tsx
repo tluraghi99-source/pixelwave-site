@@ -138,7 +138,13 @@ export function WorkAmbient() {
   const x = useTransform(rawX, (v) => `${wrap(-50, 0, v)}%`)
 
   return (
-    <section id="work" className="sec work-ambient" data-screen-label="Selected Work" ref={sectionRef}>
+    <section
+      id="work"
+      className="sec work-ambient"
+      data-theme="dark"
+      data-screen-label="Selected Work"
+      ref={sectionRef}
+    >
       <div className="wrap">
         <WorkHeading />
       </div>

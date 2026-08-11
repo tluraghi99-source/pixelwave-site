@@ -848,14 +848,16 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 /* Mobile/tablet: plain normal-flow section, no offset — the video ahead of
    it is what's sticky (see .video-scrub--ambient above), so it naturally
    stays pinned full-screen while this section's own top scrolls up from
-   below and covers it. position: relative + a solid background are what
-   make that covering actually happen: a static (non-positioned) element
-   paints below a sticky one regardless of DOM order, and a transparent one
-   would let the pinned video show through its gaps. */
+   below and covers it. position: relative is what makes that covering
+   actually happen (a static, non-positioned element paints below a sticky
+   one regardless of DOM order) — the 40%-black background is a deliberate
+   tint, not full coverage, so the pinned video keeps showing through
+   underneath instead of being hidden outright. data-theme="dark" on the
+   section (Work.tsx) keeps the heading/card text legible against it. */
 @media (max-width: 1023px) {
   .work-ambient {
     position: relative; z-index: 1;
-    background: var(--surface-page);
+    background: rgba(0, 0, 0, 0.4);
   }
 }
 
