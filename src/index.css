@@ -1256,7 +1256,7 @@ footer { position: relative; isolation: isolate; background: var(--surface-subtl
 
 .foot__giant {
   overflow: hidden; white-space: nowrap;
-  padding-inline: clamp(1.25rem, 2.5vw, 4rem);
+  padding-left: clamp(1rem, 1.2vw, 1.25rem); padding-right: clamp(1rem, 1.2vw, 1.25rem);
   padding-bottom: clamp(1.5rem, 2vw, 2.5rem);
 }
 .foot__giant-text {
