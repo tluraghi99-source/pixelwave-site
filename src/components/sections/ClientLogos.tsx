@@ -40,12 +40,12 @@ export function ClientLogos() {
   return (
     <div className="client-logos">
       <h2 className="sr-only">Clients</h2>
-      <Marquee speed={70} className="client-logos__row">
+      <Marquee speed={110} className="client-logos__row">
         {ROW_ONE.map((client, i) => (
           <ClientMark client={client} key={`${client.name}-${i}`} />
         ))}
       </Marquee>
-      <Marquee speed={80} reverse className="client-logos__row">
+      <Marquee speed={125} reverse className="client-logos__row">
         {ROW_TWO.map((client, i) => (
           <ClientMark client={client} key={`${client.name}-${i}`} />
         ))}
