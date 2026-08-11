@@ -89,17 +89,16 @@ export function Header() {
     document.documentElement.classList.toggle("nav-open", open)
   }, [open])
 
-  // The full-panel menu is a fixed overlay, so lock page scroll while it's
-  // open on desktop (mobile's dropdown stays in normal flow, no lock needed).
-  // Releasing the lock happens in releaseScrollLock (called from
+  // Both menus are fixed overlays now (desktop's dropdown panel, mobile's
+  // full-screen takeover), so page scroll is locked behind either one.
+  // Releasing the lock happens in releaseScrollLock (called from each
   // AnimatePresence's onExitComplete below), NOT in this effect's own
-  // cleanup — the exit animation runs for 0.5s after `open` already flips to
-  // false, and restoring the scrollbar that early snapped the still-visible,
-  // still-animating panel's width mid-transition.
+  // cleanup — the exit animation runs for a few hundred ms after `open`
+  // already flips to false, and restoring the scrollbar that early snapped
+  // the still-visible, still-animating panel's width mid-transition.
   useEffect(() => {
     if (!open) return
-    const isDesktop = window.innerWidth >= 768
-    if (isDesktop && !scrollLockedRef.current) {
+    if (!scrollLockedRef.current) {
       // Locking overflow removes the scrollbar, widening the layout viewport.
       // Body's own in-flow content is compensated the standard way (padding
       // matching the vanished scrollbar's width), but position:fixed elements
@@ -269,22 +268,27 @@ export function Header() {
         )}
       </AnimatePresence>
 
-      {open && (
-        <div className="nav__mobile wrap flex flex-col gap-5 py-6 md:hidden">
-          {links.map((link) =>
-            renderLink(link.href, link.label, link.href, "nav__link text-base", () => setOpen(false))
-          )}
-          <Button
-            variant="primary"
-            size="sm"
-            href="/contact"
-            onClick={() => setOpen(false)}
-            className="w-fit"
+      <AnimatePresence onExitComplete={releaseScrollLock}>
+        {open && (
+          <motion.div
+            key="nav-mobile"
+            className="nav__mobile md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: EASE_WAVE }}
           >
-            Let's talk
-          </Button>
-        </div>
-      )}
+            <div className="nav__mobile-links">
+              {links.map((link) =>
+                renderLink(link.href, link.label, link.href, "nav__link", () => setOpen(false))
+              )}
+            </div>
+            <Button variant="primary" size="lg" href="/contact" onClick={() => setOpen(false)} className="w-fit">
+              Let's talk
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   )
 }

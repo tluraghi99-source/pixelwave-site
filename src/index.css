@@ -531,7 +531,35 @@ header.nav[data-theme="light"] .nav__link {
   color: rgba(0,0,0,0.85); text-shadow: 0 1px 10px rgba(255,255,255,0.6);
 }
 header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
-.nav__mobile { background: rgba(0,0,0,0.94); backdrop-filter: blur(14px); border-top: 1px solid rgba(255,255,255,0.1); }
+/* Mobile menu — a full-screen orange takeover (not a small dropdown),
+   hugging the 76px top bar so the logo/close button stay reachable above it.
+   display starts at none and only flips to flex under the max-width query
+   below — Tailwind's md:hidden utility has the same specificity as a plain
+   class selector, so leaving display unconditional here would tie with it
+   and could win the cascade on desktop too (same trap .nav__panel's own
+   comment already warns about). */
+.nav__mobile {
+  position: fixed; top: 76px; left: 0; right: 0; bottom: 0;
+  background: var(--pw-orange);
+  flex-direction: column; justify-content: center;
+  gap: clamp(2rem, 8vw, 3rem);
+  padding: clamp(1.5rem, 5vw, 2.5rem);
+  overflow-y: auto;
+  display: none;
+}
+@media (max-width: 767px) { .nav__mobile { display: flex; } }
+.nav__mobile-links { display: flex; flex-direction: column; gap: clamp(0.75rem, 3vw, 1.25rem); }
+.nav__mobile .nav__link {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(2.75rem, 13vw, 4.25rem); letter-spacing: -0.02em;
+  color: var(--pw-black); text-shadow: none;
+}
+.nav__mobile .nav__link:hover { color: var(--pw-white); }
+.nav__mobile .pw-btn--primary {
+  align-self: flex-start;
+  background: var(--pw-black); color: var(--pw-white); border-color: var(--pw-black);
+}
+.nav__mobile .pw-btn--primary:hover { background: var(--pw-white); color: var(--pw-black); border-color: var(--pw-white); }
 
 /* Menu button's own dark shell — always black/bordered regardless of the
    header's light/dark theme, with a hover-triggered pixel-grid glow (reused
