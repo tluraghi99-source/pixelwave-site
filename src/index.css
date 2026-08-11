@@ -1088,6 +1088,14 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .svc-row--open .svc-row__num,
 .svc-row--open .svc-row__name { color: var(--pw-orange); transform: translateX(10px); }
 
+/* Mobile: shrink enough that even the longest name ("Video & Editing")
+   fits the row on one line instead of wrapping. */
+@media (max-width: 767px) {
+  .svc-row__head { gap: 0.6rem; }
+  .svc-row__num,
+  .svc-row__name { font-size: clamp(1.25rem, 6vw, 2rem); }
+}
+
 .svc-row__plus {
   width: 28px; height: 28px;
   flex-shrink: 0;
