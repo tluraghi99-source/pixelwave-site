@@ -536,15 +536,16 @@ header.nav[data-theme="light"] .nav__link {
   color: rgba(0,0,0,0.85); text-shadow: 0 1px 10px rgba(255,255,255,0.6);
 }
 header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
-/* Mobile menu — a full-screen orange takeover (not a small dropdown),
-   hugging the 76px top bar so the logo/close button stay reachable above it.
+/* Mobile menu — an orange takeover reaching 3/4 of the viewport height
+   (76px top bar + this panel together), not a small dropdown, hugging the
+   top bar so the logo/close button stay reachable above it.
    display starts at none and only flips to flex under the max-width query
    below — Tailwind's md:hidden utility has the same specificity as a plain
    class selector, so leaving display unconditional here would tie with it
    and could win the cascade on desktop too (same trap .nav__panel's own
    comment already warns about). */
 .nav__mobile {
-  position: fixed; top: 76px; left: 0; right: 0; bottom: 0;
+  position: fixed; top: 76px; left: 0; right: 0; height: calc(75svh - 76px);
   background: var(--pw-orange);
   flex-direction: column; justify-content: center;
   gap: clamp(2rem, 8vw, 3rem);
