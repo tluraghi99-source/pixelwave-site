@@ -519,6 +519,11 @@ header.nav {
   background: transparent; border: none;
   padding-right: var(--scroll-comp);
 }
+/* Mobile menu open: the top bar joins the full-screen takeover below it as
+   one solid orange block, instead of a white strip sitting above it. */
+@media (max-width: 767px) {
+  header.nav.nav--open { background: var(--pw-orange); }
+}
 .nav__inner { display: flex; align-items: center; justify-content: space-between; height: 76px; }
 .nav__links { display: flex; gap: 2.25rem; align-items: center; }
 .nav__link {

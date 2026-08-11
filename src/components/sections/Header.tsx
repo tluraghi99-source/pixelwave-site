@@ -230,7 +230,7 @@ export function Header() {
         <button
           type="button"
           aria-label={open ? "Close menu" : "Open menu"}
-          className={`cursor-pointer md:hidden ${onDark ? "text-white" : "text-black"}`}
+          className={`cursor-pointer md:hidden ${open || !onDark ? "text-black" : "text-white"}`}
           onClick={() => setOpen((v) => !v)}
         >
           {open ? <X size={22} /> : <Menu size={22} />}
