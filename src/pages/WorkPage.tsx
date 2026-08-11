@@ -119,7 +119,15 @@ export function WorkPage() {
             {/* amount is fraction of the GROUP's own height, not the viewport's —
                 default 0.2 is unreachable for a grid this much taller than the
                 viewport, so it would never reveal. */}
-            <RevealGroup className="work-grid" stagger={0.06} amount={0.01}>
+            {/* key forces a remount on filter change — whileInView's viewport.once
+                only fires once per mount, so without this, cards that mount later
+                (e.g. widening back out after narrowing) would stay at opacity 0. */}
+            <RevealGroup
+              key={mode === "category" ? `cat:${[...activeTags].sort().join(",")}` : `cli:${activeClient ?? ""}`}
+              className="work-grid"
+              stagger={0.06}
+              amount={0.01}
+            >
               {visibleProjects.map((p) => (
                 <RevealItem key={p.id}>
                   <Card
