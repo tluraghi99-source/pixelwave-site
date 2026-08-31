@@ -1115,7 +1115,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 /* flex-shrink: 0 (unlike .work__gallery-wrap above, which shrinks to make
    room) — this only ever holds a few lines of text, it should never be the
    thing that gives up space. */
-.reel__cta { display: flex; flex-direction: column; align-items: center; text-align: center; flex-shrink: 0; gap: clamp(0.5rem, 1vw, 0.75rem); padding-top: clamp(1rem, 2vw, 1.5rem); }
+.reel__cta { display: flex; flex-direction: column; align-items: center; text-align: center; flex-shrink: 0; gap: clamp(0.5rem, 1vw, 0.75rem); padding-top: clamp(1rem, 2vw, 1.5rem); margin-top: -20px; }
 .reel__cta-headline { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; font-size: clamp(1.5rem, 2.6vw, 2.75rem); margin: 0; }
 /* Outline by default, fills solid orange on hover — distinct from
    CtaBand's own always-solid-orange button. CtaBand's own button uses
