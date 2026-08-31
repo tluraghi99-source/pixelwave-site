@@ -65,10 +65,11 @@ function StudioGalleryDesktop() {
           bend={2}
           borderRadius={0}
           // Inverted from CircularGallery's portrait default (933.333x1200)
-          // to landscape — studio photos read as horizontal shots, unlike
-          // the homepage gallery's vertical project cards.
-          cardWidth={1200}
-          cardHeight={933.333}
+          // to landscape (studio photos read as horizontal shots, unlike
+          // the homepage gallery's vertical project cards), then bumped
+          // 30% bigger (x1.3) than that inverted 1200x933.333 base.
+          cardWidth={1560}
+          cardHeight={1213.333}
           className="studio-gallery__canvas"
         />
       </div>
