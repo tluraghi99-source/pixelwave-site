@@ -618,7 +618,7 @@ export const CircularGallery = forwardRef<CircularGalleryHandle, CircularGallery
       onHover: (hover) => {
         const caption = captionRef.current
         if (!caption) return
-        if (!hover || !hover.text) {
+        if (!hover || (!hover.text && !hover.tags?.length)) {
           caption.style.opacity = "0"
           if (hoveredIndexRef.current !== null) {
             hoveredIndexRef.current = null
