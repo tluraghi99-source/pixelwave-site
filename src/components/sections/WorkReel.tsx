@@ -168,6 +168,14 @@ function WorkReelPinned({ ctaHeadline }: { ctaHeadline: string }) {
   const ctaOpacity = useTransform(scrollYProgress, (v) =>
     FADE_EASE(clampedProgress(v, CAROUSEL_CYCLE_END_FRACTION, CTA_FADE_END_FRACTION))
   )
+  // .reel__content's own pointerEvents above turns "auto" well before this
+  // (once the heading/gallery are visible, ~0.6), but .reel__cta doesn't
+  // fade in until CAROUSEL_CYCLE_END_FRACTION (~0.84) — without this, its
+  // button would be clickable and tab-focusable while still fully
+  // transparent, the only interactive element in the whole pin that isn't
+  // gated by its own visibility.
+  const ctaPointerEvents = useTransform(ctaOpacity, (v) => (v > 0.05 ? "auto" : "none"))
+  const ctaVisibility = useTransform(ctaOpacity, (v) => (v > 0.05 ? "visible" : "hidden"))
 
   return (
     <>
@@ -185,7 +193,10 @@ function WorkReelPinned({ ctaHeadline }: { ctaHeadline: string }) {
             <motion.div className="work__gallery-wrap" style={{ opacity: contentOpacity, y: galleryY }}>
               <WorkGallery scrollYProgress={carouselProgress} />
             </motion.div>
-            <motion.div className="reel__cta" style={{ opacity: ctaOpacity }}>
+            <motion.div
+              className="reel__cta"
+              style={{ opacity: ctaOpacity, pointerEvents: ctaPointerEvents, visibility: ctaVisibility }}
+            >
               <SectionLabel>Let's talk</SectionLabel>
               <p className="reel__cta-headline">{ctaHeadline}</p>
               <Button

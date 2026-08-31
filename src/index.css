@@ -1087,7 +1087,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
    reel__reveal-overlay below) — scrubs the video to its last frame, holds it
    there undimmed through a short frozen pause, fades a black background in
    slowly (scroll-linked), then the carousel starts fading in at 65% through
-   that black fade and keeps scrolling on top (WorkReel.tsx); 730vh =
+   that black fade and keeps scrolling on top (WorkReel.tsx); 850vh =
    PIN_HEIGHT_VH there, kept in sync by hand. No background here — while
    .reel__inner is still hidden (pre-handoff) the fixed hero/overlay need to
    show through. */
@@ -1118,9 +1118,10 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .reel__cta { display: flex; flex-direction: column; align-items: center; text-align: center; flex-shrink: 0; gap: clamp(0.5rem, 1vw, 0.75rem); padding-top: clamp(1rem, 2vw, 1.5rem); }
 .reel__cta-headline { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; font-size: clamp(1.5rem, 2.6vw, 2.75rem); margin: 0; }
 /* Outline by default, fills solid orange on hover — distinct from
-   CtaBand's own always-solid-orange button (see cta-band__cta in this same
-   file), scoped to this one instance since it isn't requested as a new
-   shared Button variant. */
+   CtaBand's own always-solid-orange button. CtaBand's own button uses
+   variant="primary", not a scoped override — see .pw-btn--primary; this one
+   is scoped to this one instance since it isn't requested as a new shared
+   Button variant. */
 .reel__cta-btn.pw-btn--secondary {
   background: transparent; color: var(--pw-white); border-color: rgba(255, 255, 255, 0.6);
 }
