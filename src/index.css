@@ -1091,7 +1091,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
    PIN_HEIGHT_VH there, kept in sync by hand. No background here — while
    .reel__inner is still hidden (pre-handoff) the fixed hero/overlay need to
    show through. */
-.reel { position: relative; height: 730vh; }
+.reel { position: relative; height: 850vh; }
 .reel__inner { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 /* Fixed reveal overlay — sits directly on the hero (not part of .reel's own
    document flow), so the video's iris opens in place from the very first
@@ -1112,6 +1112,21 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 
 .work__gallery-wrap { flex: 1 1 0%; width: 100%; position: relative; margin-top: 1rem; }
 .work__gallery { display: block; }
+/* flex-shrink: 0 (unlike .work__gallery-wrap above, which shrinks to make
+   room) — this only ever holds a few lines of text, it should never be the
+   thing that gives up space. */
+.reel__cta { display: flex; flex-direction: column; align-items: center; text-align: center; flex-shrink: 0; gap: clamp(0.5rem, 1vw, 0.75rem); padding-top: clamp(1rem, 2vw, 1.5rem); }
+.reel__cta-headline { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; font-size: clamp(1.5rem, 2.6vw, 2.75rem); margin: 0; }
+/* Outline by default, fills solid orange on hover — distinct from
+   CtaBand's own always-solid-orange button (see cta-band__cta in this same
+   file), scoped to this one instance since it isn't requested as a new
+   shared Button variant. */
+.reel__cta-btn.pw-btn--secondary {
+  background: transparent; color: var(--pw-white); border-color: rgba(255, 255, 255, 0.6);
+}
+.reel__cta-btn.pw-btn--secondary:hover {
+  background: var(--pw-orange); border-color: var(--pw-orange); color: var(--pw-white);
+}
 
 .gallery-caption {
   position: absolute; pointer-events: none; transform-origin: 50% 50%;

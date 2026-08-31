@@ -16,7 +16,7 @@ export function HomePage() {
       <Hero introDone={introDone} />
       <div className="page-content">
         <main>
-          <WorkReel />
+          <WorkReel ctaHeadline="Got a wave in mind?" />
           <TickerStrip />
           <Services />
         </main>
