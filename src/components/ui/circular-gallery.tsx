@@ -41,6 +41,12 @@ interface CircularGalleryProps extends React.HTMLAttributes<HTMLDivElement> {
   scrollSpeed?: number
   /** Easing factor for the scroll animation (lower is smoother). @default 0.05 */
   scrollEase?: number
+  /** Card width, in the same arbitrary units as cardHeight (not pixels —
+   *  see Media.onResize). @default 933.333 (portrait, matches the homepage
+   *  gallery's original proportions) */
+  cardWidth?: number
+  /** Card height, in the same arbitrary units as cardWidth. @default 1200 */
+  cardHeight?: number
 }
 
 interface HoverInfo {
@@ -101,6 +107,8 @@ class Media {
   viewport: { width: number; height: number }
   bend: number
   borderRadius: number
+  cardWidth: number
+  cardHeight: number
   program!: Program
   plane!: Mesh
   extra = 0
@@ -126,6 +134,8 @@ class Media {
     viewport,
     bend,
     borderRadius = 0,
+    cardWidth,
+    cardHeight,
   }: {
     geometry: Plane
     gl: OGLRenderingContext
@@ -139,6 +149,8 @@ class Media {
     viewport: { width: number; height: number }
     bend: number
     borderRadius: number
+    cardWidth: number
+    cardHeight: number
   }) {
     this.geometry = geometry
     this.gl = gl
@@ -152,6 +164,8 @@ class Media {
     this.viewport = viewport
     this.bend = bend
     this.borderRadius = borderRadius
+    this.cardWidth = cardWidth
+    this.cardHeight = cardHeight
     this.createShader()
     this.createMesh()
     this.onResize()
@@ -301,13 +315,12 @@ class Media {
   }: { screen?: { width: number; height: number }; viewport?: { width: number; height: number } } = {}) {
     if (screen) this.screen = screen
     if (viewport) this.viewport = viewport
-    // Card size, in the same units as screen.height at scale 1 — bumped 1/3
-    // bigger (x4/3) than the original 900x700 reference, same aspect ratio.
-    const CARD_HEIGHT = 1200
-    const CARD_WIDTH = 933.333
+    // Card size, in the same units as screen.height at scale 1 — this.cardWidth/
+    // cardHeight come from the CircularGallery props (see their doc comments
+    // for the default portrait proportions).
     this.scale = this.screen.height / 1500
-    this.plane.scale.y = (this.viewport.height * (CARD_HEIGHT * this.scale)) / this.screen.height
-    this.plane.scale.x = (this.viewport.width * (CARD_WIDTH * this.scale)) / this.screen.width
+    this.plane.scale.y = (this.viewport.height * (this.cardHeight * this.scale)) / this.screen.height
+    this.plane.scale.x = (this.viewport.width * (this.cardWidth * this.scale)) / this.screen.width
     this.program.uniforms.uPlaneSizes.value = [this.plane.scale.x, this.plane.scale.y]
     this.padding = 2
     this.width = this.plane.scale.x + this.padding
@@ -357,6 +370,8 @@ class App {
       borderRadius,
       scrollSpeed,
       scrollEase,
+      cardWidth,
+      cardHeight,
       onHover,
     }: {
       items?: GalleryItem[]
@@ -364,6 +379,8 @@ class App {
       borderRadius: number
       scrollSpeed: number
       scrollEase: number
+      cardWidth: number
+      cardHeight: number
       onHover?: (hover: HoverInfo | null) => void
     }
   ) {
@@ -380,7 +397,7 @@ class App {
     this.createScene()
     this.onResize()
     this.createGeometry()
-    this.createMedias(items, bend, borderRadius)
+    this.createMedias(items, bend, borderRadius, cardWidth, cardHeight)
     this.update()
     this.addEventListeners()
   }
@@ -406,7 +423,13 @@ class App {
     this.planeGeometry = new Plane(this.gl, { heightSegments: 50, widthSegments: 100 })
   }
 
-  createMedias(items: GalleryItem[] | undefined, bend: number, borderRadius: number) {
+  createMedias(
+    items: GalleryItem[] | undefined,
+    bend: number,
+    borderRadius: number,
+    cardWidth: number,
+    cardHeight: number
+  ) {
     const defaultItems: GalleryItem[] = [
       { image: `https://picsum.photos/seed/1/800/600?grayscale`, text: "Bridge" },
       { image: `https://picsum.photos/seed/2/800/600?grayscale`, text: "Desk Setup" },
@@ -429,6 +452,8 @@ class App {
         viewport: this.viewport,
         bend,
         borderRadius,
+        cardWidth,
+        cardHeight,
       })
     })
   }
@@ -606,7 +631,17 @@ class App {
  * React component
  ----------------------------------- */
 export const CircularGallery = forwardRef<CircularGalleryHandle, CircularGalleryProps>(function CircularGallery(
-  { items, bend = 3, borderRadius = 0.05, scrollSpeed = 2, scrollEase = 0.05, className, ...props },
+  {
+    items,
+    bend = 3,
+    borderRadius = 0.05,
+    scrollSpeed = 2,
+    scrollEase = 0.05,
+    cardWidth = 933.333,
+    cardHeight = 1200,
+    className,
+    ...props
+  },
   ref
 ) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -632,6 +667,8 @@ export const CircularGallery = forwardRef<CircularGalleryHandle, CircularGallery
       borderRadius,
       scrollSpeed,
       scrollEase,
+      cardWidth,
+      cardHeight,
       onHover: (hover) => {
         const caption = captionRef.current
         if (!caption) return
@@ -662,7 +699,7 @@ export const CircularGallery = forwardRef<CircularGalleryHandle, CircularGallery
       app.destroy()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, bend, borderRadius, scrollSpeed, scrollEase])
+  }, [items, bend, borderRadius, scrollSpeed, scrollEase, cardWidth, cardHeight])
 
   return (
     <div className={cn("relative h-full w-full", className)} {...props}>
