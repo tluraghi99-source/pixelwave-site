@@ -1099,7 +1099,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
    inherited `color`. .lead has no color of its own, so without this it
    renders invisible (black-on-black). Same fix .reel__content already
    applies for the homepage's own dark carousel section. */
-.studio-gallery { position: relative; isolation: isolate; padding-block: clamp(3rem, 6vw, 6rem); color: var(--pw-white); }
+.studio-gallery { position: relative; isolation: isolate; padding-top: clamp(3rem, 6vw, 6rem); padding-bottom: clamp(6rem, 12vw, 12rem); color: var(--pw-white); }
 .studio-gallery__wrap { height: clamp(360px, 42vw, 640px); width: 100%; margin-top: 2rem; position: relative; }
 .studio-gallery__canvas { display: block; }
 
