@@ -8,15 +8,22 @@ import {
   Transform,
   type OGLRenderingContext,
 } from "ogl"
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react"
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type ComponentProps } from "react"
 import { cn } from "@/lib/utils"
+import { Tag } from "@/components/pw/Tag"
 
 /* --------------------------------
  * Types
  ----------------------------------- */
+export interface GalleryTag {
+  variant?: ComponentProps<typeof Tag>["variant"]
+  label: string
+}
+
 export interface GalleryItem {
   image: string
   text: string
+  tags?: GalleryTag[]
 }
 
 export interface CircularGalleryHandle {
@@ -34,7 +41,15 @@ interface CircularGalleryProps extends React.HTMLAttributes<HTMLDivElement> {
   scrollSpeed?: number
   /** Easing factor for the scroll animation (lower is smoother). @default 0.05 */
   scrollEase?: number
-  fontClassName?: string
+}
+
+interface HoverInfo {
+  index: number
+  text: string
+  tags?: GalleryTag[]
+  rect: { left: number; top: number; width: number; height: number }
+  /** Card's current tilt, in degrees, matching its on-screen rotation. */
+  rotationDeg: number
 }
 
 /* --------------------------------
@@ -63,102 +78,9 @@ function autoBind(instance: object) {
   }
 }
 
-function createTextTexture(gl: OGLRenderingContext, text: string, font: string, color: string) {
-  const canvas = document.createElement("canvas")
-  const context = canvas.getContext("2d")!
-  context.font = font
-  const metrics = context.measureText(text)
-  const textWidth = Math.ceil(metrics.width)
-  // Extract the pixel size specifically — `font` is a full CSS font shorthand
-  // (e.g. "600 20px Hanken Grotesk"), so a plain parseInt would read the weight instead.
-  const sizeMatch = font.match(/(\d+(?:\.\d+)?)px/)
-  const fontSizePx = sizeMatch ? parseFloat(sizeMatch[1]) : 16
-  const textHeight = Math.ceil(fontSizePx * 1.2)
-  canvas.width = textWidth + 20
-  canvas.height = textHeight + 20
-  context.font = font
-  context.fillStyle = color
-  context.textBaseline = "middle"
-  context.textAlign = "center"
-  context.clearRect(0, 0, canvas.width, canvas.height)
-  context.fillText(text, canvas.width / 2, canvas.height / 2)
-  const texture = new Texture(gl, { generateMipmaps: false })
-  texture.image = canvas
-  return { texture, width: canvas.width, height: canvas.height }
-}
-
 /* --------------------------------
  * OGL scene objects
  ----------------------------------- */
-class Title {
-  gl: OGLRenderingContext
-  plane: Mesh
-  text: string
-  textColor: string
-  font: string
-  mesh!: Mesh
-
-  constructor({
-    gl,
-    plane,
-    text,
-    textColor,
-    font,
-  }: {
-    gl: OGLRenderingContext
-    plane: Mesh
-    text: string
-    textColor: string
-    font: string
-  }) {
-    autoBind(this)
-    this.gl = gl
-    this.plane = plane
-    this.text = text
-    this.textColor = textColor
-    this.font = font
-    this.createMesh()
-  }
-
-  createMesh() {
-    const { texture, width, height } = createTextTexture(this.gl, this.text, this.font, this.textColor)
-    const geometry = new Plane(this.gl)
-    const program = new Program(this.gl, {
-      cullFace: false,
-      vertex: `
-        attribute vec3 position;
-        attribute vec2 uv;
-        uniform mat4 modelViewMatrix;
-        uniform mat4 projectionMatrix;
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragment: `
-        precision highp float;
-        uniform sampler2D tMap;
-        varying vec2 vUv;
-        void main() {
-          vec4 color = texture2D(tMap, vUv);
-          if (color.a < 0.1) discard;
-          gl_FragColor = color;
-        }
-      `,
-      uniforms: { tMap: { value: texture } },
-      transparent: true,
-    })
-    this.mesh = new Mesh(this.gl, { geometry, program })
-    const aspect = width / height
-    const textHeight = this.plane.scale.y * 0.15
-    const textWidth = textHeight * aspect
-    this.mesh.scale.set(textWidth, textHeight, 1)
-    this.mesh.position.y = -this.plane.scale.y * 0.5 - textHeight * 0.5 - 0.05
-    this.mesh.setParent(this.plane)
-  }
-}
-
 interface ScrollState {
   ease: number
   current: number
@@ -175,14 +97,12 @@ class Media {
   scene: Transform
   screen: { width: number; height: number }
   text: string
+  tags?: GalleryTag[]
   viewport: { width: number; height: number }
   bend: number
-  textColor: string
   borderRadius: number
-  font: string
   program!: Program
   plane!: Mesh
-  title!: Title
   extra = 0
   widthTotal = 0
   width = 0
@@ -202,11 +122,10 @@ class Media {
     scene,
     screen,
     text,
+    tags,
     viewport,
     bend,
-    textColor,
     borderRadius = 0,
-    font,
   }: {
     geometry: Plane
     gl: OGLRenderingContext
@@ -216,11 +135,10 @@ class Media {
     scene: Transform
     screen: { width: number; height: number }
     text: string
+    tags?: GalleryTag[]
     viewport: { width: number; height: number }
     bend: number
-    textColor: string
     borderRadius: number
-    font: string
   }) {
     this.geometry = geometry
     this.gl = gl
@@ -230,14 +148,12 @@ class Media {
     this.scene = scene
     this.screen = screen
     this.text = text
+    this.tags = tags
     this.viewport = viewport
     this.bend = bend
-    this.textColor = textColor
     this.borderRadius = borderRadius
-    this.font = font
     this.createShader()
     this.createMesh()
-    this.createTitle()
     this.onResize()
   }
 
@@ -319,16 +235,6 @@ class Media {
     this.plane.setParent(this.scene)
   }
 
-  createTitle() {
-    this.title = new Title({
-      gl: this.gl,
-      plane: this.plane,
-      text: this.text,
-      textColor: this.textColor,
-      font: this.font,
-    })
-  }
-
   update(scroll: ScrollState, direction: "left" | "right") {
     this.plane.position.x = this.x - scroll.current - this.extra
 
@@ -378,9 +284,13 @@ class Media {
   }: { screen?: { width: number; height: number }; viewport?: { width: number; height: number } } = {}) {
     if (screen) this.screen = screen
     if (viewport) this.viewport = viewport
+    // Card size, in the same units as screen.height at scale 1 — bumped 1/3
+    // bigger (x4/3) than the original 900x700 reference, same aspect ratio.
+    const CARD_HEIGHT = 1200
+    const CARD_WIDTH = 933.333
     this.scale = this.screen.height / 1500
-    this.plane.scale.y = (this.viewport.height * (900 * this.scale)) / this.screen.height
-    this.plane.scale.x = (this.viewport.width * (700 * this.scale)) / this.screen.width
+    this.plane.scale.y = (this.viewport.height * (CARD_HEIGHT * this.scale)) / this.screen.height
+    this.plane.scale.x = (this.viewport.width * (CARD_WIDTH * this.scale)) / this.screen.width
     this.program.uniforms.uPlaneSizes.value = [this.plane.scale.x, this.plane.scale.y]
     this.padding = 2
     this.width = this.plane.scale.x + this.padding
@@ -394,6 +304,7 @@ class App {
   scrollSpeed: number
   scroll: ScrollState
   onCheckDebounce: () => void
+  onHover?: (hover: HoverInfo | null) => void
   renderer!: Renderer
   gl!: OGLRenderingContext
   camera!: Camera
@@ -411,35 +322,39 @@ class App {
   screen!: { width: number; height: number }
   viewport!: { width: number; height: number }
   raf!: number
+  /** Last known pointer position, in container-local pixels; null when not hovering. */
+  mouse: { x: number; y: number } | null = null
+  hoveredIndex: number | null = null
   boundOnResize!: () => void
   boundOnTouchDown!: (e: MouseEvent | TouchEvent) => void
   boundOnTouchMove!: (e: MouseEvent | TouchEvent) => void
   boundOnTouchUp!: () => void
+  boundOnPointerMove!: (e: MouseEvent) => void
+  boundOnPointerLeave!: () => void
 
   constructor(
     container: HTMLElement,
     {
       items,
       bend,
-      textColor,
       borderRadius,
-      font,
       scrollSpeed,
       scrollEase,
+      onHover,
     }: {
       items?: GalleryItem[]
       bend: number
-      textColor: string
       borderRadius: number
-      font: string
       scrollSpeed: number
       scrollEase: number
+      onHover?: (hover: HoverInfo | null) => void
     }
   ) {
     this.container = container
     this.scrollSpeed = scrollSpeed
     this.scroll = { ease: scrollEase, current: 0, target: 0, last: 0 }
     this.onCheckDebounce = debounce(this.onCheck.bind(this), 200)
+    this.onHover = onHover
 
     autoBind(this)
 
@@ -448,7 +363,7 @@ class App {
     this.createScene()
     this.onResize()
     this.createGeometry()
-    this.createMedias(items, bend, textColor, borderRadius, font)
+    this.createMedias(items, bend, borderRadius)
     this.update()
     this.addEventListeners()
   }
@@ -474,13 +389,7 @@ class App {
     this.planeGeometry = new Plane(this.gl, { heightSegments: 50, widthSegments: 100 })
   }
 
-  createMedias(
-    items: GalleryItem[] | undefined,
-    bend: number,
-    textColor: string,
-    borderRadius: number,
-    font: string
-  ) {
+  createMedias(items: GalleryItem[] | undefined, bend: number, borderRadius: number) {
     const defaultItems: GalleryItem[] = [
       { image: `https://picsum.photos/seed/1/800/600?grayscale`, text: "Bridge" },
       { image: `https://picsum.photos/seed/2/800/600?grayscale`, text: "Desk Setup" },
@@ -499,11 +408,10 @@ class App {
         scene: this.scene,
         screen: this.screen,
         text: data.text,
+        tags: data.tags,
         viewport: this.viewport,
         bend,
-        textColor,
         borderRadius,
-        font,
       })
     })
   }
@@ -544,6 +452,73 @@ class App {
     this.scroll.target = this.externalOffset + this.manualOffset
   }
 
+  /** Only meaningful for real pointers — coarse (touch) devices have no hover concept. */
+  onPointerMove(e: MouseEvent) {
+    if (window.matchMedia("(pointer: coarse)").matches) return
+    const rect = this.container.getBoundingClientRect()
+    this.mouse = { x: e.clientX - rect.left, y: e.clientY - rect.top }
+  }
+
+  onPointerLeave() {
+    this.mouse = null
+  }
+
+  /** Hit-test the last known pointer position against each media's current on-screen rect. */
+  updateHover() {
+    if (!this.onHover) return
+    if (!this.mouse || !this.medias) {
+      if (this.hoveredIndex !== null) {
+        this.hoveredIndex = null
+        this.onHover(null)
+      }
+      return
+    }
+
+    const ratio = this.screen.width / this.viewport.width
+    const { x: mouseX, y: mouseY } = this.mouse
+    let hit: Media | null = null
+
+    for (const media of this.medias) {
+      const centerX = this.screen.width / 2 + media.plane.position.x * ratio
+      const centerY = this.screen.height / 2 - media.plane.position.y * ratio
+      const halfW = (media.plane.scale.x * ratio) / 2
+      const halfH = (media.plane.scale.y * ratio) / 2
+      if (Math.abs(mouseX - centerX) <= halfW && Math.abs(mouseY - centerY) <= halfH) {
+        hit = media
+        break
+      }
+    }
+
+    if (!hit) {
+      if (this.hoveredIndex !== null) {
+        this.hoveredIndex = null
+        this.onHover(null)
+      }
+      return
+    }
+
+    const centerX = this.screen.width / 2 + hit.plane.position.x * ratio
+    const centerY = this.screen.height / 2 - hit.plane.position.y * ratio
+    const halfW = (hit.plane.scale.x * ratio) / 2
+    const halfH = (hit.plane.scale.y * ratio) / 2
+
+    this.hoveredIndex = hit.index
+    this.onHover({
+      index: hit.index,
+      text: hit.text,
+      tags: hit.tags,
+      rect: {
+        left: centerX - halfW,
+        top: centerY - halfH,
+        width: halfW * 2,
+        height: halfH * 2,
+      },
+      // World rotation is CCW around the camera-facing axis; screen space is Y-flipped
+      // relative to world space, which reverses the apparent sense of rotation.
+      rotationDeg: (-hit.plane.rotation.z * 180) / Math.PI,
+    })
+  }
+
   onResize() {
     this.screen = { width: this.container.clientWidth, height: this.container.clientHeight }
     this.renderer.setSize(this.screen.width, this.screen.height)
@@ -563,6 +538,7 @@ class App {
     if (this.medias) {
       this.medias.forEach((media) => media.update(this.scroll, direction))
     }
+    this.updateHover()
     this.renderer.render({ scene: this.scene, camera: this.camera })
     this.scroll.last = this.scroll.current
     this.raf = window.requestAnimationFrame(this.update)
@@ -573,6 +549,8 @@ class App {
     this.boundOnTouchDown = this.onTouchDown
     this.boundOnTouchMove = this.onTouchMove
     this.boundOnTouchUp = this.onTouchUp
+    this.boundOnPointerMove = this.onPointerMove
+    this.boundOnPointerLeave = this.onPointerLeave
 
     // Deliberately no wheel listener: this gallery lives in a page-scroll-driven
     // (pinned) section, so a wheel listener here would double-count the same
@@ -585,6 +563,8 @@ class App {
     this.container.addEventListener("touchstart", this.boundOnTouchDown)
     window.addEventListener("touchmove", this.boundOnTouchMove)
     window.addEventListener("touchend", this.boundOnTouchUp)
+    this.container.addEventListener("mousemove", this.boundOnPointerMove)
+    this.container.addEventListener("mouseleave", this.boundOnPointerLeave)
   }
 
   destroy() {
@@ -596,6 +576,8 @@ class App {
     this.container.removeEventListener("touchstart", this.boundOnTouchDown)
     window.removeEventListener("touchmove", this.boundOnTouchMove)
     window.removeEventListener("touchend", this.boundOnTouchUp)
+    this.container.removeEventListener("mousemove", this.boundOnPointerMove)
+    this.container.removeEventListener("mouseleave", this.boundOnPointerLeave)
 
     if (this.renderer?.gl.canvas.parentNode) {
       this.renderer.gl.canvas.parentNode.removeChild(this.renderer.gl.canvas)
@@ -607,11 +589,14 @@ class App {
  * React component
  ----------------------------------- */
 export const CircularGallery = forwardRef<CircularGalleryHandle, CircularGalleryProps>(function CircularGallery(
-  { items, bend = 3, borderRadius = 0.05, scrollSpeed = 2, scrollEase = 0.05, className, fontClassName, ...props },
+  { items, bend = 3, borderRadius = 0.05, scrollSpeed = 2, scrollEase = 0.05, className, ...props },
   ref
 ) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const captionRef = useRef<HTMLDivElement>(null)
   const appRef = useRef<App | null>(null)
+  const hoveredIndexRef = useRef<number | null>(null)
+  const [hoveredContent, setHoveredContent] = useState<{ text: string; tags?: GalleryTag[] } | null>(null)
 
   useImperativeHandle(
     ref,
@@ -624,21 +609,34 @@ export const CircularGallery = forwardRef<CircularGalleryHandle, CircularGallery
   useEffect(() => {
     if (!containerRef.current) return
 
-    const computedStyle = getComputedStyle(containerRef.current)
-    const computedColor = computedStyle.color || "#000"
-    const computedFontWeight = computedStyle.fontWeight || "500"
-    const computedFontSize = computedStyle.fontSize || "18px"
-    const computedFontFamily = computedStyle.fontFamily
-    const computedFont = `${computedFontWeight} ${computedFontSize} ${computedFontFamily}`
-
     const app = new App(containerRef.current, {
       items,
       bend,
-      textColor: computedColor,
       borderRadius,
-      font: computedFont,
       scrollSpeed,
       scrollEase,
+      onHover: (hover) => {
+        const caption = captionRef.current
+        if (!caption) return
+        if (!hover) {
+          caption.style.opacity = "0"
+          if (hoveredIndexRef.current !== null) {
+            hoveredIndexRef.current = null
+            setHoveredContent(null)
+          }
+          return
+        }
+        caption.style.opacity = "1"
+        caption.style.left = `${hover.rect.left}px`
+        caption.style.top = `${hover.rect.top}px`
+        caption.style.width = `${hover.rect.width}px`
+        caption.style.height = `${hover.rect.height}px`
+        caption.style.transform = `rotate(${hover.rotationDeg}deg)`
+        if (hoveredIndexRef.current !== hover.index) {
+          hoveredIndexRef.current = hover.index
+          setHoveredContent({ text: hover.text, tags: hover.tags })
+        }
+      },
     })
     appRef.current = app
 
@@ -647,13 +645,27 @@ export const CircularGallery = forwardRef<CircularGalleryHandle, CircularGallery
       app.destroy()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [items, bend, borderRadius, scrollSpeed, scrollEase, fontClassName])
+  }, [items, bend, borderRadius, scrollSpeed, scrollEase])
 
   return (
-    <div
-      ref={containerRef}
-      className={cn("h-full w-full cursor-grab overflow-hidden active:cursor-grabbing", fontClassName, className)}
-      {...props}
-    />
+    <div className={cn("relative h-full w-full", className)} {...props}>
+      <div ref={containerRef} className="h-full w-full cursor-grab overflow-hidden active:cursor-grabbing" />
+      <div ref={captionRef} className="gallery-caption" data-theme="dark" style={{ opacity: 0 }}>
+        {hoveredContent ? (
+          <>
+            <p className="gallery-caption__title">{hoveredContent.text}</p>
+            {hoveredContent.tags && hoveredContent.tags.length > 0 ? (
+              <div className="gallery-caption__tags">
+                {hoveredContent.tags.map((tag, i) => (
+                  <Tag key={i} variant={tag.variant}>
+                    {tag.label}
+                  </Tag>
+                ))}
+              </div>
+            ) : null}
+          </>
+        ) : null}
+      </div>
+    </div>
   )
 })
