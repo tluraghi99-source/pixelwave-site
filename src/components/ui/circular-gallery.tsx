@@ -213,13 +213,30 @@ class Media {
       uniforms: {
         tMap: { value: texture },
         uPlaneSizes: { value: [0, 0] },
-        uImageSizes: { value: [0, 0] },
+        // [1, 1], not [0, 0]: matches the 1x1 white fallback canvas set as
+        // the texture's initial image below, and keeps the fragment
+        // shader's aspect-fit ratio (uPlaneSizes / uImageSizes) from
+        // dividing by zero before a real image loads.
+        uImageSizes: { value: [1, 1] },
         uSpeed: { value: 0 },
         uTime: { value: 100 * Math.random() },
         uBorderRadius: { value: this.borderRadius },
       },
       transparent: true,
     })
+
+    // A bare OGL Texture with no image renders solid black, which
+    // disappears entirely against this gallery's dark backdrop whenever a
+    // photo is loading or fails to load (e.g. the placeholder image host
+    // being unreachable) — swap in a solid white 1x1 canvas so every card
+    // stays visible as a plain white card until (or unless) its real photo
+    // loads in and replaces it below.
+    const fallback = document.createElement("canvas")
+    fallback.width = 1
+    fallback.height = 1
+    fallback.getContext("2d")!.fillStyle = "#fff"
+    fallback.getContext("2d")!.fillRect(0, 0, 1, 1)
+    texture.image = fallback
 
     const img = new Image()
     img.crossOrigin = "anonymous"
