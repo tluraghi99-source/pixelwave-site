@@ -817,57 +817,6 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   text-transform: uppercase; letter-spacing: 0.05em; color: var(--card-text); opacity: 0.75;
 }
 
-/* Studio floor plan pin — 300vh = PIN_HEIGHT_VH in StudioFloorPlan.tsx, kept
-   in sync by hand (60+60+80+100). Simpler than .reel: just two floor-section
-   illustrations crossfading in place, no video/carousel phases. */
-.floor-pin { position: relative; height: 300vh; }
-.floor-pin__inner {
-  position: sticky; top: 0; height: 100svh; overflow: hidden;
-  isolation: isolate;
-  background: var(--pw-black);
-  display: flex; align-items: center;
-}
-.floor-plan { position: relative; width: 100%; min-height: 86vh; padding-block: clamp(2.5rem, 5vw, 5rem); }
-/* Row, not column: the plan is portrait (taller than wide) now, so putting
-   the label beside it instead of stacked above frees the full pinned height
-   for the plan itself rather than splitting it between label and drawing.
-   Higher-specificity .floor-plan__layer--ambient rule below still overrides
-   this back to a column for the mobile/tablet fallback. */
-.floor-plan__layer {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: row; align-items: center; justify-content: center; gap: clamp(2rem, 4vw, 4rem);
-}
-.floor-plan__label {
-  font-family: var(--font-mono-accent); font-size: 0.8rem;
-  text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary);
-}
-/* Portrait viewBox (taller than wide) — capped by max-height only, no
-   max-width, so it's free to grow as wide as its own aspect ratio wants;
-   height: auto keeps it proportional. flex-shrink: 0 still matters:
-   .floor-plan__layer is a flex row in a fixed-height box (the pinned
-   viewport), so without it the flex algorithm would compress the svg's
-   height alone to fit, warping the shapes instead of just scaling them. */
-.floor-plan__svg { width: auto; height: auto; max-height: 82vh; flex-shrink: 0; }
-
-.floor-section__outline { fill: none; stroke: var(--pw-white); stroke-width: 2; }
-.floor-section__divider { stroke: var(--pw-white); stroke-width: 1.5; opacity: 0.5; }
-.floor-section__detail { fill: none; stroke: var(--pw-white); stroke-width: 1.5; opacity: 0.85; }
-.floor-section__detail--accent { stroke: var(--pw-orange); opacity: 1; }
-.floor-section__tread { stroke: var(--pw-white); stroke-width: 1.5; opacity: 0.85; }
-.floor-section__hatch { fill: var(--pw-white); fill-opacity: 0.1; stroke: var(--pw-white); stroke-width: 1.5; stroke-opacity: 0.85; }
-.floor-section__zone-label {
-  font-family: var(--font-mono-accent); font-size: 11px;
-  text-transform: uppercase; letter-spacing: 0.05em; fill: var(--text-secondary);
-}
-
-.studio-floor-ambient { position: relative; isolation: isolate; padding-block: clamp(3rem, 6vw, 6rem); }
-.studio-floor-ambient .floor-plan__layer--ambient {
-  position: static;
-  display: flex; flex-direction: column; align-items: center; gap: 1.5rem;
-  margin-bottom: clamp(3rem, 5vw, 5rem);
-}
-.studio-floor-ambient .floor-plan__layer--ambient:last-child { margin-bottom: 0; }
-
 .lead { font-family: var(--font-display); font-weight: 600; font-size: clamp(2rem, 1.6vw, 4.5rem); line-height: 1.05; letter-spacing: -0.02em; margin: 1.25rem 0 0; text-wrap: balance; }
 .secbody { font-size: 1.125rem; line-height: 1.5; color: var(--text-secondary); max-width: 52ch; margin: 1.25rem 0 0; }
 
@@ -1009,7 +958,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 }
 
 /* height set inline from VIDEO_PIN_HEIGHT_VH in ProjectPage.tsx (see the
-   comment there for why this isn't a hand-synced CSS number like .floor-pin
+   comment there for why this isn't a hand-synced CSS number like .reel
    above is) */
 .project-video-pin { position: relative; }
 .project-video-pin__inner { position: sticky; top: 0; height: 100svh; overflow: hidden; }

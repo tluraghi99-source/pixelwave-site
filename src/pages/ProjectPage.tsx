@@ -56,9 +56,9 @@ function ProjectMedia({ media }: { media: MediaItem }) {
 }
 
 // VIDEO_PIN_HEIGHT_VH drives the pin wrapper's height directly via an inline
-// style below (not a separately hand-synced CSS rule, unlike StudioFloorPlan's
-// .floor-pin — there's no other consumer of this number to keep in sync with).
-// Unlike StudioFloorPlan's pin, this one needs no useScroll/useTransform at
+// style below (not a separately hand-synced CSS rule, unlike WorkReel's
+// .reel — there's no other consumer of this number to keep in sync with).
+// Unlike WorkReel's pin, this one needs no useScroll/useTransform at
 // all — there's no scroll-scrubbed opacity or crossfade, the video just
 // autoplays and loops in place. The sticky+height combo alone produces the
 // "locks while scrolling through, releases once the wrapper's extra height
@@ -95,7 +95,7 @@ function ProjectVideoPinned({ media }: { media: MediaItem }) {
 
 /** Mobile/tablet: no pin — the video/image just renders as a plain full-width
  *  block in normal document flow, same fallback shape every other pinned
- *  desktop section on this site already uses (see StudioFloorPlan.tsx). */
+ *  desktop section on this site already uses (see WorkReel.tsx). */
 function ProjectVideoAmbient({ media }: { media: MediaItem }) {
   return (
     <div className="project-video-ambient" data-screen-label="Project Video">
