@@ -662,6 +662,32 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   .video-scrub--ambient { position: sticky; top: 0; height: 100svh; z-index: 0; }
 }
 
+/* cta band — interstitial nudge, not a numbered content section (see
+   CtaBand.tsx). Own padding-bottom is shorter than .sec's default — it
+   hands off straight into .ticker's black background right after, so it
+   doesn't need the same breathing room a section flanked by page bg would. */
+.cta-band { padding-bottom: clamp(2.5rem, 3vw, 5rem); }
+.cta-band__inner {
+  display: flex; flex-direction: row; justify-content: space-between; align-items: flex-end;
+  gap: clamp(1.5rem, 3vw, 3rem); text-align: left;
+}
+.cta-band__copy { min-width: 0; }
+.cta-band__headline {
+  font-family: var(--font-display); font-weight: var(--fw-black); letter-spacing: -0.035em;
+  font-size: clamp(2.5rem, 6vw, 7.5rem); line-height: 0.9; max-width: 12ch;
+  margin-top: clamp(1rem, 1.5vw, 1.5rem);
+}
+.cta-band__cta { flex-shrink: 0; }
+/* Muted/scoped to this section only — SectionLabel's shared default
+   (solid text-secondary, 2.5rem/2px rule) is unchanged everywhere else
+   it's used (Services, Work). This one reads as a quiet category tag,
+   not a UI element competing with the headline/button for attention. */
+.cta-band .pw-seclabel__text { color: rgba(255, 255, 255, 0.45); }
+.cta-band .pw-seclabel__rule { width: 1.5rem; height: 1px; background: rgba(255, 91, 0, 0.6); }
+@media (max-width: 767px) {
+  .cta-band__inner { flex-direction: column; align-items: flex-start; gap: clamp(1.5rem, 4vw, 2rem); }
+}
+
 /* ticker */
 .ticker { position: relative; isolation: isolate; padding-block: clamp(1.5rem, 2vw, 3rem); background: var(--pw-black); }
 .ticker__item {
