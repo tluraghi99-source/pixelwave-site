@@ -22,7 +22,7 @@ function StudioGalleryHeading() {
   return (
     <>
       <Reveal>
-        <SectionLabel number="01">Inside the studio</SectionLabel>
+        <SectionLabel number="02">Inside the studio</SectionLabel>
       </Reveal>
       <Reveal delay={0.1}>
         <p className="lead">Where it happens.</p>

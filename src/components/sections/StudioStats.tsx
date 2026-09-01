@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import type { AnimationPlaybackControls } from "framer-motion"
 import { animate, motion, useMotionValue, useMotionValueEvent } from "framer-motion"
 import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Reveal } from "@/components/motion/Reveal"
@@ -24,24 +25,34 @@ interface StatBlockProps {
 function StatBlock({ value, label, accent, delay }: StatBlockProps) {
   const count = useMotionValue(PREFERS_REDUCED_MOTION ? value : 0)
   const [display, setDisplay] = useState(count.get())
+  const controlsRef = useRef<AnimationPlaybackControls | null>(null)
   useMotionValueEvent(count, "change", (v) => setDisplay(Math.round(v)))
+  useEffect(() => {
+    return () => controlsRef.current?.stop()
+  }, [])
 
   return (
     <motion.div
       className="studio-stats__stat"
+      aria-label={`${value} ${label}`}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.5 }}
       transition={{ duration: 0.6, delay, ease: EASE_WAVE }}
       onViewportEnter={() => {
         if (PREFERS_REDUCED_MOTION) return
-        animate(count, value, { duration: 0.9, delay, ease: [0.16, 0.84, 0.44, 1] })
+        // A stat with a small target (e.g. Floors=2) reaches its final
+        // rounded value well before one with a large target (e.g.
+        // People=14) even with a later start delay — it needs far less of
+        // the easing curve's progress to round to its integer. Not a bug.
+        controlsRef.current = animate(count, value, { duration: 0.9, delay, ease: [0.16, 0.84, 0.44, 1] })
       }}
     >
       <span className={accent ? "studio-stats__value studio-stats__value--accent" : "studio-stats__value"}>
-        {display}
+        <span className="studio-stats__value-ghost" aria-hidden="true">{value}</span>
+        <span aria-hidden="true">{display}</span>
       </span>
-      <span className="studio-stats__caption">{label}</span>
+      <span aria-hidden="true" className="studio-stats__caption">{label}</span>
     </motion.div>
   )
 }
