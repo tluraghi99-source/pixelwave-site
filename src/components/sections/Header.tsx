@@ -38,6 +38,7 @@ const MENU_COLUMNS = [
     label: "Let's chat",
     href: "/contact",
     links: [
+      { label: "Call us", href: "#" },
       { label: "Instagram", href: "#" },
       { label: "Tiktok", href: "#" },
       { label: "LinkedIn", href: "#" },
