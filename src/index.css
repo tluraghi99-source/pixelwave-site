@@ -752,7 +752,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .studio-stats__value-ghost { visibility: hidden; }
 .studio-stats__value--accent { color: var(--pw-orange); }
 .studio-stats__caption { font-family: var(--font-mono-accent); font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255, 255, 255, 0.55); margin-top: 0.75rem; }
-.studio-stats__tail { font-family: var(--font-display); font-size: 1.1rem; line-height: 1.5; color: rgba(255, 255, 255, 0.55); max-width: 32ch; margin: 0 0 0 auto; }
+.studio-stats__tail { font-family: var(--font-display); font-size: 1.1rem; line-height: 1.5; color: rgba(255, 255, 255, 0.55); max-width: 46ch; margin: 0 0 0 auto; }
 @media (max-width: 767px) {
   .studio-stats__tail { margin-left: 0; }
 }

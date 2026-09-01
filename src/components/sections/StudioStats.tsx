@@ -77,7 +77,9 @@ export function StudioStats() {
             viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: 0.6, delay: 0.9, ease: EASE_WAVE }}
           >
-            A space where creativity has no boundaries. And every idea has room to grow.
+            A space where creativity has no boundaries.
+            <br />
+            And every idea has room to grow.
           </motion.p>
         </div>
       </div>
