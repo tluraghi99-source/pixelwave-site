@@ -17,12 +17,15 @@ interface StatBlockProps {
   label: string
   accent?: boolean
   delay: number
+  /** Appended after the number, both animated and final (e.g. "+" for an
+   *  open-ended "100+"). Not counted itself — only `value` animates. */
+  suffix?: string
 }
 
 /** Counts up from 0 to `value` once scrolled into view, staggered by `delay`.
  *  Skips straight to the final value under prefers-reduced-motion instead of
  *  forcing the count-up on people who've asked their OS to reduce motion. */
-function StatBlock({ value, label, accent, delay }: StatBlockProps) {
+function StatBlock({ value, label, accent, delay, suffix = "" }: StatBlockProps) {
   const count = useMotionValue(PREFERS_REDUCED_MOTION ? value : 0)
   const [display, setDisplay] = useState(count.get())
   const controlsRef = useRef<AnimationPlaybackControls | null>(null)
@@ -35,7 +38,7 @@ function StatBlock({ value, label, accent, delay }: StatBlockProps) {
     <motion.div
       className="studio-stats__stat"
       role="img"
-      aria-label={`${value} ${label}`}
+      aria-label={`${value}${suffix} ${label}`}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.5 }}
@@ -50,8 +53,8 @@ function StatBlock({ value, label, accent, delay }: StatBlockProps) {
       }}
     >
       <span className={accent ? "studio-stats__value studio-stats__value--accent" : "studio-stats__value"}>
-        <span className="studio-stats__value-ghost" aria-hidden="true">{value}</span>
-        <span aria-hidden="true">{display}</span>
+        <span className="studio-stats__value-ghost" aria-hidden="true">{value}{suffix}</span>
+        <span aria-hidden="true">{display}{suffix}</span>
       </span>
       <span aria-hidden="true" className="studio-stats__caption">{label}</span>
     </motion.div>
@@ -70,6 +73,7 @@ export function StudioStats() {
         <div className="studio-stats__row">
           <StatBlock value={TEAM.length} label="People" delay={0.1} />
           <StatBlock value={2} label="Floors" accent delay={0.35} />
+          <StatBlock value={100} label="Projects" suffix="+" delay={0.6} />
           <motion.p
             className="studio-stats__tail"
             initial={{ opacity: 0 }}
