@@ -34,6 +34,7 @@ function StatBlock({ value, label, accent, delay }: StatBlockProps) {
   return (
     <motion.div
       className="studio-stats__stat"
+      role="img"
       aria-label={`${value} ${label}`}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
