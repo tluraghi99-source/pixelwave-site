@@ -22,7 +22,11 @@ const MENU_COLUMNS = [
   {
     label: "Work",
     href: "/work",
-    links: [] as { label: string; href: string }[],
+    // Land directly on a filter mode — WorkPage.tsx reads ?mode= once on mount.
+    links: [
+      { label: "Category", href: "/work?mode=category" },
+      { label: "Client", href: "/work?mode=client" },
+    ],
   },
   {
     label: "Services",

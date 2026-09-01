@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react"
+import { useSearchParams } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
 import { Card } from "@/components/pw/Card"
@@ -20,7 +21,13 @@ const FILTER_TAGS = Array.from(
 const FILTER_CLIENTS = Array.from(new Set(PROJECTS.map((p) => p.client))).sort()
 
 export function WorkPage() {
-  const [mode, setMode] = useState<"category" | "client">("category")
+  // Lets the nav menu's "Category"/"Client" links land directly on a mode
+  // (e.g. /work?mode=client) — read once on mount, not kept in sync with
+  // further clicks on the toggle below (out of scope for now).
+  const [searchParams] = useSearchParams()
+  const [mode, setMode] = useState<"category" | "client">(
+    searchParams.get("mode") === "client" ? "client" : "category"
+  )
   const [activeTags, setActiveTags] = useState<Set<string>>(new Set())
   const [activeClient, setActiveClient] = useState<string | null>(null)
 
