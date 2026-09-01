@@ -77,7 +77,7 @@ export function StudioStats() {
             viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: 0.6, delay: 0.9, ease: EASE_WAVE }}
           >
-            No open-plan pretending, no ping-pong table. Just a place built for the work.
+            A space where creativity has no boundaries. And every idea has room to grow.
           </motion.p>
         </div>
       </div>
