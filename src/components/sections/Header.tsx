@@ -7,7 +7,6 @@ import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
 import { BrandLogo } from "@/components/pw/Logo"
 import { PixelTrail } from "@/components/ui/pixel-trail"
 import { EASE_WAVE, HERO_CROSSFADE_RATIO, HERO_NAV_HIDE_AFTER, HERO_REVEAL_END, HERO_REVEAL_START } from "@/lib/motion"
-import { PROJECTS } from "@/data/work"
 
 // "Work" goes to the dedicated /work page (like the carousel's "All projects"
 // button); the rest are in-page anchors on the homepage.
@@ -19,12 +18,11 @@ const links = [
 
 // Desktop-only full menu panel — columns mirror the top-level nav, filled
 // out with a level of real sub-navigation (mirrors a reference layout).
-const FEATURED_WORK = PROJECTS.filter((p) => p.tags.some(([variant]) => variant === "orange"))
 const MENU_COLUMNS = [
   {
     label: "Work",
     href: "/work",
-    links: FEATURED_WORK.map((p) => ({ label: p.title, href: `/work/${p.slug}` })),
+    links: [] as { label: string; href: string }[],
   },
   {
     label: "Services",
