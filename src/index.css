@@ -740,23 +740,18 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 /* Studio page (src/pages/StudioPage.tsx) — dark throughout. */
 .studio-page { background: var(--pw-black); }
 
-.studio-intro { position: relative; isolation: isolate; padding-bottom: clamp(2rem, 4vw, 3rem); }
+.studio-stats { position: relative; isolation: isolate; padding-bottom: clamp(2rem, 4vw, 3rem); color: var(--pw-white); }
 /* Same role as WorkPage's .work-hero: an empty spacer pushing the real
    content down to start at the vertical midpoint of the viewport. */
-.studio-intro__hero { height: 50svh; }
-.studio-intro__line {
-  font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em;
-  font-size: clamp(2.5rem, 5.2vw, 5.5rem); line-height: 1.12; margin: 0;
-  max-width: 46ch; margin-inline: auto; text-align: center;
-  color: var(--pw-white);
-}
-/* Per-word hover instead of a static highlight — each word is its own
-   inline span so :hover can target just that one, not the whole sentence. */
-.studio-intro__word {
-  transition: color 0.25s var(--ease-wave);
-}
-.studio-intro__word:hover {
-  color: var(--pw-orange);
+.studio-stats__hero { height: 50svh; }
+.studio-stats__row { display: flex; align-items: flex-end; flex-wrap: wrap; gap: clamp(2.5rem, 5vw, 4rem); margin-top: 2rem; }
+.studio-stats__stat { display: flex; flex-direction: column; }
+.studio-stats__value { font-family: var(--font-display); font-weight: var(--fw-black); font-size: clamp(3.5rem, 7vw, 6rem); line-height: 1; letter-spacing: -0.03em; }
+.studio-stats__value--accent { color: var(--pw-orange); }
+.studio-stats__caption { font-family: var(--font-mono-accent); font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(255, 255, 255, 0.55); margin-top: 0.75rem; }
+.studio-stats__tail { font-family: var(--font-display); font-size: 1.1rem; line-height: 1.5; color: rgba(255, 255, 255, 0.55); max-width: 32ch; margin: 0 0 0 auto; }
+@media (max-width: 767px) {
+  .studio-stats__tail { margin-left: 0; }
 }
 
 .studio-team { position: relative; isolation: isolate; padding-block: clamp(3rem, 6vw, 6rem); }
@@ -921,7 +916,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 
 /* project detail page */
 /* Starts at the vertical midpoint of the viewport, same convention as
-   .work-hero on /work and .studio-intro__hero on /studio. */
+   .work-hero on /work and .studio-stats__hero on /studio. */
 .project-page { padding-top: 50svh; background: var(--pw-black); color: var(--pw-white); }
 .project-page__hero-glow { position: relative; isolation: isolate; }
 /* .project-page's own padding-top (above) is what creates the 50svh gap
