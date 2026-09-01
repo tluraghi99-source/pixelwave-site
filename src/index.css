@@ -1269,9 +1269,30 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .contact-page__content {
   position: relative; z-index: 2;
   flex: 1 1 auto; min-height: 0;
-  display: flex; flex-direction: column; justify-content: center;
+  display: flex; flex-direction: row; align-items: center; justify-content: space-between;
+  gap: 2rem;
   padding: 0 clamp(1rem, 1.2vw, 1.25rem) 0.5rem;
 }
+.contact-page__content-main {
+  display: flex; flex-direction: column; justify-content: center; min-width: 0;
+}
+/* Vertically centered against .contact-page__content-main as a whole (the
+   small eyebrow plus the huge reactive text below it) via the parent's
+   align-items: center — reads as level with the reactive text specifically,
+   since that's what dominates the column's height. Desktop + first step
+   only (hidden below, and conditionally rendered in ContactPage.tsx) —
+   there's no room next to the big reactive text on a fixed 100svh mobile
+   screen. */
+.contact-page__quick-contact {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;
+  flex-shrink: 0; text-align: right;
+}
+.contact-page__quick-contact-link {
+  font-family: var(--font-text); font-size: 0.95rem;
+  color: var(--text-secondary); text-decoration: none;
+  transition: color 0.15s ease;
+}
+.contact-page__quick-contact-link:hover { color: var(--pw-white); }
 .contact-page__reactive-text {
   display: block;
   font-family: var(--font-display); font-weight: 700;
@@ -1340,6 +1361,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   .contact-page__strip-row { gap: 1rem; }
   .contact-page__recap-row { flex-wrap: wrap; }
   .contact-page__recap-label { flex-basis: 100%; }
+  .contact-page__quick-contact { display: none; }
 }
 
 footer { position: relative; isolation: isolate; background: var(--surface-subtle); color: var(--pw-black); overflow-x: hidden; }

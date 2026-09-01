@@ -112,13 +112,28 @@ export function ContactPage() {
         </div>
 
         <div className="contact-page__content">
-          <h2 className="contact-page__eyebrow">{eyebrowText}</h2>
-          <div
-            className={`contact-page__reactive ${reactive.isPlaceholder ? "is-placeholder" : ""}`}
-            aria-hidden="true"
-          >
-            <span className="contact-page__reactive-text">{reactive.text}</span>
+          <div className="contact-page__content-main">
+            <h2 className="contact-page__eyebrow">{eyebrowText}</h2>
+            <div
+              className={`contact-page__reactive ${reactive.isPlaceholder ? "is-placeholder" : ""}`}
+              aria-hidden="true"
+            >
+              <span className="contact-page__reactive-text">{reactive.text}</span>
+            </div>
           </div>
+          {/* Desktop only, first step only — quick-access info for anyone who'd
+             rather not fill out the form. Placeholder href/values until real
+             contact details are set, same posture as the nav menu's "Call us". */}
+          {!sent && step.key === "detail" && (
+            <div className="contact-page__quick-contact">
+              <a className="contact-page__quick-contact-link" href="#">
+                hello@pixellwave.com
+              </a>
+              <a className="contact-page__quick-contact-link" href="#">
+                +1 (000) 000-0000
+              </a>
+            </div>
+          )}
         </div>
 
         <div className="contact-page__strip">
