@@ -86,21 +86,23 @@ export function StudioTeam() {
     <section className="studio-team" data-theme="dark" data-screen-label="Studio Team">
       <CursorGlow className="cursor-glow" variant="dark" glow={false} />
       <div className="wrap">
-        <RevealGroup className="team-grid" stagger={0.05} amount={0.05}>
-          {gridItems.map((item) =>
-            item.kind === "member" ? (
-              <RevealItem key={item.member.id}>
-                <TeamCard member={item.member} color={item.color} />
-              </RevealItem>
-            ) : (
-              <RevealItem key={item.id}>
-                <div className="team-card team-card--blank" aria-hidden="true">
-                  <div className="team-card__media" />
-                </div>
-              </RevealItem>
-            )
-          )}
-        </RevealGroup>
+        {gridItems.length > 0 && (
+          <RevealGroup className="team-grid" stagger={0.05} amount={0.05}>
+            {gridItems.map((item) =>
+              item.kind === "member" ? (
+                <RevealItem key={item.member.id}>
+                  <TeamCard member={item.member} color={item.color} />
+                </RevealItem>
+              ) : (
+                <RevealItem key={item.id}>
+                  <div className="team-card team-card--blank" aria-hidden="true">
+                    <div className="team-card__media" />
+                  </div>
+                </RevealItem>
+              )
+            )}
+          </RevealGroup>
+        )}
       </div>
     </section>
   )

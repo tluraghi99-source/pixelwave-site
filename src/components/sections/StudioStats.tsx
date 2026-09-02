@@ -62,7 +62,10 @@ function StatBlock({ value, label, accent, delay, suffix = "" }: StatBlockProps)
       transition={{ duration: 0.6, delay, ease: EASE_WAVE }}
       onViewportEnter={() => {
         hasEnteredRef.current = true
-        if (PREFERS_REDUCED_MOTION) return
+        if (PREFERS_REDUCED_MOTION) {
+          count.set(value)
+          return
+        }
         // A stat with a small target (e.g. Floors=2) reaches its final
         // rounded value well before one with a large target (e.g. the
         // live People count) even with a later start delay — it needs far

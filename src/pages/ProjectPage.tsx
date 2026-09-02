@@ -215,16 +215,18 @@ export function ProjectPage() {
             </Reveal>
           </div>
 
-          <RevealGroup className="project-gallery" stagger={0.1} data-screen-label="Project Gallery">
-            <RevealItem>
-              <GalleryRow items={project.gallery.slice(0, Math.ceil(project.gallery.length / 2))} reverse={false} />
-            </RevealItem>
-            {project.gallery.length > 1 && (
+          {project.gallery.length > 0 && (
+            <RevealGroup className="project-gallery" stagger={0.1} data-screen-label="Project Gallery">
               <RevealItem>
-                <GalleryRow items={project.gallery.slice(Math.ceil(project.gallery.length / 2))} reverse={true} />
+                <GalleryRow items={project.gallery.slice(0, Math.ceil(project.gallery.length / 2))} reverse={false} />
               </RevealItem>
-            )}
-          </RevealGroup>
+              {project.gallery.length > 1 && (
+                <RevealItem>
+                  <GalleryRow items={project.gallery.slice(Math.ceil(project.gallery.length / 2))} reverse={true} />
+                </RevealItem>
+              )}
+            </RevealGroup>
+          )}
 
           <Reveal>
             <Link to={`/work/${nextProject.slug}`} className="project-next wrap" data-screen-label="Next Project">

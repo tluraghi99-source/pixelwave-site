@@ -165,33 +165,35 @@ export function WorkPage() {
             {/* key forces a remount on filter change — whileInView's viewport.once
                 only fires once per mount, so without this, cards that mount later
                 (e.g. widening back out after narrowing) would stay at opacity 0. */}
-            <RevealGroup
-              key={mode === "category" ? `cat:${[...activeTags].sort().join(",")}` : `cli:${activeClient ?? ""}`}
-              className="work-grid"
-              stagger={0.06}
-              amount={0.01}
-            >
-              {visibleProjects.map((p) => (
-                <RevealItem key={p.id}>
-                  <Card
-                    index={p.idx}
-                    titleFirst
-                    media={<img src={gridThumbUrl(p)} alt={p.title} />}
-                    meta={p.tags.map((t, ti) => (
-                      <Tag key={ti} variant={t.highlighted ? "orange" : "outline"}>
-                        {t.label}
-                      </Tag>
-                    ))}
-                    title={p.title}
-                    href={`/work/${p.slug}`}
-                  >
-                    <span className="work__view">
-                      View project <ArrowUpRight size={15} />
-                    </span>
-                  </Card>
-                </RevealItem>
-              ))}
-            </RevealGroup>
+            {visibleProjects.length > 0 && (
+              <RevealGroup
+                key={mode === "category" ? `cat:${[...activeTags].sort().join(",")}` : `cli:${activeClient ?? ""}`}
+                className="work-grid"
+                stagger={0.06}
+                amount={0.01}
+              >
+                {visibleProjects.map((p) => (
+                  <RevealItem key={p.id}>
+                    <Card
+                      index={p.idx}
+                      titleFirst
+                      media={<img src={gridThumbUrl(p)} alt={p.title} />}
+                      meta={p.tags.map((t, ti) => (
+                        <Tag key={ti} variant={t.highlighted ? "orange" : "outline"}>
+                          {t.label}
+                        </Tag>
+                      ))}
+                      title={p.title}
+                      href={`/work/${p.slug}`}
+                    >
+                      <span className="work__view">
+                        View project <ArrowUpRight size={15} />
+                      </span>
+                    </Card>
+                  </RevealItem>
+                ))}
+              </RevealGroup>
+            )}
           </div>
         </section>
       </main>
