@@ -8,19 +8,14 @@ import { Tag } from "@/components/pw/Tag"
 import { Reveal } from "@/components/motion/Reveal"
 import { wrap } from "@/lib/motion"
 import { CircularGallery, type CircularGalleryHandle } from "@/components/ui/circular-gallery"
-import { PROJECTS } from "@/data/work"
+import type { Project } from "@/lib/strapi"
 
-// The homepage teases a curated few — the full roster lives on the /work page.
-const WORK = PROJECTS.slice(0, 3)
-
-const CARDS = [...WORK, ...WORK]
-
-// Temporary stand-in photography (Lorem Picsum) until real project imagery is ready.
-const GALLERY_ITEMS = WORK.map((w) => ({
-  image: `https://picsum.photos/seed/pixellwave-${w.id}/1200/900?grayscale`,
-  text: w.title,
-  tags: w.tags.map(([variant, label]) => ({ variant: variant || ("outline" as const), label })),
-}))
+/** Falls back to today's exact Picsum pattern when heroMedia is empty or is
+ *  a video (this gallery only ever shows static images). */
+function galleryImageUrl(p: Project): string {
+  if (p.heroMedia && !p.heroMedia.mime.startsWith("video/")) return p.heroMedia.url
+  return `https://picsum.photos/seed/pixellwave-${p.id}/1200/900?grayscale`
+}
 
 function WorkMedia({ index }: { index: string }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -67,17 +62,23 @@ function WorkMedia({ index }: { index: string }) {
   )
 }
 
-function WorkTrack({ x }: { x: MotionValue<string> }) {
+function WorkTrack({ projects, x }: { projects: Project[]; x: MotionValue<string> }) {
+  // The homepage teases a curated few — the full roster lives on the /work
+  // page. Doubled so the marquee track can translate exactly -50% and loop
+  // seamlessly.
+  const work = projects.slice(0, 3)
+  const cards = [...work, ...work]
+
   return (
     <motion.div className="work__track" style={{ x }}>
-      {CARDS.map((w, i) => (
+      {cards.map((w, i) => (
         <div className="work__card-wrap" key={`${w.id}-${i}`}>
           <Card
             index={w.idx}
             media={<WorkMedia index={w.idx} />}
             meta={w.tags.map((t, ti) => (
-              <Tag key={ti} variant={t[0] || "outline"}>
-                {t[1]}
+              <Tag key={ti} variant={t.highlighted ? "orange" : "outline"}>
+                {t.label}
               </Tag>
             ))}
             title={w.title}
@@ -94,17 +95,29 @@ function WorkTrack({ x }: { x: MotionValue<string> }) {
   )
 }
 
-export function WorkGallery({ scrollYProgress }: { scrollYProgress: MotionValue<number> }) {
+export function WorkGallery({
+  projects,
+  scrollYProgress,
+}: {
+  projects: Project[]
+  scrollYProgress: MotionValue<number>
+}) {
   const galleryRef = useRef<CircularGalleryHandle>(null)
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     galleryRef.current?.setProgress(latest)
   })
 
+  const galleryItems = projects.slice(0, 3).map((w) => ({
+    image: galleryImageUrl(w),
+    text: w.title,
+    tags: w.tags.map((t) => ({ variant: t.highlighted ? ("orange" as const) : ("outline" as const), label: t.label })),
+  }))
+
   return (
     <CircularGallery
       ref={galleryRef}
-      items={GALLERY_ITEMS}
+      items={galleryItems}
       bend={2}
       borderRadius={0}
       className="work__gallery"
@@ -128,7 +141,7 @@ export function WorkHeading(): ReactNode {
 }
 
 /** Mobile/tablet: ambient scroll-linked drift, no pinning (revisit later). */
-export function WorkAmbient() {
+export function WorkAmbient({ projects }: { projects: Project[] }) {
   const sectionRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -149,7 +162,7 @@ export function WorkAmbient() {
         <WorkHeading />
       </div>
       <Reveal delay={0.2} className="work__carousel">
-        <WorkTrack x={x} />
+        <WorkTrack projects={projects} x={x} />
       </Reveal>
     </section>
   )

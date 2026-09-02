@@ -3,6 +3,8 @@ import { cubicBezier, motion, useMotionValue, useScroll, useTransform } from "fr
 import { ArrowUpRight } from "lucide-react"
 import { EASE_WAVE, HERO_REVEAL_END, HERO_REVEAL_START } from "@/lib/motion"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
+import { useProjects } from "@/hooks/useProjects"
+import type { Project } from "@/lib/strapi"
 import { VideoScrubbed, VideoScrubAmbient } from "@/components/sections/VideoScrub"
 import { WorkHeading, WorkGallery, WorkAmbient } from "@/components/sections/Work"
 import { SectionLabel } from "@/components/pw/SectionLabel"
@@ -117,7 +119,7 @@ const CTA_FADE_END_FRACTION = CAROUSEL_CYCLE_END_FRACTION + (CTA_FADE_VH / 100) 
  *  dock), then hands off to a pinned section that scrubs the video to its
  *  last frame and holds it there while the same scroll drives the carousel
  *  on top of it. */
-function WorkReelPinned({ ctaHeadline }: { ctaHeadline: string }) {
+function WorkReelPinned({ ctaHeadline, projects }: { ctaHeadline: string; projects: Project[] }) {
   const pinRef = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: pinRef, offset: ["start start", "end end"] })
   // Separate global scroll read (not pin-relative) so the iris rides the
@@ -191,7 +193,7 @@ function WorkReelPinned({ ctaHeadline }: { ctaHeadline: string }) {
               <WorkHeading />
             </motion.div>
             <motion.div className="work__gallery-wrap" style={{ opacity: contentOpacity, y: galleryY }}>
-              <WorkGallery scrollYProgress={carouselProgress} />
+              <WorkGallery projects={projects} scrollYProgress={carouselProgress} />
             </motion.div>
             <motion.div
               className="reel__cta"
@@ -219,11 +221,11 @@ function WorkReelPinned({ ctaHeadline }: { ctaHeadline: string }) {
  *  order, with the CTA as its own standalone section right after — same
  *  place it's always been, just relocated here from HomePage.tsx so
  *  WorkReel owns "show the CTA" for both paths. */
-function WorkReelAmbient({ ctaHeadline }: { ctaHeadline: string }) {
+function WorkReelAmbient({ ctaHeadline, projects }: { ctaHeadline: string; projects: Project[] }) {
   return (
     <>
       <VideoScrubAmbient />
-      <WorkAmbient />
+      <WorkAmbient projects={projects} />
       <CtaBand headline={ctaHeadline} />
     </>
   )
@@ -232,10 +234,11 @@ function WorkReelAmbient({ ctaHeadline }: { ctaHeadline: string }) {
 export function WorkReel({ ctaHeadline }: { ctaHeadline: string }) {
   const screenSize = useScreenSize()
   const isDesktop = screenSize.greaterThanOrEqual("lg")
+  const projects = useProjects()
 
   return isDesktop ? (
-    <WorkReelPinned ctaHeadline={ctaHeadline} />
+    <WorkReelPinned ctaHeadline={ctaHeadline} projects={projects} />
   ) : (
-    <WorkReelAmbient ctaHeadline={ctaHeadline} />
+    <WorkReelAmbient ctaHeadline={ctaHeadline} projects={projects} />
   )
 }
