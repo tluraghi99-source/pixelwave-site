@@ -219,9 +219,11 @@ export function ProjectPage() {
             <RevealItem>
               <GalleryRow items={project.gallery.slice(0, Math.ceil(project.gallery.length / 2))} reverse={false} />
             </RevealItem>
-            <RevealItem>
-              <GalleryRow items={project.gallery.slice(Math.ceil(project.gallery.length / 2))} reverse={true} />
-            </RevealItem>
+            {project.gallery.length > 1 && (
+              <RevealItem>
+                <GalleryRow items={project.gallery.slice(Math.ceil(project.gallery.length / 2))} reverse={true} />
+              </RevealItem>
+            )}
           </RevealGroup>
 
           <Reveal>

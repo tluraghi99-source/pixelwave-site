@@ -73,7 +73,7 @@ function mapProject(raw: StrapiProjectRaw): Project {
 export async function fetchProjects(): Promise<Project[]> {
   try {
     const res = await fetch(
-      `${STRAPI_URL}/api/projects?populate=tags,heroMedia,galleryImages&sort=order:asc&pagination[pageSize]=100`
+      `${STRAPI_URL}/api/projects?populate=tags,heroMedia,galleryImages&sort=order:asc,documentId:asc&pagination[pageSize]=100`
     )
     if (!res.ok) return []
     const json = await res.json()

@@ -1,4 +1,4 @@
-import { useRef, type PointerEvent, type ReactNode } from "react"
+import { useMemo, useRef, type PointerEvent, type ReactNode } from "react"
 import { motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform } from "framer-motion"
 import type { MotionValue } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
@@ -108,11 +108,21 @@ export function WorkGallery({
     galleryRef.current?.setProgress(latest)
   })
 
-  const galleryItems = projects.slice(0, 3).map((w) => ({
-    image: galleryImageUrl(w),
-    text: w.title,
-    tags: w.tags.map((t) => ({ variant: t.highlighted ? ("orange" as const) : ("outline" as const), label: t.label })),
-  }))
+  const galleryItems = useMemo(
+    () =>
+      projects.slice(0, 3).map((w) => ({
+        image: galleryImageUrl(w),
+        text: w.title,
+        tags: w.tags.map((t) => ({ variant: t.highlighted ? ("orange" as const) : ("outline" as const), label: t.label })),
+      })),
+    [projects]
+  )
+
+  // Before the fetch resolves (or if it fails, resolving to []),
+  // CircularGallery would otherwise substitute its own built-in stock
+  // demo photos — this must stay empty/invisible instead, matching every
+  // other surface's "nothing until real data" behavior.
+  if (galleryItems.length === 0) return null
 
   return (
     <CircularGallery
