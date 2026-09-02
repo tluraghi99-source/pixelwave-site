@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from "react"
+import { Link } from "react-router-dom"
 
 interface CardProps extends Omit<HTMLAttributes<HTMLElement>, "title"> {
   media?: ReactNode
@@ -8,6 +9,9 @@ interface CardProps extends Omit<HTMLAttributes<HTMLElement>, "title"> {
   meta?: ReactNode
   href?: string
   interactive?: boolean
+  /** Default order is index, tags, title (homepage carousel). Set this to
+   *  put the title before the tags instead (used on the /work listing). */
+  titleFirst?: boolean
   children?: ReactNode
 }
 
@@ -19,6 +23,7 @@ export function Card({
   meta,
   href,
   interactive = true,
+  titleFirst = false,
   children,
   className = "",
   ...rest
@@ -27,28 +32,49 @@ export function Card({
     .filter(Boolean)
     .join(" ")
 
+  const titleEl = title ? <h3 className="pw-card__title">{title}</h3> : null
+  const metaEl = meta ? <div className="pw-card__meta">{meta}</div> : null
+
   const body = (
     <>
       {media ? (
         <div className="pw-card__media">
           {media}
-          <div className="pw-card__overlay">
-            <div className="pw-card__overlay-content">
-              {description ? <p className="pw-card__desc">{description}</p> : null}
-              {children}
+          {description || children ? (
+            <div className="pw-card__overlay">
+              <div className="pw-card__overlay-content">
+                {description ? <p className="pw-card__desc">{description}</p> : null}
+                {children}
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
       ) : null}
       <div className="pw-card__body">
         {index ? <span className="pw-card__index">{index}</span> : null}
-        {meta ? <div className="pw-card__meta">{meta}</div> : null}
-        {title ? <h3 className="pw-card__title">{title}</h3> : null}
+        {titleFirst ? (
+          <>
+            {titleEl}
+            {metaEl}
+          </>
+        ) : (
+          <>
+            {metaEl}
+            {titleEl}
+          </>
+        )}
       </div>
     </>
   )
 
   if (href) {
+    if (href.startsWith("/") && !href.includes("#")) {
+      return (
+        <Link className={cls} to={href} {...rest}>
+          {body}
+        </Link>
+      )
+    }
     return (
       <a className={cls} href={href} {...rest}>
         {body}

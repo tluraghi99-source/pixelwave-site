@@ -10,6 +10,13 @@
       "headers": {
         "x-api-key": "${TWENTYFIRST_API_KEY}"
       }
+    },
+    "higgsfield": {
+      "type": "http",
+      "url": "https://mcp.higgsfield.ai/mcp",
+      "headers": {
+        "x-api-key": "${HIGGSFIELD_API_KEY}"
+      }
     }
   }
 }

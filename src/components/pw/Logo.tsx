@@ -1,4 +1,4 @@
-import logoShortWhite from "@/assets/logo-short-white.png"
+import logoWordmark from "@/assets/logo-wordmark.svg"
 import logoIconWhite from "@/assets/logo-icon-white.png"
 
 interface BrandLogoProps {
@@ -6,7 +6,8 @@ interface BrandLogoProps {
   variant?: "full" | "icon"
   /** Fixed pixel height. Omit to size via CSS (e.g. a responsive clamp() on className). */
   height?: number
-  /** The source assets are white-on-transparent; invert renders them black. */
+  /** Flips to the opposite of the asset's natural color — "full" is black by
+   *  default (for light backgrounds), "icon" is white by default (for dark). */
   invert?: boolean
   className?: string
 }
@@ -19,7 +20,7 @@ export function BrandLogo({
 }: BrandLogoProps) {
   return (
     <img
-      src={variant === "icon" ? logoIconWhite : logoShortWhite}
+      src={variant === "icon" ? logoIconWhite : logoWordmark}
       alt="PixellWave"
       className={className}
       style={{

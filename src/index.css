@@ -852,16 +852,37 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   position: relative; isolation: isolate; height: 50svh; overflow: hidden;
   background: var(--pw-white); color: var(--pw-black);
 }
+/* nowrap above 767px: whether this row wraps must depend on viewport, not on
+   which filter list is active. flex-wrap: wrap here would let the browser
+   decide based on each child's unwrapped content width — fine for the short
+   Category tag list, but the longer Client name list doesn't fit next to
+   the title even on a wide desktop screen, so the whole filter block would
+   drop to its own line in Client mode and stay inline in Category mode. The
+   filters row already wraps its own pills internally, so nowrap here just
+   lets the block shrink in place instead of kicking the layout to a
+   different shape depending on content. */
 .work-page__head {
   display: flex; align-items: baseline; justify-content: space-between;
-  gap: clamp(1.5rem, 3vw, 4rem); flex-wrap: wrap;
+  gap: clamp(1.5rem, 3vw, 4rem); flex-wrap: nowrap;
+}
+/* Without this, a long filter-block (Client mode) competes with the title
+   for the row's width and flexbox shrinks both — squeezing "All projects."
+   down until it wraps to two lines. The title should never give up space;
+   let the filter block (which already wraps its own pills) absorb it. */
+.work-page__title { flex-shrink: 0; }
+@media (max-width: 767px) {
+  .work-page__head { flex-wrap: wrap; }
 }
 /* Page title reads bigger than the shared .lead default — desktop only,
    mobile keeps the original size (doubling it there would be too much). */
 @media (min-width: 768px) {
   .work-page__head .lead { font-size: clamp(4rem, 3.2vw, 9rem); }
 }
-.work-page__filters { display: flex; flex-wrap: wrap; gap: clamp(1.25rem, 2vw, 2.5rem); }
+/* justify-content: flex-end so wrapped rows hug the right edge — without it,
+   a long pill list (e.g. the Client mode filter) can outgrow the available
+   width, forcing the block to stretch full-width, and flex-start would then
+   flush every row to the left like the mobile layout even on desktop. */
+.work-page__filters { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: clamp(1.25rem, 2vw, 2.5rem); }
 .work-page__filter {
   font-size: 14px; font-weight: 500; color: var(--text-secondary); cursor: pointer;
   transition: color .2s var(--ease-wave);
@@ -875,6 +896,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
    left. Left-align it too so the whole stack shares one edge. */
 @media (max-width: 767px) {
   .work-page__filter-block { align-items: flex-start; }
+  .work-page__filters { justify-content: flex-start; }
 }
 .work-page__mode-toggle { display: flex; gap: 1.25rem; }
 .work-page__mode-tab {
