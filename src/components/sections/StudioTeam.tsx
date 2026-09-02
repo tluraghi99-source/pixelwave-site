@@ -1,17 +1,21 @@
+import { useMemo } from "react"
 import { RevealGroup, RevealItem } from "@/components/motion/Reveal"
-import { TEAM } from "@/data/team"
+import { useTeamMembers } from "@/hooks/useTeamMembers"
+import type { TeamMember } from "@/lib/strapi"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 
-// Temporary stand-in photography (Lorem Picsum) until real team photos are
-// ready — same posture as Work.tsx's GALLERY_ITEMS. Two seeds per person so
-// the hover-swap has a second, different placeholder image to crossfade to.
-// No longer forced to grayscale: each card gets a color tint instead (see
-// CARD_COLORS below), so the photo itself should carry its own color too.
-const TEAM_WITH_PHOTOS = TEAM.map((m) => ({
-  ...m,
-  photo: `https://picsum.photos/seed/pixellwave-team-${m.id}/600/750`,
-  photoHover: `https://picsum.photos/seed/pixellwave-team-${m.id}-alt/600/750`,
-}))
+/** Falls back to today's exact Picsum placeholder pattern when Strapi's
+ *  photo/photoHover are empty — each field checked independently, since an
+ *  editor could set one before the other. */
+function withPhotos(m: TeamMember) {
+  return {
+    ...m,
+    photo: m.photo?.url ?? `https://picsum.photos/seed/pixellwave-team-${m.id}/600/750`,
+    photoHover: m.photoHover?.url ?? `https://picsum.photos/seed/pixellwave-team-${m.id}-alt/600/750`,
+  }
+}
+
+type TeamMemberWithPhotos = ReturnType<typeof withPhotos>
 
 // Every card sits on a flat color block, cycling through this sequence —
 // mostly the brand orange, with a dark neutral and a rare white beat for
@@ -21,25 +25,24 @@ const CARD_COLORS = ["orange", "neutral", "orange", "orange", "neutral", "white"
 type CardColor = (typeof CARD_COLORS)[number]
 
 type GridItem =
-  | { kind: "member"; member: (typeof TEAM_WITH_PHOTOS)[number]; color: CardColor }
+  | { kind: "member"; member: TeamMemberWithPhotos; color: CardColor }
   | { kind: "blank"; id: string }
 
-// Padded to a multiple of 4 (the desktop column count) with plain blank
-// cards so the grid never ends on a half-empty row, then those blanks are
-// shuffled in among the real cards — not just tacked on the end — so they
-// read as a deliberate rhythm-break, the way the reference's own grid
-// leaves occasional cells empty, rather than a leftover gap.
-const BLANK_COUNT = (4 - (TEAM_WITH_PHOTOS.length % 4)) % 4
-
-/** Fisher–Yates, run once at module load — a fixed-but-random layout, not
- *  reshuffled on every render (which would make cards jump around). */
-function buildGrid(): GridItem[] {
-  const items: GridItem[] = TEAM_WITH_PHOTOS.map((m, i) => ({
+/** Fisher–Yates — a fixed-but-random layout. Padded to a multiple of 4 (the
+ *  desktop column count) with plain blank cards so the grid never ends on a
+ *  half-empty row, then those blanks are shuffled in among the real cards —
+ *  not just tacked on the end — so they read as a deliberate rhythm-break.
+ *  Called from a useMemo below keyed on the fetched member list, so it only
+ *  reshuffles once (when the fetch resolves), not on every render. */
+function buildGrid(members: TeamMember[]): GridItem[] {
+  const withPhotoMembers = members.map(withPhotos)
+  const blankCount = (4 - (withPhotoMembers.length % 4)) % 4
+  const items: GridItem[] = withPhotoMembers.map((m, i) => ({
     kind: "member",
     member: m,
     color: CARD_COLORS[i % CARD_COLORS.length],
   }))
-  for (let i = 0; i < BLANK_COUNT; i++) items.push({ kind: "blank", id: `blank-${i}` })
+  for (let i = 0; i < blankCount; i++) items.push({ kind: "blank", id: `blank-${i}` })
   for (let i = items.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
     ;[items[i], items[j]] = [items[j], items[i]]
@@ -47,9 +50,7 @@ function buildGrid(): GridItem[] {
   return items
 }
 
-const GRID_ITEMS = buildGrid()
-
-function TeamCard({ member, color }: { member: (typeof TEAM_WITH_PHOTOS)[number]; color: CardColor }) {
+function TeamCard({ member, color }: { member: TeamMemberWithPhotos; color: CardColor }) {
   return (
     <div className={`team-card team-card--${color}`}>
       <div className="team-card__media">
@@ -78,12 +79,15 @@ function TeamCard({ member, color }: { member: (typeof TEAM_WITH_PHOTOS)[number]
 }
 
 export function StudioTeam() {
+  const members = useTeamMembers()
+  const gridItems = useMemo(() => buildGrid(members), [members])
+
   return (
     <section className="studio-team" data-theme="dark" data-screen-label="Studio Team">
       <CursorGlow className="cursor-glow" variant="dark" glow={false} />
       <div className="wrap">
         <RevealGroup className="team-grid" stagger={0.05} amount={0.05}>
-          {GRID_ITEMS.map((item) =>
+          {gridItems.map((item) =>
             item.kind === "member" ? (
               <RevealItem key={item.member.id}>
                 <TeamCard member={item.member} color={item.color} />
