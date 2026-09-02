@@ -82,3 +82,50 @@ export async function fetchProjects(): Promise<Project[]> {
     return []
   }
 }
+
+export interface TeamMember {
+  id: string
+  order: number
+  name: string
+  role: string
+  photo: StrapiMedia | null
+  photoHover: StrapiMedia | null
+}
+
+interface StrapiTeamMemberRaw {
+  documentId: string
+  name: string
+  role: string
+  order: number
+  photo: StrapiMediaRaw | null
+  photoHover: StrapiMediaRaw | null
+}
+
+function mapTeamMember(raw: StrapiTeamMemberRaw): TeamMember {
+  return {
+    id: raw.documentId,
+    order: raw.order,
+    name: raw.name,
+    role: raw.role,
+    photo: raw.photo ? { url: strapiMediaUrl(raw.photo.url), mime: raw.photo.mime } : null,
+    photoHover: raw.photoHover
+      ? { url: strapiMediaUrl(raw.photoHover.url), mime: raw.photoHover.mime }
+      : null,
+  }
+}
+
+/** Fetches all published team members, sorted by their editorial `order`.
+ *  Resolves to `[]` on any network/parse failure — callers render an
+ *  empty state rather than an error message. */
+export async function fetchTeamMembers(): Promise<TeamMember[]> {
+  try {
+    const res = await fetch(
+      `${STRAPI_URL}/api/team-members?populate=photo,photoHover&sort=order:asc,documentId:asc&pagination[pageSize]=100`
+    )
+    if (!res.ok) return []
+    const json = await res.json()
+    return (json.data as StrapiTeamMemberRaw[]).map(mapTeamMember)
+  } catch {
+    return []
+  }
+}
