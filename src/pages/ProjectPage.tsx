@@ -5,7 +5,8 @@ import { ArrowUpRight } from "lucide-react"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { Footer } from "@/components/sections/Footer"
-import { PROJECTS, type Project } from "@/data/work"
+import { useProjects } from "@/hooks/useProjects"
+import type { Project } from "@/lib/strapi"
 
 interface MediaItem {
   type: "image" | "video"
@@ -18,23 +19,36 @@ interface ProjectWithMedia extends Project {
   thumb: string
 }
 
-// Temporary stand-in photography (Lorem Picsum) until real project imagery is
-// ready — same posture as Work.tsx's GALLERY_ITEMS and StudioTeam's
-// TEAM_WITH_PHOTOS. Media URLs never live in data/work.ts itself.
-const PROJECTS_WITH_MEDIA: ProjectWithMedia[] = PROJECTS.map((p) => ({
-  ...p,
-  hero: { type: "image", src: `https://picsum.photos/seed/pixellwave-${p.id}-hero/1600/900?grayscale` },
-  gallery: Array.from({ length: 8 }, (_, i) => ({
-    type: "image" as const,
-    src: `https://picsum.photos/seed/pixellwave-${p.id}-g${i}/900/700?grayscale`,
-  })),
-  thumb: `https://picsum.photos/seed/pixellwave-${p.id}-hero/400/300?grayscale`,
-}))
+/** Builds the hero/gallery/thumb media fields for one project, falling back
+ *  to today's exact Picsum placeholder patterns wherever Strapi's media
+ *  fields are empty. Real heroMedia can be an image or a video (decided by
+ *  mime type); the placeholder fallback is always a static image. */
+function withMedia(p: Project): ProjectWithMedia {
+  const hero: MediaItem = p.heroMedia
+    ? { type: p.heroMedia.mime.startsWith("video/") ? "video" : "image", src: p.heroMedia.url }
+    : { type: "image", src: `https://picsum.photos/seed/pixellwave-${p.id}-hero/1600/900?grayscale` }
 
-// Northwind demos the video-media path with the existing studio.mp4 asset —
-// every other project stays image-only until real footage exists.
-const northwindEntry = PROJECTS_WITH_MEDIA.find((p) => p.slug === "northwind")
-if (northwindEntry) northwindEntry.hero = { type: "video", src: "/video/studio.mp4" }
+  const gallery: MediaItem[] =
+    p.galleryImages.length > 0
+      ? p.galleryImages.map((m) => ({
+          type: m.mime.startsWith("video/") ? ("video" as const) : ("image" as const),
+          src: m.url,
+        }))
+      : Array.from({ length: 8 }, (_, i) => ({
+          type: "image" as const,
+          src: `https://picsum.photos/seed/pixellwave-${p.id}-g${i}/900/700?grayscale`,
+        }))
+
+  // Used only as a static <img> "next project" teaser — a video heroMedia
+  // still falls back to the Picsum thumb here, same reasoning as the grid
+  // thumbnail in WorkPage.tsx.
+  const thumb =
+    p.heroMedia && !p.heroMedia.mime.startsWith("video/")
+      ? p.heroMedia.url
+      : `https://picsum.photos/seed/pixellwave-${p.id}-hero/400/300?grayscale`
+
+  return { ...p, hero, gallery, thumb }
+}
 
 /** Small "Overview" label, paired with the year on its first appearance only —
  *  this page shows the same overview text twice (split by the pinned video
@@ -140,15 +154,16 @@ function GalleryRow({ items, reverse }: { items: MediaItem[]; reverse: boolean }
 
 export function ProjectPage() {
   const { slug } = useParams<{ slug: string }>()
+  const projects = useProjects()
 
   const { project, nextProject } = useMemo(() => {
-    const index = PROJECTS_WITH_MEDIA.findIndex((p) => p.slug === slug)
+    const index = projects.findIndex((p) => p.slug === slug)
     if (index === -1) return { project: undefined, nextProject: undefined }
     return {
-      project: PROJECTS_WITH_MEDIA[index],
-      nextProject: PROJECTS_WITH_MEDIA[(index + 1) % PROJECTS_WITH_MEDIA.length],
+      project: withMedia(projects[index]),
+      nextProject: withMedia(projects[(index + 1) % projects.length]),
     }
-  }, [slug])
+  }, [projects, slug])
 
   if (!project || !nextProject) {
     return (
