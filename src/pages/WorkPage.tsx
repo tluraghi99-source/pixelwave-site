@@ -8,19 +8,39 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { Footer } from "@/components/sections/Footer"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { EASE_WAVE } from "@/lib/motion"
-import { PROJECTS } from "@/data/work"
+import { useProjects } from "@/hooks/useProjects"
+import type { Project } from "@/lib/strapi"
 
-// "Featured" is a highlight badge, not a category, so it's excluded from the filter row.
-const FILTER_TAGS = Array.from(
-  new Set(PROJECTS.flatMap((p) => p.tags.map(([, label]) => label)))
-).filter((label) => label !== "Featured")
-
-// Alphabetical (unlike FILTER_TAGS' insertion order) — categories are a
-// small curated set where order doesn't matter; clients are the dimension
-// expected to grow, so alphabetical keeps a long list scannable.
-const FILTER_CLIENTS = Array.from(new Set(PROJECTS.map((p) => p.client))).sort()
+/** Falls back to today's exact Picsum grid-thumbnail pattern when heroMedia
+ *  is empty or is a video (a small grid card is never a sensible place to
+ *  autoplay video). */
+function gridThumbUrl(p: Project): string {
+  if (p.heroMedia && !p.heroMedia.mime.startsWith("video/")) return p.heroMedia.url
+  return `https://picsum.photos/seed/pixellwave-${p.id}/900/1200?grayscale`
+}
 
 export function WorkPage() {
+  const projects = useProjects()
+
+  // "Featured" is a highlight badge, not a category, so it's excluded from
+  // the filter row. Can't be computed until the fetch resolves, so this
+  // moves from a module-level constant to a memo derived from `projects`.
+  const FILTER_TAGS = useMemo(
+    () =>
+      Array.from(new Set(projects.flatMap((p) => p.tags.map((t) => t.label)))).filter(
+        (label) => label !== "Featured"
+      ),
+    [projects]
+  )
+
+  // Alphabetical (unlike FILTER_TAGS' insertion order) — categories are a
+  // small curated set where order doesn't matter; clients are the dimension
+  // expected to grow, so alphabetical keeps a long list scannable.
+  const FILTER_CLIENTS = useMemo(
+    () => Array.from(new Set(projects.map((p) => p.client))).sort(),
+    [projects]
+  )
+
   // Lets the nav menu's "Category"/"Client" links land directly on a mode
   // (e.g. /work?mode=client) — read once on mount, not kept in sync with
   // further clicks on the toggle below (out of scope for now).
@@ -51,12 +71,12 @@ export function WorkPage() {
   // actually drives the grid below.
   const visibleProjects = useMemo(() => {
     if (mode === "category") {
-      if (activeTags.size === 0) return PROJECTS
-      return PROJECTS.filter((p) => p.tags.some(([, label]) => activeTags.has(label)))
+      if (activeTags.size === 0) return projects
+      return projects.filter((p) => p.tags.some((t) => activeTags.has(t.label)))
     }
-    if (!activeClient) return PROJECTS
-    return PROJECTS.filter((p) => p.client === activeClient)
-  }, [mode, activeTags, activeClient])
+    if (!activeClient) return projects
+    return projects.filter((p) => p.client === activeClient)
+  }, [projects, mode, activeTags, activeClient])
 
   return (
     <>
@@ -156,15 +176,10 @@ export function WorkPage() {
                   <Card
                     index={p.idx}
                     titleFirst
-                    media={
-                      <img
-                        src={`https://picsum.photos/seed/pixellwave-${p.id}/900/1200?grayscale`}
-                        alt={p.title}
-                      />
-                    }
+                    media={<img src={gridThumbUrl(p)} alt={p.title} />}
                     meta={p.tags.map((t, ti) => (
-                      <Tag key={ti} variant={t[0] || "outline"}>
-                        {t[1]}
+                      <Tag key={ti} variant={t.highlighted ? "orange" : "outline"}>
+                        {t.label}
                       </Tag>
                     ))}
                     title={p.title}
