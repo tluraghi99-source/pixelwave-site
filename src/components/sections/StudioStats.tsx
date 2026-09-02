@@ -5,7 +5,7 @@ import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Reveal } from "@/components/motion/Reveal"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { EASE_WAVE } from "@/lib/motion"
-import { TEAM } from "@/data/team"
+import { useTeamMembers } from "@/hooks/useTeamMembers"
 
 // Set once at module load, not per-render — matches the codebase's existing
 // window.matchMedia usage (e.g. Work.tsx's "(pointer: coarse)" check).
@@ -29,10 +29,27 @@ function StatBlock({ value, label, accent, delay, suffix = "" }: StatBlockProps)
   const count = useMotionValue(PREFERS_REDUCED_MOTION ? value : 0)
   const [display, setDisplay] = useState(count.get())
   const controlsRef = useRef<AnimationPlaybackControls | null>(null)
+  const hasEnteredRef = useRef(false)
   useMotionValueEvent(count, "change", (v) => setDisplay(Math.round(v)))
   useEffect(() => {
     return () => controlsRef.current?.stop()
   }, [])
+
+  // `value` can arrive asynchronously (e.g. People's team-member count, which
+  // starts at 0 until the fetch resolves). If it changes after this stat has
+  // already entered the viewport — whileInView only fires once — re-animate
+  // (or, under reduced motion, jump) to the corrected value instead of
+  // leaving the count-up stuck at whatever it was when data first arrived.
+  useEffect(() => {
+    if (!hasEnteredRef.current) return
+    controlsRef.current?.stop()
+    if (PREFERS_REDUCED_MOTION) {
+      count.set(value)
+      return
+    }
+    controlsRef.current = animate(count, value, { duration: 0.9, ease: [0.16, 0.84, 0.44, 1] })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
 
   return (
     <motion.div
@@ -44,6 +61,7 @@ function StatBlock({ value, label, accent, delay, suffix = "" }: StatBlockProps)
       viewport={{ once: true, amount: 0.5 }}
       transition={{ duration: 0.6, delay, ease: EASE_WAVE }}
       onViewportEnter={() => {
+        hasEnteredRef.current = true
         if (PREFERS_REDUCED_MOTION) return
         // A stat with a small target (e.g. Floors=2) reaches its final
         // rounded value well before one with a large target (e.g.
@@ -62,6 +80,8 @@ function StatBlock({ value, label, accent, delay, suffix = "" }: StatBlockProps)
 }
 
 export function StudioStats() {
+  const teamMembers = useTeamMembers()
+
   return (
     <section className="studio-stats" data-theme="dark" data-screen-label="Studio Stats">
       <CursorGlow className="cursor-glow" variant="dark" glow />
@@ -71,7 +91,7 @@ export function StudioStats() {
           <SectionLabel number="01">The studio</SectionLabel>
         </Reveal>
         <div className="studio-stats__row">
-          <StatBlock value={TEAM.length} label="People" delay={0.1} />
+          <StatBlock value={teamMembers.length} label="People" delay={0.1} />
           <StatBlock value={2} label="Floors" accent delay={0.35} />
           <StatBlock value={100} label="Projects" suffix="+" delay={0.6} />
           <motion.p
