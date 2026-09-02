@@ -64,9 +64,10 @@ function StatBlock({ value, label, accent, delay, suffix = "" }: StatBlockProps)
         hasEnteredRef.current = true
         if (PREFERS_REDUCED_MOTION) return
         // A stat with a small target (e.g. Floors=2) reaches its final
-        // rounded value well before one with a large target (e.g.
-        // People=14) even with a later start delay — it needs far less of
-        // the easing curve's progress to round to its integer. Not a bug.
+        // rounded value well before one with a large target (e.g. the
+        // live People count) even with a later start delay — it needs far
+        // less of the easing curve's progress to round to its integer.
+        // Not a bug.
         controlsRef.current = animate(count, value, { duration: 0.9, delay, ease: [0.16, 0.84, 0.44, 1] })
       }}
     >
