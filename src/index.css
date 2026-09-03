@@ -728,14 +728,12 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   color: var(--pw-black);
   white-space: nowrap;
 }
-/* Real logo files, forced flat black regardless of source color so the wall
-   reads as one consistent mark (see data/clients.ts for why a few keep
-   their real colors instead). */
+/* Real logo files, forced flat black regardless of source color so the
+   wall reads as one consistent mark. */
 .client-logos__item--logo {
   display: block; height: clamp(2rem, 2.9vw, 2.75rem); width: auto;
   filter: brightness(0);
 }
-.client-logos__item--color { filter: none; }
 
 /* Studio page (src/pages/StudioPage.tsx) — dark throughout. */
 .studio-page { background: var(--pw-black); }
