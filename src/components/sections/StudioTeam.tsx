@@ -17,15 +17,8 @@ function withPhotos(m: TeamMember) {
 
 type TeamMemberWithPhotos = ReturnType<typeof withPhotos>
 
-// Every card sits on a flat color block, cycling through this sequence —
-// mostly the brand orange, with a dark neutral and a rare white beat for
-// variety, echoing the reference's per-person color-block team grid without
-// spending the site's whole palette on it (still just orange/black/white).
-const CARD_COLORS = ["orange", "neutral", "orange", "orange", "neutral", "white"] as const
-type CardColor = (typeof CARD_COLORS)[number]
-
 type GridItem =
-  | { kind: "member"; member: TeamMemberWithPhotos; color: CardColor }
+  | { kind: "member"; member: TeamMemberWithPhotos }
   | { kind: "blank"; id: string }
 
 /** Fisher–Yates — a fixed-but-random layout. Padded to a multiple of 4 (the
@@ -37,10 +30,9 @@ type GridItem =
 function buildGrid(members: TeamMember[]): GridItem[] {
   const withPhotoMembers = members.map(withPhotos)
   const blankCount = (4 - (withPhotoMembers.length % 4)) % 4
-  const items: GridItem[] = withPhotoMembers.map((m, i) => ({
+  const items: GridItem[] = withPhotoMembers.map((m) => ({
     kind: "member",
     member: m,
-    color: CARD_COLORS[i % CARD_COLORS.length],
   }))
   for (let i = 0; i < blankCount; i++) items.push({ kind: "blank", id: `blank-${i}` })
   for (let i = items.length - 1; i > 0; i--) {
@@ -50,9 +42,9 @@ function buildGrid(members: TeamMember[]): GridItem[] {
   return items
 }
 
-function TeamCard({ member, color }: { member: TeamMemberWithPhotos; color: CardColor }) {
+function TeamCard({ member }: { member: TeamMemberWithPhotos }) {
   return (
-    <div className={`team-card team-card--${color}`}>
+    <div className="team-card team-card--orange">
       <div className="team-card__media">
         <img
           className="team-card__photo team-card__photo--base"
@@ -91,7 +83,7 @@ export function StudioTeam() {
             {gridItems.map((item) =>
               item.kind === "member" ? (
                 <RevealItem key={item.member.id}>
-                  <TeamCard member={item.member} color={item.color} />
+                  <TeamCard member={item.member} />
                 </RevealItem>
               ) : (
                 <RevealItem key={item.id}>

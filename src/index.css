@@ -766,12 +766,11 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 @media (max-width: 768px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px) { .team-grid { grid-template-columns: 1fr; } }
 
-/* Each card sits on a flat color block (--card-color) with the photo
-   tinted toward it (mix-blend-mode: color keeps the photo's own luminance/
-   detail, just recolors its hue), rather than a plain grayscale crop. */
+/* Every card sits on the same flat orange block (--card-color) with the
+   photo tinted toward it (mix-blend-mode: color keeps the photo's own
+   luminance/detail, just recolors its hue), rather than a plain grayscale
+   crop. */
 .team-card--orange { --card-color: var(--pw-orange); --card-text: var(--pw-white); }
-.team-card--neutral { --card-color: var(--pw-neutral-20); --card-text: var(--pw-white); }
-.team-card--white { --card-color: var(--pw-white); --card-text: var(--pw-black); }
 /* A deliberate empty beat in the grid — slightly lighter than the page's
    own pure black so it still reads as a card, not a missing image. */
 .team-card--blank { --card-color: var(--pw-neutral-10); }
@@ -801,9 +800,6 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .team-card__scrim {
   position: absolute; inset: 0; pointer-events: none;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 45%);
-}
-.team-card--white .team-card__scrim {
-  background: linear-gradient(to top, rgba(255, 255, 255, 0.75), transparent 45%);
 }
 .team-card__caption {
   position: absolute; left: 0.9rem; right: 0.9rem; bottom: 0.8rem;
