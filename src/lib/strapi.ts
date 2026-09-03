@@ -129,3 +129,39 @@ export async function fetchTeamMembers(): Promise<TeamMember[]> {
     return []
   }
 }
+
+export interface ClientLogo {
+  id: string
+  name: string
+  logo: StrapiMedia | null
+}
+
+interface StrapiClientLogoRaw {
+  documentId: string
+  name: string
+  logo: StrapiMediaRaw | null
+}
+
+function mapClientLogo(raw: StrapiClientLogoRaw): ClientLogo {
+  return {
+    id: raw.documentId,
+    name: raw.name,
+    logo: raw.logo ? { url: strapiMediaUrl(raw.logo.url), mime: raw.logo.mime } : null,
+  }
+}
+
+/** Fetches all published client logos, sorted by their editorial `order`.
+ *  Resolves to `[]` on any network/parse failure — callers render an
+ *  empty state rather than an error message. */
+export async function fetchClientLogos(): Promise<ClientLogo[]> {
+  try {
+    const res = await fetch(
+      `${STRAPI_URL}/api/client-logos?populate=logo&sort=order:asc,documentId:asc&pagination[pageSize]=100`
+    )
+    if (!res.ok) return []
+    const json = await res.json()
+    return (json.data as StrapiClientLogoRaw[]).map(mapClientLogo)
+  } catch {
+    return []
+  }
+}
