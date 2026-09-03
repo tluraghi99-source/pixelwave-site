@@ -1,13 +1,13 @@
 import { Marquee } from "@/components/motion/Marquee"
 import { useClientLogos } from "@/hooks/useClientLogos"
-import { strapiMediaUrl, type ClientLogo } from "@/lib/strapi"
+import type { ClientLogo } from "@/lib/strapi"
 
 function ClientMark({ client }: { client: ClientLogo }) {
   if (client.logo) {
     return (
       <img
         className="client-logos__item client-logos__item--logo"
-        src={strapiMediaUrl(client.logo.url)}
+        src={client.logo.url}
         alt={client.name}
       />
     )
