@@ -1053,6 +1053,11 @@ header.nav .nav__mobile .nav__link {
 .project-video-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 .project-overview { padding-block: clamp(2.5rem, 4vw, 4rem); }
+/* Body-section text (project.bodyDesc) only — double .secbody's shared
+   52ch default, since this is a longer, fuller paragraph than the hero
+   teaser above it (same class, .project-page__hero-glow .secbody, which
+   keeps the narrower default). */
+.project-page__body-glow .secbody { max-width: 104ch; }
 
 .project-gallery { padding: clamp(2.5rem, 4vw, 4rem) 0; }
 /* Each row sits alone inside its own RevealItem wrapper div, so it's always
