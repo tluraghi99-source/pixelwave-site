@@ -8,10 +8,7 @@ import { Footer } from "@/components/sections/Footer"
 import { useProjects } from "@/hooks/useProjects"
 import type { Project } from "@/lib/strapi"
 
-interface MediaItem {
-  type: "image" | "video"
-  src: string
-}
+type MediaItem = { type: "image"; src: string } | { type: "video"; src: string } | { type: "youtube"; videoId: string }
 
 interface ProjectWithMedia extends Project {
   hero: MediaItem
@@ -19,14 +16,38 @@ interface ProjectWithMedia extends Project {
   thumb: string
 }
 
+/** Extracts an 11-character YouTube video id from any normal URL shape
+ *  editors are likely to paste: a watch URL (`?v=ID`, optionally with
+ *  other query params before/after), a shortened youtu.be/ID link, or an
+ *  existing /embed/ID link. Returns null on anything else, so callers can
+ *  fail soft to the placeholder image rather than rendering a broken
+ *  embed. */
+function parseYoutubeId(url: string): string | null {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|watch\?(?:.*&)?v=))([A-Za-z0-9_-]{11})/)
+  return match ? match[1] : null
+}
+
 /** Builds the hero/gallery/thumb media fields for one project, falling back
  *  to today's exact Picsum placeholder patterns wherever Strapi's media
- *  fields are empty. Real heroMedia can be an image or a video (decided by
- *  mime type); the placeholder fallback is always a static image. */
+ *  fields are empty. heroMediaType (not mime-sniffing) now decides whether
+ *  hero is an image, a video, or a YouTube embed — an unparseable/empty
+ *  heroYoutubeUrl for a "youtube" project falls back to the placeholder
+ *  image, same as an empty heroMedia does for "image"/"video". */
 function withMedia(p: Project): ProjectWithMedia {
-  const hero: MediaItem = p.heroMedia
-    ? { type: p.heroMedia.mime.startsWith("video/") ? "video" : "image", src: p.heroMedia.url }
-    : { type: "image", src: `https://picsum.photos/seed/pixellwave-${p.id}-hero/1600/900?grayscale` }
+  const placeholderHero: MediaItem = {
+    type: "image",
+    src: `https://picsum.photos/seed/pixellwave-${p.id}-hero/1600/900?grayscale`,
+  }
+
+  let hero: MediaItem
+  if (p.heroMediaType === "youtube") {
+    const videoId = p.heroYoutubeUrl ? parseYoutubeId(p.heroYoutubeUrl) : null
+    hero = videoId ? { type: "youtube", videoId } : placeholderHero
+  } else if (p.heroMediaType === "video") {
+    hero = p.heroMedia ? { type: "video", src: p.heroMedia.url } : placeholderHero
+  } else {
+    hero = p.heroMedia ? { type: "image", src: p.heroMedia.url } : placeholderHero
+  }
 
   const gallery: MediaItem[] =
     p.galleryImages.length > 0
@@ -39,13 +60,16 @@ function withMedia(p: Project): ProjectWithMedia {
           src: `https://picsum.photos/seed/pixellwave-${p.id}-g${i}/900/700?grayscale`,
         }))
 
-  // Used only as a static <img> "next project" teaser — a video heroMedia
-  // still falls back to the Picsum thumb here, same reasoning as the grid
-  // thumbnail in WorkPage.tsx.
+  // Used only as a static <img> "next project" teaser (and, via the same
+  // logic, WorkPage.tsx's grid thumbnail — see gridThumbUrl there). Chain:
+  // cover -> heroMedia (only when it's an image) -> Picsum placeholder.
+  // Never a video or YouTube embed here, regardless of heroMediaType — a
+  // small teaser/grid card is never a sensible place to autoplay either.
   const thumb =
-    p.heroMedia && !p.heroMedia.mime.startsWith("video/")
+    p.cover?.url ??
+    (p.heroMediaType === "image" && p.heroMedia
       ? p.heroMedia.url
-      : `https://picsum.photos/seed/pixellwave-${p.id}-hero/400/300?grayscale`
+      : `https://picsum.photos/seed/pixellwave-${p.id}-hero/400/300?grayscale`)
 
   return { ...p, hero, gallery, thumb }
 }
@@ -65,6 +89,23 @@ function ProjectMeta({ year }: { year?: number }) {
 function ProjectMedia({ media }: { media: MediaItem }) {
   if (media.type === "video") {
     return <video className="project-video-media" src={media.src} autoPlay loop muted playsInline />
+  }
+  if (media.type === "youtube") {
+    // playlist={videoId} is the documented trick that makes a *single*
+    // video loop via the embed player (YouTube's loop param alone only
+    // loops actual playlists). controls=0 keeps it chromeless, matching
+    // the plain <video>'s look; this is a best-effort approximation of
+    // autoplay/loop/mute, not scroll-scrubbable like a real <video>
+    // element (accepted trade-off — see the design spec).
+    return (
+      <iframe
+        className="project-video-media"
+        src={`https://www.youtube.com/embed/${media.videoId}?autoplay=1&mute=1&loop=1&playlist=${media.videoId}&controls=0&playsinline=1`}
+        title=""
+        allow="autoplay"
+        frameBorder={0}
+      />
+    )
   }
   return <img className="project-video-media" src={media.src} alt="" />
 }
@@ -136,9 +177,9 @@ function GalleryRow({ items, reverse }: { items: MediaItem[]; reverse: boolean }
       <div className="project-gallery__item" key={`${keyPrefix}-${i}`}>
         {item.type === "video" ? (
           <video src={item.src} autoPlay loop muted playsInline />
-        ) : (
+        ) : item.type === "image" ? (
           <img src={item.src} alt="" loading="lazy" />
-        )}
+        ) : null}
       </div>
     ))
 
