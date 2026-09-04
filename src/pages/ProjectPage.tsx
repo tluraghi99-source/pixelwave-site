@@ -211,7 +211,7 @@ export function ProjectPage() {
               <ProjectMeta />
             </Reveal>
             <Reveal delay={0.05}>
-              <p className="secbody">{project.desc}</p>
+              <p className="secbody">{project.bodyDesc}</p>
             </Reveal>
           </div>
 

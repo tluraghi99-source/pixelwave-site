@@ -16,6 +16,9 @@ export interface Project {
   slug: string
   title: string
   desc: string
+  /** Longer body-section text — a separate field from `desc` (the hero
+   *  teaser) so the two sections don't just repeat the same line twice. */
+  bodyDesc: string
   client: string
   year: number
   tags: ProjectTag[]
@@ -42,6 +45,7 @@ interface StrapiProjectRaw {
   slug: string
   title: string
   description: string
+  bodyDescription: string
   client: string
   year: number
   order: number
@@ -57,6 +61,7 @@ function mapProject(raw: StrapiProjectRaw): Project {
     slug: raw.slug,
     title: raw.title,
     desc: raw.description,
+    bodyDesc: raw.bodyDescription,
     client: raw.client,
     year: raw.year,
     tags: raw.tags.map((t) => ({ label: t.label, highlighted: t.highlighted })),
