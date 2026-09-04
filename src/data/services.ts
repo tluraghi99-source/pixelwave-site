@@ -38,19 +38,19 @@ export const SERVICES = [
   {
     num: "05",
     name: "Social",
-    desc: "Content built for the feed first — native to each platform's own rhythm, not a shrunk-down version of something else.",
+    desc: "Day-to-day management of your channels — a calendar that actually ships, real community replies, and the numbers to back it up.",
     tagCols: [
-      ["Content", "Campaigns"],
-      ["Community", "Paid Social"],
+      ["Content Calendar", "Community"],
+      ["Scheduling", "Analytics"],
     ],
   },
   {
     num: "06",
     name: "Events",
-    desc: "Branding and on-the-ground production for launches, activations, and everything in between.",
+    desc: "Full planning and production for launches and activations — venue, logistics, and everything that has to land on the day.",
     tagCols: [
-      ["Branding", "Signage"],
-      ["Production", "Live Coverage"],
+      ["Planning", "Logistics"],
+      ["Vendor Coordination", "On-Site Production"],
     ],
   },
 ]
