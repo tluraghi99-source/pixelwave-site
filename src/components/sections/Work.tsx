@@ -1,4 +1,5 @@
 import { useMemo, useRef, type PointerEvent, type ReactNode } from "react"
+import { useNavigate } from "react-router-dom"
 import { motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform } from "framer-motion"
 import type { MotionValue } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
@@ -104,6 +105,7 @@ export function WorkGallery({
   scrollYProgress: MotionValue<number>
 }) {
   const galleryRef = useRef<CircularGalleryHandle>(null)
+  const navigate = useNavigate()
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     galleryRef.current?.setProgress(latest)
@@ -115,6 +117,7 @@ export function WorkGallery({
         image: galleryImageUrl(w),
         text: w.title,
         tags: w.tags.map((t) => ({ variant: t.highlighted ? ("orange" as const) : ("outline" as const), label: t.label })),
+        href: `/work/${w.slug}`,
       })),
     [projects]
   )
@@ -132,6 +135,7 @@ export function WorkGallery({
       bend={2}
       borderRadius={0}
       className="work__gallery"
+      onItemClick={(href) => navigate(href)}
     />
   )
 }

@@ -24,6 +24,10 @@ export interface GalleryItem {
   image: string
   text: string
   tags?: GalleryTag[]
+  /** Present -> the card is clickable (a tap/click that isn't a drag fires
+   *  onItemClick with this URL). Absent -> purely decorative, same as
+   *  before (e.g. StudioGallery's atmosphere photos). */
+  href?: string
 }
 
 export interface CircularGalleryHandle {
@@ -47,12 +51,17 @@ interface CircularGalleryProps extends React.HTMLAttributes<HTMLDivElement> {
   cardWidth?: number
   /** Card height, in the same arbitrary units as cardWidth. @default 1200 */
   cardHeight?: number
+  /** Fires on a tap/click that isn't a drag, with that card's own `href` —
+   *  only for cards that have one (see GalleryItem.href). Absent entirely
+   *  -> every card stays purely decorative, same as before this existed. */
+  onItemClick?: (href: string) => void
 }
 
 interface HoverInfo {
   index: number
   text: string
   tags?: GalleryTag[]
+  href?: string
   rect: { left: number; top: number; width: number; height: number }
   /** Card's current tilt, in degrees, matching its on-screen rotation. */
   rotationDeg: number
@@ -71,6 +80,28 @@ function debounce(func: (...args: unknown[]) => void, wait: number) {
 
 function lerp(p1: number, p2: number, t: number) {
   return p1 + (p2 - p1) * t
+}
+
+/** Total down-to-up movement, in pixels, below which a pointer gesture
+ *  counts as a click/tap rather than a drag of the carousel. */
+const CLICK_DRAG_THRESHOLD_PX = 6
+
+// touchstart/touchmove have their position in `touches`; touchend's `touches`
+// is already empty by the time it fires (the touch has ended) — its
+// position lives in `changedTouches` instead. clientXOf/clientYOf cover the
+// down/move case, clientEndXOf/clientEndYOf the up case; both fall back to
+// plain MouseEvent clientX/clientY when `e` isn't a TouchEvent at all.
+function clientXOf(e: MouseEvent | TouchEvent): number {
+  return "touches" in e ? e.touches[0].clientX : e.clientX
+}
+function clientYOf(e: MouseEvent | TouchEvent): number {
+  return "touches" in e ? e.touches[0].clientY : e.clientY
+}
+function clientEndXOf(e: MouseEvent | TouchEvent): number {
+  return "changedTouches" in e ? e.changedTouches[0].clientX : e.clientX
+}
+function clientEndYOf(e: MouseEvent | TouchEvent): number {
+  return "changedTouches" in e ? e.changedTouches[0].clientY : e.clientY
 }
 
 function autoBind(instance: object) {
@@ -104,6 +135,7 @@ class Media {
   screen: { width: number; height: number }
   text: string
   tags?: GalleryTag[]
+  href?: string
   viewport: { width: number; height: number }
   bend: number
   borderRadius: number
@@ -131,6 +163,7 @@ class Media {
     screen,
     text,
     tags,
+    href,
     viewport,
     bend,
     borderRadius = 0,
@@ -146,6 +179,7 @@ class Media {
     screen: { width: number; height: number }
     text: string
     tags?: GalleryTag[]
+    href?: string
     viewport: { width: number; height: number }
     bend: number
     borderRadius: number
@@ -161,6 +195,7 @@ class Media {
     this.screen = screen
     this.text = text
     this.tags = tags
+    this.href = href
     this.viewport = viewport
     this.bend = bend
     this.borderRadius = borderRadius
@@ -335,6 +370,7 @@ class App {
   scroll: ScrollState
   onCheckDebounce: () => void
   onHover?: (hover: HoverInfo | null) => void
+  onItemClick?: (href: string) => void
   renderer!: Renderer
   gl!: OGLRenderingContext
   camera!: Camera
@@ -344,6 +380,7 @@ class App {
   medias!: Media[]
   isDown = false
   start = 0
+  startY = 0
   dragStartOffset = 0
   /** Manual drag nudge — separate from the externally (scroll-)driven offset. */
   manualOffset = 0
@@ -358,7 +395,7 @@ class App {
   boundOnResize!: () => void
   boundOnTouchDown!: (e: MouseEvent | TouchEvent) => void
   boundOnTouchMove!: (e: MouseEvent | TouchEvent) => void
-  boundOnTouchUp!: () => void
+  boundOnTouchUp!: (e: MouseEvent | TouchEvent) => void
   boundOnPointerMove!: (e: MouseEvent) => void
   boundOnPointerLeave!: () => void
 
@@ -373,6 +410,7 @@ class App {
       cardWidth,
       cardHeight,
       onHover,
+      onItemClick,
     }: {
       items?: GalleryItem[]
       bend: number
@@ -382,6 +420,7 @@ class App {
       cardWidth: number
       cardHeight: number
       onHover?: (hover: HoverInfo | null) => void
+      onItemClick?: (href: string) => void
     }
   ) {
     this.container = container
@@ -389,6 +428,7 @@ class App {
     this.scroll = { ease: scrollEase, current: 0, target: 0, last: 0 }
     this.onCheckDebounce = debounce(this.onCheck.bind(this), 200)
     this.onHover = onHover
+    this.onItemClick = onItemClick
 
     autoBind(this)
 
@@ -449,6 +489,7 @@ class App {
         screen: this.screen,
         text: data.text,
         tags: data.tags,
+        href: data.href,
         viewport: this.viewport,
         bend,
         borderRadius,
@@ -468,19 +509,34 @@ class App {
   onTouchDown(e: MouseEvent | TouchEvent) {
     this.isDown = true
     this.dragStartOffset = this.manualOffset
-    this.start = "touches" in e ? e.touches[0].clientX : e.clientX
+    this.start = clientXOf(e)
+    this.startY = clientYOf(e)
   }
 
   onTouchMove(e: MouseEvent | TouchEvent) {
     if (!this.isDown) return
-    const x = "touches" in e ? e.touches[0].clientX : e.clientX
+    const x = clientXOf(e)
     const distance = (this.start - x) * (this.scrollSpeed * 0.025)
     this.manualOffset = this.dragStartOffset + distance
     this.scroll.target = this.externalOffset + this.manualOffset
   }
 
-  onTouchUp() {
+  onTouchUp(e: MouseEvent | TouchEvent) {
     this.isDown = false
+
+    // A tap/click, not a drag — the down/up positions barely moved. Hit-test
+    // fresh at the up position rather than reusing this.hoveredIndex: that's
+    // only ever populated for fine pointers (see onPointerMove's early
+    // return on coarse/touch input below), so it'd never fire on touch.
+    const endX = clientEndXOf(e)
+    const endY = clientEndYOf(e)
+    const moved = Math.hypot(endX - this.start, endY - this.startY)
+    if (moved <= CLICK_DRAG_THRESHOLD_PX && this.onItemClick) {
+      const rect = this.container.getBoundingClientRect()
+      const hit = this.hitTest(endX - rect.left, endY - rect.top)
+      if (hit?.href) this.onItemClick(hit.href)
+    }
+
     this.onCheck()
   }
 
@@ -505,6 +561,25 @@ class App {
     this.mouse = null
   }
 
+  /** Hit-test a container-local pixel position against each media's current
+   *  on-screen rect. Shared by updateHover (continuous, fine-pointer-only)
+   *  and onTouchUp's click detection (one-off, any pointer type). */
+  hitTest(mouseX: number, mouseY: number): Media | null {
+    if (!this.medias) return null
+    const ratio = this.screen.width / this.viewport.width
+
+    for (const media of this.medias) {
+      const centerX = this.screen.width / 2 + media.plane.position.x * ratio
+      const centerY = this.screen.height / 2 - media.plane.position.y * ratio
+      const halfW = (media.plane.scale.x * ratio) / 2
+      const halfH = (media.plane.scale.y * ratio) / 2
+      if (Math.abs(mouseX - centerX) <= halfW && Math.abs(mouseY - centerY) <= halfH) {
+        return media
+      }
+    }
+    return null
+  }
+
   /** Hit-test the last known pointer position against each media's current on-screen rect. */
   updateHover() {
     if (!this.onHover) return
@@ -517,19 +592,7 @@ class App {
     }
 
     const ratio = this.screen.width / this.viewport.width
-    const { x: mouseX, y: mouseY } = this.mouse
-    let hit: Media | null = null
-
-    for (const media of this.medias) {
-      const centerX = this.screen.width / 2 + media.plane.position.x * ratio
-      const centerY = this.screen.height / 2 - media.plane.position.y * ratio
-      const halfW = (media.plane.scale.x * ratio) / 2
-      const halfH = (media.plane.scale.y * ratio) / 2
-      if (Math.abs(mouseX - centerX) <= halfW && Math.abs(mouseY - centerY) <= halfH) {
-        hit = media
-        break
-      }
-    }
+    const hit = this.hitTest(this.mouse.x, this.mouse.y)
 
     if (!hit) {
       if (this.hoveredIndex !== null) {
@@ -549,6 +612,7 @@ class App {
       index: hit.index,
       text: hit.text,
       tags: hit.tags,
+      href: hit.href,
       rect: {
         left: centerX - halfW,
         top: centerY - halfH,
@@ -639,6 +703,7 @@ export const CircularGallery = forwardRef<CircularGalleryHandle, CircularGallery
     scrollEase = 0.05,
     cardWidth = 933.333,
     cardHeight = 1200,
+    onItemClick,
     className,
     ...props
   },
@@ -669,7 +734,15 @@ export const CircularGallery = forwardRef<CircularGalleryHandle, CircularGallery
       scrollEase,
       cardWidth,
       cardHeight,
+      onItemClick,
       onHover: (hover) => {
+        // Canvas-rendered cards give no native cursor cue that one is
+        // clickable — swap in a pointer over any card with an href,
+        // independent of the caption logic below (a card could in
+        // principle have an href but no text/tags to caption).
+        if (containerRef.current) {
+          containerRef.current.style.cursor = hover?.href ? "pointer" : ""
+        }
         const caption = captionRef.current
         if (!caption) return
         if (!hover || (!hover.text && !hover.tags?.length)) {
