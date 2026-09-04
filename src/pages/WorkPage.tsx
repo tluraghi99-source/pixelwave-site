@@ -12,11 +12,13 @@ import { EASE_WAVE } from "@/lib/motion"
 import { useProjects } from "@/hooks/useProjects"
 import type { Project } from "@/lib/strapi"
 
-/** Falls back to today's exact Picsum grid-thumbnail pattern when heroMedia
- *  is empty or is a video (a small grid card is never a sensible place to
- *  autoplay video). */
+/** cover -> heroMedia (only when heroMediaType is "image") -> Picsum
+ *  placeholder. Same chain as ProjectPage.tsx's own thumb — a small grid
+ *  card is never a sensible place to autoplay a video or a YouTube embed,
+ *  regardless of what the project's actual hero media is. */
 function gridThumbUrl(p: Project): string {
-  if (p.heroMedia && !p.heroMedia.mime.startsWith("video/")) return p.heroMedia.url
+  if (p.cover) return p.cover.url
+  if (p.heroMediaType === "image" && p.heroMedia) return p.heroMedia.url
   return `https://picsum.photos/seed/pixellwave-${p.id}/900/1200?grayscale`
 }
 
