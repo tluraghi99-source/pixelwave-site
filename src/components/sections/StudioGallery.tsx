@@ -1,12 +1,10 @@
 import { useRef } from "react"
-import type { MotionValue } from "framer-motion"
-import { motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion"
+import { useMotionValueEvent, useScroll } from "framer-motion"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
 import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Reveal } from "@/components/motion/Reveal"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { CircularGallery, type CircularGalleryHandle } from "@/components/ui/circular-gallery"
-import { wrap } from "@/lib/motion"
 
 // Temporary stand-in photography (Lorem Picsum) until real studio photos are
 // ready — same posture as Work.tsx's GALLERY_ITEMS and StudioTeam's
@@ -77,44 +75,35 @@ function StudioGalleryDesktop() {
   )
 }
 
-/** Mobile/tablet: no WebGL, no pinning — a plain horizontal track that
- *  drifts as the section scrolls through, structurally identical to
- *  WorkAmbient's WorkTrack (Work.tsx) but rendering plain <img> tiles
- *  instead of full project Cards (studio photos aren't clickable items). */
-function StudioGalleryTrack({ x }: { x: MotionValue<string> }) {
+/** Mobile/tablet: no WebGL, no pinning — a plain horizontal track, once
+ *  driven by page-scroll drift (structurally identical to WorkAmbient's
+ *  WorkTrack in Work.tsx) with no way to move it yourself. Now a native
+ *  scroll container instead (see .studio-gallery__carousel), so a swipe
+ *  moves it directly — which is also why the photo list is no longer
+ *  duplicated: that doubling existed only to hide the seam of the old
+ *  infinite scroll-linked loop, and a real scrollable list needs a real
+ *  start and end, not a repeat. */
+function StudioGalleryTrack() {
   return (
-    <motion.div className="studio-gallery__track" style={{ x }}>
-      {[...STUDIO_PHOTOS, ...STUDIO_PHOTOS].map((photo, i) => (
+    <div className="studio-gallery__track">
+      {STUDIO_PHOTOS.map((photo, i) => (
         <div className="studio-gallery__item" key={i}>
           <img src={photo.image} alt="" loading="lazy" />
         </div>
       ))}
-    </motion.div>
+    </div>
   )
 }
 
 function StudioGalleryAmbient() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  })
-  const rawX = useTransform(scrollYProgress, [0, 1], [0, -300])
-  const x = useTransform(rawX, (v) => `${wrap(-50, 0, v)}%`)
-
   return (
-    <section
-      className="studio-gallery studio-gallery--ambient"
-      data-theme="dark"
-      data-screen-label="Studio Gallery"
-      ref={sectionRef}
-    >
+    <section className="studio-gallery studio-gallery--ambient" data-theme="dark" data-screen-label="Studio Gallery">
       <CursorGlow className="cursor-glow" variant="dark" glow={false} />
       <div className="wrap">
         <StudioGalleryHeading />
       </div>
       <Reveal delay={0.2} className="studio-gallery__carousel">
-        <StudioGalleryTrack x={x} />
+        <StudioGalleryTrack />
       </Reveal>
     </section>
   )
