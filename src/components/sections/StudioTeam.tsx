@@ -1,8 +1,9 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { useTeamMembers } from "@/hooks/useTeamMembers"
 import type { TeamMember } from "@/lib/strapi"
 import { CursorGlow } from "@/components/motion/CursorGlow"
+import { Button } from "@/components/pw/Button"
 
 /** Falls back to today's exact Picsum placeholder pattern when Strapi's
  *  photo/photoHover are empty — each field checked independently, since an
@@ -73,27 +74,55 @@ function TeamCard({ member }: { member: TeamMemberWithPhotos }) {
 export function StudioTeam() {
   const members = useTeamMembers()
   const gridItems = useMemo(() => buildGrid(members), [members])
+  // Phone-only (see .team-grid__show-all-wrap, ≤480px): the grid opens on
+  // just the first two real member cards plus a third shown dimmed as a
+  // "there's more" hint, everything else held back until this flips true.
+  // Blanks are excluded from that count entirely — they're already hidden
+  // below 767px (see .team-card--blank) and never worth revealing. One-way:
+  // there's no collapse back once expanded, so the button just disappears.
+  const [expanded, setExpanded] = useState(false)
+
+  let memberIndex = -1
 
   return (
     <section className="studio-team" data-theme="dark" data-screen-label="Studio Team">
       <CursorGlow className="cursor-glow" variant="dark" glow={false} />
       <div className="wrap">
         {gridItems.length > 0 && (
-          <RevealGroup className="team-grid" stagger={0.05} amount={0.05}>
-            {gridItems.map((item) =>
-              item.kind === "member" ? (
-                <RevealItem key={item.member.id}>
-                  <TeamCard member={item.member} />
-                </RevealItem>
-              ) : (
-                <RevealItem key={item.id}>
-                  <div className="team-card team-card--blank" aria-hidden="true">
-                    <div className="team-card__media" />
-                  </div>
-                </RevealItem>
-              )
+          <>
+            <RevealGroup
+              className={`team-grid${expanded ? " team-grid--expanded" : ""}`}
+              stagger={0.05}
+              amount={0.05}
+            >
+              {gridItems.map((item) => {
+                if (item.kind === "member") {
+                  memberIndex += 1
+                  const collapseClass =
+                    memberIndex === 2 ? " team-card-wrap--peek" : memberIndex > 2 ? " team-card-wrap--collapsed" : ""
+                  return (
+                    <RevealItem key={item.member.id} className={collapseClass || undefined}>
+                      <TeamCard member={item.member} />
+                    </RevealItem>
+                  )
+                }
+                return (
+                  <RevealItem key={item.id}>
+                    <div className="team-card team-card--blank" aria-hidden="true">
+                      <div className="team-card__media" />
+                    </div>
+                  </RevealItem>
+                )
+              })}
+            </RevealGroup>
+            {!expanded && memberIndex > 1 && (
+              <div className="team-grid__show-all-wrap">
+                <Button type="button" variant="secondary" size="md" onClick={() => setExpanded(true)}>
+                  Show all
+                </Button>
+              </div>
             )}
-          </RevealGroup>
+          </>
         )}
       </div>
     </section>
