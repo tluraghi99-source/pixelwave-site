@@ -34,7 +34,6 @@ function ServiceRow({
       onClick={onClick}
     >
       <div className="svc-row__head">
-        <span className="svc-row__num">{service.num}</span>
         <span className="svc-row__name">{service.name}</span>
         <span className="svc-row__plus" aria-hidden="true" />
       </div>

@@ -1228,31 +1228,25 @@ header.nav .nav__mobile .nav__link {
   gap: 1rem;
   padding: 1.25rem 0;
 }
-/* Number and name are one visual unit — same size/weight/color, not a small
-   muted index next to a big name. */
-.svc-row__num,
 .svc-row__name {
   font-family: var(--font-display);
   font-weight: 800;
   letter-spacing: -0.02em;
   font-size: clamp(3rem, 6.5vw, 6.25rem);
   transition: color var(--dur-slow) var(--ease-wave), transform var(--dur-slow) var(--ease-wave);
+  /* min-width: 0 overrides the flex-item default (min-width: auto), which
+     otherwise refuses to shrink below the longest unbroken word's rendered
+     width — at this row's big display font size, a name like "Development"
+     was wider than the whole row on mobile and blew out the page's horizontal
+     bounds, cutting off the fixed header's mobile menu button. */
+  flex: 1; min-width: 0; overflow-wrap: break-word; hyphens: auto;
 }
-.svc-row__num { flex-shrink: 0; }
-/* min-width: 0 overrides the flex-item default (min-width: auto), which
-   otherwise refuses to shrink below the longest unbroken word's rendered
-   width — at this row's big display font size, a name like "Development"
-   was wider than the whole row on mobile and blew out the page's horizontal
-   bounds, cutting off the fixed header's mobile menu button. */
-.svc-row__name { flex: 1; min-width: 0; overflow-wrap: break-word; hyphens: auto; }
-.svc-row--open .svc-row__num,
 .svc-row--open .svc-row__name { color: var(--pw-orange); transform: translateX(10px); }
 
 /* Mobile: shrink enough that even the longest name ("Video & Editing")
    fits the row on one line instead of wrapping. */
 @media (max-width: 767px) {
   .svc-row__head { gap: 0.6rem; }
-  .svc-row__num,
   .svc-row__name { font-size: clamp(1.25rem, 6vw, 2rem); }
 }
 
