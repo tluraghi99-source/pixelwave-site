@@ -1,46 +1,15 @@
 export const SERVICES = [
   {
     num: "01",
-    name: "Web Design",
-    desc: "Interfaces that feel considered from the first click — structure, motion, and detail working together instead of fighting each other.",
+    name: "Video",
+    desc: "From concept to final grade — short-form, brand film, and everything a launch needs to move.",
     tagCols: [
-      ["UX/UI", "Design Systems"],
-      ["Prototyping", "Accessibility"],
+      ["Production", "Color Grade"],
+      ["Editing", "Sound Design"],
     ],
   },
   {
     num: "02",
-    name: "Brand Identity",
-    desc: "A visual language built to hold up across every surface it touches, from a business card to a billboard.",
-    tagCols: [
-      ["Logo", "Guidelines"],
-      ["Naming", "Art Direction"],
-    ],
-  },
-  {
-    num: "03",
-    name: "Motion",
-    desc: "Interaction and animation that explain themselves — every transition earns its place, nothing moves just to move.",
-    tagCols: [
-      ["Interaction", "Video"],
-      ["Storyboarding", "3D"],
-    ],
-  },
-  {
-    num: "04",
-    // Soft hyphen (U+00AD) gives the browser a sane break point on narrow
-    // screens — this one word is wider than the whole row at the display
-    // font size, and without it the fallback break lands mid-letter
-    // ("Developm/ent") instead of at a syllable ("Develop-ment").
-    name: "Develop­ment",
-    desc: "Fast, resilient front-ends built directly from the design system — no gap between what's designed and what ships.",
-    tagCols: [
-      ["Front-end", "Headless"],
-      ["Performance", "CMS"],
-    ],
-  },
-  {
-    num: "05",
     name: "Photo",
     desc: "Editorial and product photography shot to match the brand's own tone, not bolted on after the fact.",
     tagCols: [
@@ -49,12 +18,39 @@ export const SERVICES = [
     ],
   },
   {
-    num: "06",
-    name: "Video & Editing",
-    desc: "From concept to final grade — short-form, brand film, and everything a launch needs to move.",
+    num: "03",
+    name: "Branding",
+    desc: "A visual language built to hold up across every surface it touches, from a business card to a billboard.",
     tagCols: [
-      ["Production", "Color Grade"],
-      ["Editing", "Sound Design"],
+      ["Logo", "Guidelines"],
+      ["Naming", "Art Direction"],
+    ],
+  },
+  {
+    num: "04",
+    name: "Web Design",
+    desc: "Interfaces that feel considered from the first click — structure, motion, and detail working together instead of fighting each other.",
+    tagCols: [
+      ["UX/UI", "Design Systems"],
+      ["Prototyping", "Accessibility"],
+    ],
+  },
+  {
+    num: "05",
+    name: "Social",
+    desc: "Content built for the feed first — native to each platform's own rhythm, not a shrunk-down version of something else.",
+    tagCols: [
+      ["Content", "Campaigns"],
+      ["Community", "Paid Social"],
+    ],
+  },
+  {
+    num: "06",
+    name: "Events",
+    desc: "Branding and on-the-ground production for launches, activations, and everything in between.",
+    tagCols: [
+      ["Branding", "Signage"],
+      ["Production", "Live Coverage"],
     ],
   },
 ]
