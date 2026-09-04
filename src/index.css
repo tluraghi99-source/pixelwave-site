@@ -1542,6 +1542,13 @@ html.nav-open .cursor-dot { background: var(--pw-black); }
   font-family: var(--font-text); font-size: 1.05rem; font-weight: 500;
   color: var(--pw-orange); white-space: nowrap;
 }
+/* Services rows turn their own name orange while open/hovered
+   (.svc-row--open .svc-row__name) — the exact same --pw-orange as this
+   label's default color, so without this override "Explore" becomes
+   invisible sitting right on top of the now-orange heading it's floating
+   over. White keeps the glow (still orange) legible regardless of the
+   row's state. */
+.svc-row .cursor-hint__inner { color: var(--pw-white); }
 .cursor-hint__inner--glow { animation: cursor-hint-glow 2.6s ease-in-out infinite; }
 @keyframes cursor-hint-glow {
   0%, 100% { text-shadow: 0 0 6px rgba(255, 91, 0, 0.25); }
