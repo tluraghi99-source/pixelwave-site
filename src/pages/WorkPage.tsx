@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react"
+import { useLayoutEffect, useMemo, useRef, useState } from "react"
+import type { ReactNode } from "react"
 import { useSearchParams } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
@@ -17,6 +18,84 @@ import type { Project } from "@/lib/strapi"
 function gridThumbUrl(p: Project): string {
   if (p.heroMedia && !p.heroMedia.mime.startsWith("video/")) return p.heroMedia.url
   return `https://picsum.photos/seed/pixellwave-${p.id}/900/1200?grayscale`
+}
+
+const FADE_WIDTH = 20 // px
+
+/** The scrollable filter-pill row (.work-page__filters, shared by both
+ *  Category and Client mode). The edge fade only used to be a static
+ *  mask-image baked into the CSS class, always on — which faded the first
+ *  and last pill even when the whole list fit with nothing hidden past
+ *  either edge, needlessly clipping legible text. This measures actual
+ *  scroll position/overflow instead, so each edge fades only while there's
+ *  real content hidden behind it, and clears once you've scrolled all the
+ *  way to that edge. */
+function FilterRow({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [fade, setFade] = useState({ left: false, right: false })
+
+  const measure = () => {
+    const el = ref.current
+    if (!el) return
+    const left = el.scrollLeft > 1
+    const right = el.scrollLeft < el.scrollWidth - el.clientWidth - 1
+    // Bail out when nothing actually changed — this runs on every render
+    // (see the dependency-free useLayoutEffect below), and setting a new
+    // object unconditionally would re-render every time, which re-runs this
+    // effect, which sets state again: an infinite render loop.
+    setFade((prev) => (prev.left === left && prev.right === right ? prev : { left, right }))
+  }
+
+  // No dependency array — re-measures after every render, which covers a
+  // mode switch or filter-list change (both change this row's content and
+  // therefore its scrollWidth) without needing to track those inputs here.
+  useLayoutEffect(measure)
+
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    // A trackpad's horizontal swipe (real deltaX) already scrolls this
+    // natively via overflow-x — nothing to do there. A plain mouse's wheel
+    // only ever sends deltaY though, which a horizontal-only overflow
+    // container ignores by default, reading as "not scrollable" to anyone
+    // without a trackpad. Redirecting a vertically-dominant wheel gesture
+    // into scrollLeft (only while this row actually overflows, so a mouse
+    // over a fully-visible list still scrolls the page normally) covers it.
+    const onWheel = (e: WheelEvent) => {
+      if (el.scrollWidth <= el.clientWidth) return
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return
+      el.scrollLeft += e.deltaY
+      e.preventDefault()
+    }
+    el.addEventListener("scroll", measure, { passive: true })
+    el.addEventListener("wheel", onWheel, { passive: false })
+    window.addEventListener("resize", measure)
+    return () => {
+      el.removeEventListener("scroll", measure)
+      el.removeEventListener("wheel", onWheel)
+      window.removeEventListener("resize", measure)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const maskImage =
+    fade.left && fade.right
+      ? `linear-gradient(to right, transparent, black ${FADE_WIDTH}px, black calc(100% - ${FADE_WIDTH}px), transparent)`
+      : fade.left
+        ? `linear-gradient(to right, transparent, black ${FADE_WIDTH}px)`
+        : fade.right
+          ? `linear-gradient(to left, transparent, black ${FADE_WIDTH}px)`
+          : "none"
+
+  return (
+    <div
+      ref={ref}
+      className="work-page__filters"
+      style={{ maskImage, WebkitMaskImage: maskImage }}
+    >
+      {children}
+    </div>
+  )
 }
 
 export function WorkPage() {
@@ -128,7 +207,7 @@ export function WorkPage() {
                 </div>
 
                 {mode === "category" ? (
-                  <div className="work-page__filters">
+                  <FilterRow>
                     {FILTER_TAGS.map((tag) => (
                       <button
                         key={tag}
@@ -140,9 +219,9 @@ export function WorkPage() {
                         {tag}
                       </button>
                     ))}
-                  </div>
+                  </FilterRow>
                 ) : (
-                  <div className="work-page__filters">
+                  <FilterRow>
                     {FILTER_CLIENTS.map((client) => (
                       <button
                         key={client}
@@ -154,7 +233,7 @@ export function WorkPage() {
                         {client}
                       </button>
                     ))}
-                  </div>
+                  </FilterRow>
                 )}
               </Reveal>
             </div>
