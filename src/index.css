@@ -1081,11 +1081,12 @@ header.nav .nav__mobile .nav__link {
    connecting gap, so 2 groups placed flush against each other reproduce the
    same uniform spacing at the seam, and -50% lands exactly on one period. */
 .project-gallery__group { display: flex; flex-shrink: 0; }
-/* Slows to a crawl on hover rather than fully stopping — animation-duration
-   can change on a running CSS animation without a position jump (the browser
-   carries over the current keyframe progress as a fraction, not an absolute
-   time), so this reads as easing down, not freezing. */
-.project-gallery__track:hover { animation-duration: 100s; }
+/* Hover slowdown is handled in JS (ProjectPage.tsx's GalleryRow, via the Web
+   Animations API's playbackRate) — an animation-duration swap here looked
+   right but actually snapped visibly, since a CSS animation's phase is
+   elapsed-time / duration and elapsed time doesn't reset when duration
+   changes mid-flight. playbackRate scales time forward from the moment
+   it's set instead, so it carries the current visual position over exactly. */
 .project-gallery__item {
   height: clamp(320px, 32vw, 520px); width: auto;
   flex-shrink: 0; border-radius: 2px; overflow: hidden; margin-right: 0.875rem;

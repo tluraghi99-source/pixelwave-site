@@ -160,7 +160,26 @@ function ProjectVideo({ media }: { media: MediaItem }) {
   return isDesktop ? <ProjectVideoPinned media={media} /> : <ProjectVideoAmbient media={media} />
 }
 
+// Hover used to be a plain CSS animation-duration swap on :hover, which
+// looks like it should ease into a slower speed but doesn't: a CSS
+// animation's phase is elapsed-time / duration, and elapsed time keeps
+// counting from when the animation started, not from the moment duration
+// changes — so swapping to a longer duration recomputes the phase against
+// the *same* elapsed time and visibly snaps to a different point in the
+// loop. The Web Animations API's playbackRate doesn't have this problem:
+// it scales time going forward from *now*, so the current visual position
+// carries over exactly and it reads as easing down, not snapping.
+const GALLERY_HOVER_RATE = 0.15
+
 function GalleryRow({ items, reverse }: { items: MediaItem[]; reverse: boolean }) {
+  const trackRef = useRef<HTMLDivElement>(null)
+
+  function setHovered(hovered: boolean) {
+    for (const anim of trackRef.current?.getAnimations() ?? []) {
+      anim.playbackRate = hovered ? GALLERY_HOVER_RATE : 1
+    }
+  }
+
   // Duplicated once so the CSS animation can translate exactly -50% and loop
   // seamlessly — same technique as Marquee.tsx. Each half is wrapped in its
   // own flex group; the per-item gap lives in each item's own trailing
@@ -180,7 +199,12 @@ function GalleryRow({ items, reverse }: { items: MediaItem[]; reverse: boolean }
 
   return (
     <div className="project-gallery__row">
-      <div className={`project-gallery__track${reverse ? " project-gallery__track--ltr" : ""}`}>
+      <div
+        ref={trackRef}
+        className={`project-gallery__track${reverse ? " project-gallery__track--ltr" : ""}`}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
         <div className="project-gallery__group">{renderItems("a")}</div>
         <div className="project-gallery__group" aria-hidden="true">{renderItems("b")}</div>
       </div>
