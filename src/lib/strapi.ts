@@ -23,6 +23,19 @@ export interface Project {
   year: number
   tags: ProjectTag[]
   heroMedia: StrapiMedia | null
+  /** Dedicated thumbnail image — separate from heroMedia, always a plain
+   *  still image. Used for grid/preview cards; see ProjectPage.tsx and
+   *  WorkPage.tsx's shared cover -> heroMedia (if image) -> placeholder
+   *  fallback chain. */
+  cover: StrapiMedia | null
+  /** Single source of truth for how heroMedia/heroYoutubeUrl should be
+   *  interpreted — not re-derived from heroMedia's mime type, since a
+   *  "youtube" project has no heroMedia upload at all. */
+  heroMediaType: "image" | "video" | "youtube"
+  /** Only meaningful when heroMediaType === "youtube". A plain pasted
+   *  YouTube URL (watch/share/embed — any normal format), parsed into a
+   *  video id on the frontend (see ProjectPage.tsx's parseYoutubeId). */
+  heroYoutubeUrl: string | null
   galleryImages: StrapiMedia[]
 }
 
@@ -51,6 +64,9 @@ interface StrapiProjectRaw {
   order: number
   tags: StrapiTagRaw[]
   heroMedia: StrapiMediaRaw | null
+  cover: StrapiMediaRaw | null
+  heroMediaType: "image" | "video" | "youtube"
+  heroMediaYoutubeUrl: string | null
   galleryImages: StrapiMediaRaw[]
 }
 
@@ -68,6 +84,12 @@ function mapProject(raw: StrapiProjectRaw): Project {
     heroMedia: raw.heroMedia
       ? { url: strapiMediaUrl(raw.heroMedia.url), mime: raw.heroMedia.mime }
       : null,
+    cover: raw.cover ? { url: strapiMediaUrl(raw.cover.url), mime: raw.cover.mime } : null,
+    // Defensive default — should never actually be needed post-backfill
+    // (Task 1), since the schema itself also defaults new entries to
+    // "image".
+    heroMediaType: raw.heroMediaType ?? "image",
+    heroYoutubeUrl: raw.heroMediaYoutubeUrl,
     galleryImages: raw.galleryImages.map((m) => ({ url: strapiMediaUrl(m.url), mime: m.mime })),
   }
 }
@@ -78,7 +100,7 @@ function mapProject(raw: StrapiProjectRaw): Project {
 export async function fetchProjects(): Promise<Project[]> {
   try {
     const res = await fetch(
-      `${STRAPI_URL}/api/projects?populate=tags,heroMedia,galleryImages&sort=order:asc,documentId:asc&pagination[pageSize]=100`
+      `${STRAPI_URL}/api/projects?populate=tags,heroMedia,cover,galleryImages&sort=order:asc,documentId:asc&pagination[pageSize]=100`
     )
     if (!res.ok) return []
     const json = await res.json()
