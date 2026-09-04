@@ -6,7 +6,7 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { Footer } from "@/components/sections/Footer"
 import { useProjects } from "@/hooks/useProjects"
-import type { Project } from "@/lib/strapi"
+import { projectThumbUrl, type Project } from "@/lib/strapi"
 
 type MediaItem = { type: "image"; src: string } | { type: "video"; src: string } | { type: "youtube"; videoId: string }
 
@@ -65,11 +65,7 @@ function withMedia(p: Project): ProjectWithMedia {
   // cover -> heroMedia (only when it's an image) -> Picsum placeholder.
   // Never a video or YouTube embed here, regardless of heroMediaType — a
   // small teaser/grid card is never a sensible place to autoplay either.
-  const thumb =
-    p.cover?.url ??
-    (p.heroMediaType === "image" && p.heroMedia
-      ? p.heroMedia.url
-      : `https://picsum.photos/seed/pixellwave-${p.id}-hero/400/300?grayscale`)
+  const thumb = projectThumbUrl(p, `https://picsum.photos/seed/pixellwave-${p.id}-hero/400/300?grayscale`)
 
   return { ...p, hero, gallery, thumb }
 }
@@ -101,9 +97,8 @@ function ProjectMedia({ media }: { media: MediaItem }) {
       <iframe
         className="project-video-media"
         src={`https://www.youtube.com/embed/${media.videoId}?autoplay=1&mute=1&loop=1&playlist=${media.videoId}&controls=0&playsinline=1`}
-        title=""
+        title="Project video"
         allow="autoplay"
-        frameBorder={0}
       />
     )
   }

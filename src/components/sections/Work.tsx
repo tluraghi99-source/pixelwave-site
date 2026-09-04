@@ -8,13 +8,14 @@ import { Tag } from "@/components/pw/Tag"
 import { Reveal } from "@/components/motion/Reveal"
 import { wrap } from "@/lib/motion"
 import { CircularGallery, type CircularGalleryHandle } from "@/components/ui/circular-gallery"
-import type { Project } from "@/lib/strapi"
+import { projectThumbUrl, type Project } from "@/lib/strapi"
 
-/** Falls back to today's exact Picsum pattern when heroMedia is empty or is
- *  a video (this gallery only ever shows static images). */
+/** Shared chain (see strapi.ts's projectThumbUrl) — this gallery only ever
+ *  shows static images, so a video/youtube heroMediaType (or no cover and
+ *  no image heroMedia) falls through to the placeholder, same as every
+ *  other project-thumbnail call site. */
 function galleryImageUrl(p: Project): string {
-  if (p.heroMedia && !p.heroMedia.mime.startsWith("video/")) return p.heroMedia.url
-  return `https://picsum.photos/seed/pixellwave-${p.id}/1200/900?grayscale`
+  return projectThumbUrl(p, `https://picsum.photos/seed/pixellwave-${p.id}/1200/900?grayscale`)
 }
 
 function WorkMedia({ index }: { index: string }) {

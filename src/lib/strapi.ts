@@ -39,6 +39,18 @@ export interface Project {
   galleryImages: StrapiMedia[]
 }
 
+/** cover -> heroMedia (only when heroMediaType is "image") -> the caller's
+ *  own placeholder. Every project-thumbnail call site (ProjectPage.tsx's
+ *  thumb, WorkPage.tsx's grid card, Work.tsx's homepage carousel) shares
+ *  this exact chain — pulled into one place after the three drifted out
+ *  of sync with each other once (Work.tsx was missed when this fallback
+ *  chain was first introduced elsewhere). */
+export function projectThumbUrl(p: Project, placeholder: string): string {
+  if (p.cover) return p.cover.url
+  if (p.heroMediaType === "image" && p.heroMedia) return p.heroMedia.url
+  return placeholder
+}
+
 /** Strapi returns relative URLs for locally-uploaded media (e.g.
  *  "/uploads/foo.jpg") — an already-absolute URL passes through unchanged. */
 export function strapiMediaUrl(url: string): string {
@@ -65,7 +77,7 @@ interface StrapiProjectRaw {
   tags: StrapiTagRaw[]
   heroMedia: StrapiMediaRaw | null
   cover: StrapiMediaRaw | null
-  heroMediaType: "image" | "video" | "youtube"
+  heroMediaType: "image" | "video" | "youtube" | null
   heroMediaYoutubeUrl: string | null
   galleryImages: StrapiMediaRaw[]
 }
@@ -85,10 +97,12 @@ function mapProject(raw: StrapiProjectRaw): Project {
       ? { url: strapiMediaUrl(raw.heroMedia.url), mime: raw.heroMedia.mime }
       : null,
     cover: raw.cover ? { url: strapiMediaUrl(raw.cover.url), mime: raw.cover.mime } : null,
-    // Defensive default — should never actually be needed post-backfill
-    // (Task 1), since the schema itself also defaults new entries to
-    // "image".
-    heroMediaType: raw.heroMediaType ?? "image",
+    // Defensive default for an unbackfilled environment (a fresh prod DB,
+    // a restored dump, any project created outside this codebase's own
+    // backfill) — reproduces Task 1's backfill rule exactly, so a project
+    // with a null heroMediaType and a video heroMedia still renders as a
+    // video instead of silently becoming a broken <img src="…mp4">.
+    heroMediaType: raw.heroMediaType ?? (raw.heroMedia?.mime.startsWith("video/") ? "video" : "image"),
     heroYoutubeUrl: raw.heroMediaYoutubeUrl,
     galleryImages: raw.galleryImages.map((m) => ({ url: strapiMediaUrl(m.url), mime: m.mime })),
   }

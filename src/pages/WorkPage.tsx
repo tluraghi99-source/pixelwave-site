@@ -10,16 +10,13 @@ import { Footer } from "@/components/sections/Footer"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { EASE_WAVE } from "@/lib/motion"
 import { useProjects } from "@/hooks/useProjects"
-import type { Project } from "@/lib/strapi"
+import { projectThumbUrl, type Project } from "@/lib/strapi"
 
-/** cover -> heroMedia (only when heroMediaType is "image") -> Picsum
- *  placeholder. Same chain as ProjectPage.tsx's own thumb — a small grid
- *  card is never a sensible place to autoplay a video or a YouTube embed,
+/** Shared chain (see strapi.ts's projectThumbUrl) — a small grid card is
+ *  never a sensible place to autoplay a video or a YouTube embed,
  *  regardless of what the project's actual hero media is. */
 function gridThumbUrl(p: Project): string {
-  if (p.cover) return p.cover.url
-  if (p.heroMediaType === "image" && p.heroMedia) return p.heroMedia.url
-  return `https://picsum.photos/seed/pixellwave-${p.id}/900/1200?grayscale`
+  return projectThumbUrl(p, `https://picsum.photos/seed/pixellwave-${p.id}/900/1200?grayscale`)
 }
 
 const FADE_WIDTH = 20 // px
