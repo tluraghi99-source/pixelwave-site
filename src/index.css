@@ -555,7 +555,13 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 }
 @media (max-width: 767px) { .nav__mobile { display: flex; } }
 .nav__mobile-links { display: flex; flex-direction: column; gap: clamp(0.75rem, 3vw, 1.25rem); }
-.nav__mobile .nav__link {
+/* header.nav prefix (not just .nav__mobile) bumps specificity above
+   header.nav[data-theme="light"] .nav__link's shadow rule above — that
+   selector was otherwise winning the cascade and leaking its white
+   text-shadow into the mobile takeover regardless of this rule's own
+   text-shadow: none, whenever the header happened to be in its light state
+   when the menu opened. */
+header.nav .nav__mobile .nav__link {
   font-family: var(--font-display); font-weight: 700;
   font-size: clamp(2.75rem, 13vw, 4.25rem); letter-spacing: -0.02em;
   color: var(--pw-black); text-shadow: none;
@@ -764,6 +770,26 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 @media (max-width: 768px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px) { .team-grid { grid-template-columns: 1fr; } }
 
+/* Blank filler cards (below) only exist to complete the desktop grid's
+   4-wide rows — on a 1-2 column mobile layout they no longer sit alongside
+   real cards, so they'd show up as standalone black rectangles between
+   people instead of a rhythm-break. Hidden below the same breakpoint the
+   nav's own mobile takeover uses. */
+@media (max-width: 767px) { .team-card--blank { display: none; } }
+
+/* Phone-only progressive disclosure (see StudioTeam.tsx's `expanded` state):
+   the 3rd real card previews dimmed, the 4th-and-on stay off until "Show
+   all" is tapped. The :not() qualifier is what makes .team-grid--expanded
+   fully undo both rules with no separate override needed. */
+@media (max-width: 480px) {
+  .team-grid:not(.team-grid--expanded) .team-card-wrap--peek { opacity: 0.35; pointer-events: none; }
+  .team-grid:not(.team-grid--expanded) .team-card-wrap--collapsed { display: none; }
+}
+.team-grid__show-all-wrap { display: none; }
+@media (max-width: 480px) {
+  .team-grid__show-all-wrap { display: flex; justify-content: center; margin-top: clamp(1.5rem, 5vw, 2rem); }
+}
+
 /* Every card sits on the same flat orange block (--card-color) with the
    photo tinted toward it (mix-blend-mode: color keeps the photo's own
    luminance/detail, just recolors its hue), rather than a plain grayscale
@@ -838,7 +864,11 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
    The hero block below supplies that space itself (flush to the very top,
    under the transparent header — same as the homepage hero) rather than
    this being blank padding. */
-.work-page { position: relative; isolation: isolate; padding-top: 0; }
+/* --work-grid-gap is shared with .work-page__filter-block's max-width below
+   — both need the exact same gap value to keep the filter row's footprint
+   matching a card's actual width; a plain variable keeps them from quietly
+   drifting apart if either changes later. */
+.work-page { position: relative; isolation: isolate; padding-top: 0; --work-grid-gap: clamp(1rem, 1.2vw, 1.25rem); }
 /* Same visual language as the homepage's Hero (interactive pixel-trail),
    just static — there's no header logo to dock into on this page, so no
    scroll-driven shrink/handoff, and it sits in normal flow, not pinned. */
@@ -872,25 +902,58 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 @media (min-width: 768px) {
   .work-page__head .lead { font-size: clamp(4rem, 3.2vw, 9rem); }
 }
-/* justify-content: flex-end so wrapped rows hug the right edge — without it,
-   a long pill list (e.g. the Client mode filter) can outgrow the available
-   width, forcing the block to stretch full-width, and flex-start would then
-   flush every row to the left like the mobile layout even on desktop. */
-.work-page__filters { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: clamp(1.25rem, 2vw, 2.5rem); }
+/* A single non-wrapping row instead of wrapping to multiple lines — Client
+   mode's list can run long (one pill per client), and even Category mode's
+   list wrapped to two lines and pushed the page title down once there were
+   enough tags to fill a normal desktop width, not just on mobile. Scrolls
+   natively (touch, trackpad, shift+wheel). The edge fade itself is set
+   inline by FilterRow (WorkPage.tsx) rather than baked in here — it measures
+   real scroll position/overflow so each edge only fades while there's
+   content actually hidden behind it, instead of a static mask permanently
+   clipping the first/last pill even when the whole list already fits.
+   justify-content: flex-start, not flex-end — once this overflows, flex-end
+   pushes the overflow onto the *start* side, and start-side overflow from
+   flex-end isn't reachable by scrolling at all (confirmed live: it left the
+   first several pills sitting off-screen at a negative x-position with no
+   scrollbar able to reach them). flex-start always overflows to the end
+   instead, which native scrolling can always reach. */
+.work-page__filters {
+  display: flex; flex-wrap: nowrap; justify-content: flex-start; gap: clamp(1.25rem, 2vw, 2.5rem);
+  max-width: 100%;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.work-page__filters::-webkit-scrollbar { display: none; }
 .work-page__filter {
+  flex: 0 0 auto; white-space: nowrap;
   font-size: 14px; font-weight: 500; color: var(--text-secondary); cursor: pointer;
   transition: color .2s var(--ease-wave);
 }
 .work-page__filter:hover { color: var(--text-primary); }
 .work-page__filter.is-active { color: var(--accent-primary); }
-.work-page__filter-block { display: flex; flex-direction: column; align-items: flex-end; gap: 0.6rem; }
+/* min-width: 0 overrides the flex item's default content-based auto
+   minimum — without it, .work-page__head can't shrink this block below the
+   filter row's full unwrapped width, so the whole PAGE overflows
+   horizontally instead of the row scrolling internally within its own
+   bounds (only .work-page__filters, a grandchild, has overflow-x: auto —
+   that alone doesn't shrink *this* flex item). */
+.work-page__filter-block { display: flex; flex-direction: column; align-items: flex-end; gap: 0.6rem; min-width: 0; }
+/* Desktop/tablet only (.work-grid is still 2 columns above 640px, see its
+   own max-width query): caps the filter row at one card's actual footprint
+   — the same (100% - gap) / 2 math as .work-grid's own columns — instead of
+   letting it stretch across as much of the head's leftover width as its
+   (possibly long) content needs. Below 640px .work-grid is already a single
+   column the full wrap width, so no cap is needed there — today's existing
+   full-width behavior already matches that card's footprint. */
+@media (min-width: 641px) {
+  .work-page__filter-block { max-width: calc((100% - var(--work-grid-gap)) / 2); }
+}
 /* Mobile: the head wraps to a single column (title, then this block, then
    the pill row), so right-aligning just the toggle read as a stray
    zig-zag against the title and pills on either side of it, both flush
    left. Left-align it too so the whole stack shares one edge. */
 @media (max-width: 767px) {
   .work-page__filter-block { align-items: flex-start; }
-  .work-page__filters { justify-content: flex-start; }
 }
 .work-page__mode-toggle { display: flex; gap: 1.25rem; }
 .work-page__mode-tab {
@@ -912,7 +975,7 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
   display: grid; grid-template-columns: repeat(2, 1fr);
   /* Matches .wrap's own left/right padding, so the gap between cards reads
      the same as the page's outer margin. */
-  gap: clamp(1rem, 1.2vw, 1.25rem); margin-top: clamp(2.5rem, 3vw, 4rem);
+  gap: var(--work-grid-gap); margin-top: clamp(2.5rem, 3vw, 4rem);
 }
 @media (max-width: 640px) { .work-grid { grid-template-columns: 1fr; } }
 /* Landscape crop instead of the shared .pw-card's tall 3/4 default, and the
@@ -1117,12 +1180,22 @@ header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 .studio-gallery__wrap { height: clamp(360px, 42vw, 640px); width: 100%; margin-top: 2rem; position: relative; }
 .studio-gallery__canvas { display: block; }
 
-/* Mobile/tablet ambient track — same structure as .work__carousel/.work__track/
-   .work__card-wrap (Work.tsx's WorkAmbient), just plain image tiles instead
-   of full project Cards, since studio photos aren't clickable items. */
-.studio-gallery__carousel { overflow: hidden; width: 100%; margin-top: 3rem; cursor: grab; }
-.studio-gallery__track { display: flex; gap: clamp(1.5rem, 0.94vw, 3rem); width: max-content; will-change: transform; padding-inline: clamp(1.25rem, 2.5vw, 4rem); }
-.studio-gallery__item { flex: 0 0 clamp(280px, 9.4vw, 520px); aspect-ratio: 4 / 3; overflow: hidden; }
+/* Mobile/tablet — plain image tiles instead of full project Cards, since
+   studio photos aren't clickable items. A native horizontal scroller (was
+   an auto-drifting track tied to page scroll — same structure as
+   .work__carousel/.work__track in Work.tsx's WorkAmbient — with no way to
+   move it yourself; swapped for real touch/trackpad scrolling here so you
+   can browse it on your own). Scrollbar hidden the same way html/body hide
+   theirs site-wide, since this is a one-off scroll container, not the page. */
+.studio-gallery__carousel {
+  overflow-x: auto; overflow-y: hidden; width: 100%; margin-top: 3rem;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.studio-gallery__carousel::-webkit-scrollbar { display: none; }
+.studio-gallery__track { display: flex; gap: clamp(1.5rem, 0.94vw, 3rem); width: max-content; padding-inline: clamp(1.25rem, 2.5vw, 4rem); }
+.studio-gallery__item { flex: 0 0 clamp(280px, 9.4vw, 520px); aspect-ratio: 4 / 3; overflow: hidden; scroll-snap-align: start; }
 .studio-gallery__item img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* Services accordion — plain in-flow list, no scroll-pin. Rows expand on
