@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
 import { ArrowUpRight } from "lucide-react"
@@ -82,9 +82,26 @@ function ProjectMeta({ year }: { year?: number }) {
   )
 }
 
-function ProjectMedia({ media }: { media: MediaItem }) {
+/** `muted` defaults to true so every call site that never passes it (the
+ *  gallery rows below, the mobile/tablet ambient hero) keeps today's
+ *  silent-autoplay behavior unchanged — only ProjectVideoPinned's own hero
+ *  wires up the unmute button and actually flips this. */
+function ProjectMedia({ media, muted = true }: { media: MediaItem; muted?: boolean }) {
+  // YouTube has no `muted` prop of its own — enablejsapi=1 (added below)
+  // lets the already-embedded player accept postMessage commands without
+  // loading the separate iframe_api script, so toggling `muted` re-sends
+  // the matching mute/unMute command whenever it changes.
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+  useEffect(() => {
+    if (media.type !== "youtube") return
+    iframeRef.current?.contentWindow?.postMessage(
+      JSON.stringify({ event: "command", func: muted ? "mute" : "unMute", args: [] }),
+      "*"
+    )
+  }, [media.type, muted])
+
   if (media.type === "video") {
-    return <video className="project-video-media" src={media.src} autoPlay loop muted playsInline />
+    return <video className="project-video-media" src={media.src} autoPlay loop muted={muted} playsInline />
   }
   if (media.type === "youtube") {
     // playlist={videoId} is the documented trick that makes a *single*
@@ -95,8 +112,9 @@ function ProjectMedia({ media }: { media: MediaItem }) {
     // element (accepted trade-off — see the design spec).
     return (
       <iframe
+        ref={iframeRef}
         className="project-video-media"
-        src={`https://www.youtube.com/embed/${media.videoId}?autoplay=1&mute=1&loop=1&playlist=${media.videoId}&controls=0&playsinline=1`}
+        src={`https://www.youtube.com/embed/${media.videoId}?autoplay=1&mute=1&loop=1&playlist=${media.videoId}&controls=0&playsinline=1&enablejsapi=1`}
         title="Project video"
         allow="autoplay"
       />
@@ -118,6 +136,10 @@ const VIDEO_PIN_HEIGHT_VH = VIDEO_HOLD_VH + 100
 
 function ProjectVideoPinned({ media }: { media: MediaItem }) {
   const pinRef = useRef<HTMLElement>(null)
+  // Starts muted, same as before this existed — the button only ever makes
+  // an already-autoplaying video louder, never changes whether it plays.
+  const [muted, setMuted] = useState(true)
+  const hasSound = media.type === "video" || media.type === "youtube"
 
   function handleSkip() {
     const el = pinRef.current
@@ -134,7 +156,17 @@ function ProjectVideoPinned({ media }: { media: MediaItem }) {
       style={{ height: `${VIDEO_PIN_HEIGHT_VH}vh` }}
     >
       <div className="project-video-pin__inner">
-        <ProjectMedia media={media} />
+        <ProjectMedia media={media} muted={muted} />
+        {hasSound && (
+          <button
+            type="button"
+            className="project-video-pin__mute"
+            aria-pressed={!muted}
+            onClick={() => setMuted((m) => !m)}
+          >
+            {muted ? "Unmute" : "Mute"}
+          </button>
+        )}
         <button type="button" className="project-video-pin__skip" onClick={handleSkip}>
           Skip
         </button>
