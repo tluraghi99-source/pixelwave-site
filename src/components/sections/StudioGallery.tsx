@@ -68,6 +68,10 @@ function StudioGalleryDesktop() {
           // 30% bigger (x1.3) than that inverted 1200x933.333 base.
           cardWidth={1560}
           cardHeight={1213.333}
+          // Purely decorative — no href on any item (see Work.tsx's
+          // WorkGallery for the linked usage) — so dimming a card on hover
+          // would just be noise with nothing to click through to.
+          dimOnHover={false}
           className="studio-gallery__canvas"
         />
       </div>

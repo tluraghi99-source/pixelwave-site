@@ -55,6 +55,9 @@ interface CircularGalleryProps extends React.HTMLAttributes<HTMLDivElement> {
    *  only for cards that have one (see GalleryItem.href). Absent entirely
    *  -> every card stays purely decorative, same as before this existed. */
   onItemClick?: (href: string) => void
+  /** Dims the hovered card (see HOVER_OPACITY) — off for purely decorative
+   *  galleries with nothing to click through to. @default true */
+  dimOnHover?: boolean
 }
 
 interface HoverInfo {
@@ -384,6 +387,7 @@ class App {
   onCheckDebounce: () => void
   onHover?: (hover: HoverInfo | null) => void
   onItemClick?: (href: string) => void
+  dimOnHover: boolean
   renderer!: Renderer
   gl!: OGLRenderingContext
   camera!: Camera
@@ -424,6 +428,7 @@ class App {
       cardHeight,
       onHover,
       onItemClick,
+      dimOnHover,
     }: {
       items?: GalleryItem[]
       bend: number
@@ -434,6 +439,7 @@ class App {
       cardHeight: number
       onHover?: (hover: HoverInfo | null) => void
       onItemClick?: (href: string) => void
+      dimOnHover: boolean
     }
   ) {
     this.container = container
@@ -442,6 +448,7 @@ class App {
     this.onCheckDebounce = debounce(this.onCheck.bind(this), 200)
     this.onHover = onHover
     this.onItemClick = onItemClick
+    this.dimOnHover = dimOnHover
 
     autoBind(this)
 
@@ -595,8 +602,9 @@ class App {
 
   /** Dims the hovered card's own texture (targetOpacity, eased in Media.update)
    *  instead of drawing anything on top of it — every other card stays full
-   *  opacity. */
+   *  opacity. No-op when dimOnHover is off (purely decorative galleries). */
   setHoverOpacity(index: number | null) {
+    if (!this.dimOnHover) return
     this.medias?.forEach((m) => {
       m.targetOpacity = m.index === index ? HOVER_OPACITY : 1
     })
@@ -731,6 +739,7 @@ export const CircularGallery = forwardRef<CircularGalleryHandle, CircularGallery
     cardWidth = 933.333,
     cardHeight = 1200,
     onItemClick,
+    dimOnHover = true,
     className,
     ...props
   },
@@ -762,6 +771,7 @@ export const CircularGallery = forwardRef<CircularGalleryHandle, CircularGallery
       cardWidth,
       cardHeight,
       onItemClick,
+      dimOnHover,
       onHover: (hover) => {
         // Canvas-rendered cards give no native cursor cue that one is
         // clickable — swap in a pointer over any card with an href,
