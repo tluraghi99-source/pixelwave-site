@@ -153,7 +153,7 @@ export function WorkGallery({
     <CircularGallery
       ref={galleryRef}
       items={galleryItems}
-      bend={2}
+      bend={1}
       borderRadius={0}
       className="work__gallery"
       onItemClick={(href) => navigate(href)}
