@@ -22,25 +22,37 @@ type GridItem =
   | { kind: "member"; member: TeamMemberWithPhotos }
   | { kind: "blank"; id: string }
 
-/** Fisher–Yates — a fixed-but-random layout. Padded to a multiple of 4 (the
- *  desktop column count) with plain blank cards so the grid never ends on a
- *  half-empty row, then those blanks are shuffled in among the real cards —
- *  not just tacked on the end — so they read as a deliberate rhythm-break.
- *  Called from a useMemo below keyed on the fetched member list, so it only
- *  reshuffles once (when the fetch resolves), not on every render. */
-function buildGrid(members: TeamMember[]): GridItem[] {
-  const withPhotoMembers = members.map(withPhotos)
-  const blankCount = (4 - (withPhotoMembers.length % 4)) % 4
-  const items: GridItem[] = withPhotoMembers.map((m) => ({
-    kind: "member",
-    member: m,
-  }))
-  for (let i = 0; i < blankCount; i++) items.push({ kind: "blank", id: `blank-${i}` })
-  for (let i = items.length - 1; i > 0; i--) {
+/** Fisher–Yates shuffle of a copy — never mutates the input. */
+function shuffle<T>(arr: T[]): T[] {
+  const copy = [...arr]
+  for (let i = copy.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
-    ;[items[i], items[j]] = [items[j], items[i]]
+    ;[copy[i], copy[j]] = [copy[j], copy[i]]
   }
-  return items
+  return copy
+}
+
+/** How many columns the grid's widest layout ever shows (see .team-grid) —
+ *  reserving this many real members up front guarantees the first row is
+ *  always full of people, never a blank "empty beat" card. */
+const FIRST_ROW_SIZE = 4
+
+/** A fixed-but-random layout. Members are shuffled first, then padded to a
+ *  multiple of 4 (the desktop column count) with plain blank cards so the
+ *  grid never ends on a half-empty row. Only the remainder past the first
+ *  row gets blanks shuffled in among it — not tacked on the end, but not
+ *  eligible for the front either — so they read as a deliberate
+ *  rhythm-break rather than a broken first impression. Called from a
+ *  useMemo below keyed on the fetched member list, so it only reshuffles
+ *  once (when the fetch resolves), not on every render. */
+function buildGrid(members: TeamMember[]): GridItem[] {
+  const memberItems: GridItem[] = shuffle(members.map(withPhotos)).map((member) => ({ kind: "member", member }))
+  const blankCount = (4 - (memberItems.length % 4)) % 4
+  const blanks: GridItem[] = Array.from({ length: blankCount }, (_, i) => ({ kind: "blank", id: `blank-${i}` }))
+
+  const firstRow = memberItems.slice(0, FIRST_ROW_SIZE)
+  const rest = shuffle([...memberItems.slice(FIRST_ROW_SIZE), ...blanks])
+  return [...firstRow, ...rest]
 }
 
 function TeamCard({ member }: { member: TeamMemberWithPhotos }) {
