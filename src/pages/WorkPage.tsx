@@ -10,6 +10,7 @@ import { Footer } from "@/components/sections/Footer"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { EASE_WAVE } from "@/lib/motion"
 import { useProjects } from "@/hooks/useProjects"
+import { useWorkCategories } from "@/hooks/useWorkCategories"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
 
 /** Shared chain (see strapi.ts's projectThumbUrl) — a small grid card is
@@ -99,21 +100,18 @@ function FilterRow({ children }: { children: ReactNode }) {
 
 export function WorkPage() {
   const projects = useProjects()
+  const workCategories = useWorkCategories()
 
-  // "Featured" is a highlight badge, not a category, so it's excluded from
-  // the filter row. Can't be computed until the fetch resolves, so this
-  // moves from a module-level constant to a memo derived from `projects`.
-  const FILTER_TAGS = useMemo(
-    () =>
-      Array.from(new Set(projects.flatMap((p) => p.tags.map((t) => t.label)))).filter(
-        (label) => label !== "Featured"
-      ),
-    [projects]
-  )
+  // The fixed Video/Photo/Branding/Web Design/Social/Events taxonomy (see
+  // useWorkCategories), in its own editorial order — every category always
+  // shows here, independent of whether any project currently has it
+  // assigned yet. Separate from each project's own display `tags`, which
+  // never drove this filter's button list.
+  const FILTER_CATEGORIES = useMemo(() => workCategories.map((c) => c.name), [workCategories])
 
-  // Alphabetical (unlike FILTER_TAGS' insertion order) — categories are a
-  // small curated set where order doesn't matter; clients are the dimension
-  // expected to grow, so alphabetical keeps a long list scannable.
+  // Alphabetical (unlike FILTER_CATEGORIES' editorial order) — categories are
+  // a small curated set where order doesn't matter; clients are the
+  // dimension expected to grow, so alphabetical keeps a long list scannable.
   const FILTER_CLIENTS = useMemo(
     () => Array.from(new Set(projects.map((p) => p.client))).sort(),
     [projects]
@@ -126,14 +124,14 @@ export function WorkPage() {
   const [mode, setMode] = useState<"category" | "client">(
     searchParams.get("mode") === "client" ? "client" : "category"
   )
-  const [activeTags, setActiveTags] = useState<Set<string>>(new Set())
+  const [activeCategories, setActiveCategories] = useState<Set<string>>(new Set())
   const [activeClient, setActiveClient] = useState<string | null>(null)
 
-  function toggleTag(tag: string) {
-    setActiveTags((prev) => {
+  function toggleCategory(category: string) {
+    setActiveCategories((prev) => {
       const next = new Set(prev)
-      if (next.has(tag)) next.delete(tag)
-      else next.add(tag)
+      if (next.has(category)) next.delete(category)
+      else next.add(category)
       return next
     })
   }
@@ -149,12 +147,12 @@ export function WorkPage() {
   // actually drives the grid below.
   const visibleProjects = useMemo(() => {
     if (mode === "category") {
-      if (activeTags.size === 0) return projects
-      return projects.filter((p) => p.tags.some((t) => activeTags.has(t.label)))
+      if (activeCategories.size === 0) return projects
+      return projects.filter((p) => p.workCategories.some((c) => activeCategories.has(c)))
     }
     if (!activeClient) return projects
     return projects.filter((p) => p.client === activeClient)
-  }, [projects, mode, activeTags, activeClient])
+  }, [projects, mode, activeCategories, activeClient])
 
   return (
     <>
@@ -207,15 +205,15 @@ export function WorkPage() {
 
                 {mode === "category" ? (
                   <FilterRow>
-                    {FILTER_TAGS.map((tag) => (
+                    {FILTER_CATEGORIES.map((category) => (
                       <button
-                        key={tag}
+                        key={category}
                         type="button"
-                        className={`work-page__filter ${activeTags.has(tag) ? "is-active" : ""}`}
-                        aria-pressed={activeTags.has(tag)}
-                        onClick={() => toggleTag(tag)}
+                        className={`work-page__filter ${activeCategories.has(category) ? "is-active" : ""}`}
+                        aria-pressed={activeCategories.has(category)}
+                        onClick={() => toggleCategory(category)}
                       >
-                        {tag}
+                        {category}
                       </button>
                     ))}
                   </FilterRow>
@@ -245,7 +243,9 @@ export function WorkPage() {
                 (e.g. widening back out after narrowing) would stay at opacity 0. */}
             {visibleProjects.length > 0 && (
               <RevealGroup
-                key={mode === "category" ? `cat:${[...activeTags].sort().join(",")}` : `cli:${activeClient ?? ""}`}
+                key={
+                  mode === "category" ? `cat:${[...activeCategories].sort().join(",")}` : `cli:${activeClient ?? ""}`
+                }
                 className="work-grid"
                 stagger={0.06}
                 amount={0.01}

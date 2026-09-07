@@ -37,6 +37,11 @@ export interface Project {
    *  video id on the frontend (see ProjectPage.tsx's parseYoutubeId). */
   heroYoutubeUrl: string | null
   galleryImages: StrapiMedia[]
+  /** Names of this project's assigned Work Categories — the fixed
+   *  Video/Photo/Branding/Web Design/Social/Events taxonomy (see
+   *  fetchWorkCategories) that drives the /work page's Category filter.
+   *  Separate from `tags` above, which are just display badges. */
+  workCategories: string[]
 }
 
 /** cover -> heroMedia (only when heroMediaType is "image") -> the caller's
@@ -80,6 +85,7 @@ interface StrapiProjectRaw {
   heroMediaType: "image" | "video" | "youtube" | null
   heroMediaYoutubeUrl: string | null
   galleryImages: StrapiMediaRaw[]
+  workCategories: { name: string }[]
 }
 
 function mapProject(raw: StrapiProjectRaw): Project {
@@ -105,6 +111,7 @@ function mapProject(raw: StrapiProjectRaw): Project {
     heroMediaType: raw.heroMediaType ?? (raw.heroMedia?.mime.startsWith("video/") ? "video" : "image"),
     heroYoutubeUrl: raw.heroMediaYoutubeUrl,
     galleryImages: raw.galleryImages.map((m) => ({ url: strapiMediaUrl(m.url), mime: m.mime })),
+    workCategories: raw.workCategories.map((c) => c.name),
   }
 }
 
@@ -114,7 +121,7 @@ function mapProject(raw: StrapiProjectRaw): Project {
 export async function fetchProjects(): Promise<Project[]> {
   try {
     const res = await fetch(
-      `${STRAPI_URL}/api/projects?populate=tags,heroMedia,cover,galleryImages&sort=order:asc,documentId:asc&pagination[pageSize]=100`
+      `${STRAPI_URL}/api/projects?populate=tags,heroMedia,cover,galleryImages,workCategories&sort=order:asc,documentId:asc&pagination[pageSize]=100`
     )
     if (!res.ok) return []
     const json = await res.json()
@@ -202,6 +209,39 @@ export async function fetchClientLogos(): Promise<ClientLogo[]> {
     if (!res.ok) return []
     const json = await res.json()
     return (json.data as StrapiClientLogoRaw[]).map(mapClientLogo)
+  } catch {
+    return []
+  }
+}
+
+export interface WorkCategory {
+  id: string
+  name: string
+}
+
+interface StrapiWorkCategoryRaw {
+  documentId: string
+  name: string
+}
+
+function mapWorkCategory(raw: StrapiWorkCategoryRaw): WorkCategory {
+  return { id: raw.documentId, name: raw.name }
+}
+
+/** Fetches the fixed Work Category taxonomy, sorted by its editorial
+ *  `order` — the full set, independent of which (if any) projects
+ *  currently have one assigned, so the /work page's Category filter always
+ *  shows the complete list rather than only categories already in use.
+ *  Resolves to `[]` on any network/parse failure — callers render an
+ *  empty state rather than an error message. */
+export async function fetchWorkCategories(): Promise<WorkCategory[]> {
+  try {
+    const res = await fetch(
+      `${STRAPI_URL}/api/work-categories?sort=order:asc,documentId:asc&pagination[pageSize]=100`
+    )
+    if (!res.ok) return []
+    const json = await res.json()
+    return (json.data as StrapiWorkCategoryRaw[]).map(mapWorkCategory)
   } catch {
     return []
   }
