@@ -18,15 +18,28 @@ export function Footer() {
   const screenSize = useScreenSize()
   const isDesktop = screenSize.greaterThanOrEqual("lg")
   // Footer is the last element on the page, so the range has to be reachable
-  // within the page's actual max scroll — "start end" → "end end" completes
-  // exactly at natural scroll-end (footer's own bottom hitting the viewport
-  // bottom) instead of a fixed viewport-fraction range that could require
-  // more scroll distance than exists past the last element on the page.
+  // within the page's actual max scroll — "start end" → "end end" targets
+  // natural scroll-end (footer's own bottom hitting the viewport bottom)
+  // instead of a fixed viewport-fraction range that could require more
+  // scroll distance than exists past the last element on the page.
   const { scrollYProgress } = useScroll({
     target: footerRef,
     offset: ["start end", "end end"],
   })
-  const clipRight = useTransform(scrollYProgress, [0, 1], ["100%", "0%"])
+  // Input caps at 0.92, not 1 — confirmed live (user report) that
+  // scrollYProgress never actually reaches the mathematically exact 1.0
+  // needed for "end end" to fully resolve: ClientLogos (the footer's first
+  // child, above this text) loads its logos asynchronously and can still be
+  // shifting the footer's own height/position after useScroll's target
+  // measurement, and momentum-scroll's last sampled position rarely lands
+  // on the exact final scrollY either. Both leave the reveal a bit short of
+  // full width even once scrolled all the way down. useTransform clamps by
+  // default, so anything past 0.92 just holds at "0%" (fully revealed) —
+  // the wipe finishes a little earlier than mathematically necessary
+  // (imperceptible mid-scroll), trading a small amount of precision for
+  // actually completing at the bottom instead of depending on a
+  // pixel-perfect alignment that isn't holding up in practice.
+  const clipRight = useTransform(scrollYProgress, [0, 0.92], ["100%", "0%"])
   const clipPath = useTransform(clipRight, (v) => `inset(0 ${v} 0 0)`)
 
   return (
