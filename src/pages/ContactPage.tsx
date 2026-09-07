@@ -7,6 +7,7 @@ import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { CursorHint } from "@/components/motion/CursorHint"
 import { EASE_WAVE } from "@/lib/motion"
+import { usePageMeta } from "@/hooks/usePageMeta"
 
 const STEPS = [
   { key: "detail", label: "Detail" },
@@ -29,6 +30,10 @@ function formatProjectTypes(types: string[]): string {
 }
 
 export function ContactPage() {
+  usePageMeta(
+    "Contact — PixellWave",
+    "Start a project with PixellWave. Tell us what you need and we'll get back to you."
+  )
   const [stepIndex, setStepIndex] = useState(0)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")

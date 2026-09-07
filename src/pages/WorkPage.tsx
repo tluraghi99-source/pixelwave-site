@@ -11,6 +11,7 @@ import { CursorGlow } from "@/components/motion/CursorGlow"
 import { EASE_WAVE } from "@/lib/motion"
 import { useProjects } from "@/hooks/useProjects"
 import { useWorkCategories } from "@/hooks/useWorkCategories"
+import { usePageMeta } from "@/hooks/usePageMeta"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
 
 /** Shared chain (see strapi.ts's projectThumbUrl) — a small grid card is
@@ -99,6 +100,10 @@ function FilterRow({ children }: { children: ReactNode }) {
 }
 
 export function WorkPage() {
+  usePageMeta(
+    "All Projects — PixellWave",
+    "Browse every PixellWave project — video, photo, branding, web design, social and events work, filterable by category or client."
+  )
   const projects = useProjects()
   const workCategories = useWorkCategories()
 

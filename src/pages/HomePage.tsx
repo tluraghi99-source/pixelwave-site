@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { usePageMeta } from "@/hooks/usePageMeta"
 import { Preloader } from "@/components/Preloader"
 import { Hero } from "@/components/sections/Hero"
 import { TickerStrip } from "@/components/sections/TickerStrip"
@@ -7,6 +8,10 @@ import { Services } from "@/components/sections/Services"
 import { Footer } from "@/components/sections/Footer"
 
 export function HomePage() {
+  usePageMeta(
+    "PixellWave — Your Vision, Our Wave",
+    "PixellWave is a creative studio for video, photo, branding, web design, social and events — from concept to final delivery."
+  )
   const [introDone, setIntroDone] = useState(false)
 
   return (

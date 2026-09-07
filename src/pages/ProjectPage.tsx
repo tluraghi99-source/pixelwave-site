@@ -6,6 +6,7 @@ import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { Footer } from "@/components/sections/Footer"
 import { useProjects } from "@/hooks/useProjects"
+import { usePageMeta } from "@/hooks/usePageMeta"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
 
 type MediaItem = { type: "image"; src: string } | { type: "video"; src: string } | { type: "youtube"; videoId: string }
@@ -256,6 +257,11 @@ export function ProjectPage() {
       nextProject: withMedia(projects[(index + 1) % projects.length]),
     }
   }, [projects, slug])
+
+  // Called unconditionally, above the not-found return below, so hook order
+  // never changes across renders — falls back to the site-wide title/desc
+  // while `projects` is still loading or the slug genuinely doesn't match.
+  usePageMeta(project ? `${project.title} — PixellWave` : "PixellWave — Your Vision, Our Wave", project?.desc)
 
   if (!project || !nextProject) {
     return (
