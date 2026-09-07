@@ -1168,11 +1168,13 @@ header.nav .nav__mobile .nav__link {
   background: var(--pw-orange); border-color: var(--pw-orange); color: var(--pw-white);
 }
 
+/* No background of its own — the card underneath dims on hover instead (see
+ * circular-gallery.tsx's uOpacity uniform), so the caption text just sits on
+ * top of that dimmed image rather than a separate dark layer. */
 .gallery-caption {
   position: absolute; pointer-events: none; transform-origin: 50% 50%;
   display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end;
   gap: 0.6rem; padding: clamp(1rem, 1.4vw, 1.75rem); overflow: hidden;
-  background: linear-gradient(to top, rgba(0,0,0,.6), rgba(0,0,0,0) 60%);
   transition: opacity 0.25s ease;
 }
 .gallery-caption__title {

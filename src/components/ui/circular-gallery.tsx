@@ -86,6 +86,10 @@ function lerp(p1: number, p2: number, t: number) {
  *  counts as a click/tap rather than a drag of the carousel. */
 const CLICK_DRAG_THRESHOLD_PX = 6
 
+/** How much a card dims (its own texture, via uOpacity — not a layer drawn
+ *  on top of it) while hovered. */
+const HOVER_OPACITY = 0.6
+
 // touchstart/touchmove have their position in `touches`; touchend's `touches`
 // is already empty by the time it fires (the touch has ended) — its
 // position lives in `changedTouches` instead. clientXOf/clientYOf cover the
@@ -152,6 +156,9 @@ class Media {
   speed = 0
   isBefore = false
   isAfter = false
+  /** Eased toward targetOpacity every frame in update() — see App.setHoverOpacity. */
+  opacity = 1
+  targetOpacity = 1
 
   constructor({
     geometry,
@@ -234,6 +241,7 @@ class Media {
         uniform vec2 uPlaneSizes;
         uniform sampler2D tMap;
         uniform float uBorderRadius;
+        uniform float uOpacity;
         varying vec2 vUv;
 
         float roundedBoxSDF(vec2 p, vec2 b, float r) {
@@ -256,7 +264,7 @@ class Media {
           float edgeSmooth = 0.002;
           float alpha = 1.0 - smoothstep(-edgeSmooth, edgeSmooth, d);
 
-          gl_FragColor = vec4(color.rgb, alpha);
+          gl_FragColor = vec4(color.rgb, alpha * uOpacity);
         }
       `,
       uniforms: {
@@ -270,6 +278,9 @@ class Media {
         uSpeed: { value: 0 },
         uTime: { value: 100 * Math.random() },
         uBorderRadius: { value: this.borderRadius },
+        // Eased toward this.targetOpacity each frame (see update()) — the
+        // hovered card dims instead of a dark layer sitting on top of it.
+        uOpacity: { value: 1 },
       },
       transparent: true,
     })
@@ -328,6 +339,8 @@ class Media {
     this.speed = scroll.current - scroll.last
     this.program.uniforms.uTime.value += 0.04
     this.program.uniforms.uSpeed.value = this.speed
+    this.opacity = lerp(this.opacity, this.targetOpacity, 0.15)
+    this.program.uniforms.uOpacity.value = this.opacity
 
     const planeOffset = this.plane.scale.x / 2
     const viewportOffset = this.viewport.width / 2
@@ -580,12 +593,22 @@ class App {
     return null
   }
 
+  /** Dims the hovered card's own texture (targetOpacity, eased in Media.update)
+   *  instead of drawing anything on top of it — every other card stays full
+   *  opacity. */
+  setHoverOpacity(index: number | null) {
+    this.medias?.forEach((m) => {
+      m.targetOpacity = m.index === index ? HOVER_OPACITY : 1
+    })
+  }
+
   /** Hit-test the last known pointer position against each media's current on-screen rect. */
   updateHover() {
     if (!this.onHover) return
     if (!this.mouse || !this.medias) {
       if (this.hoveredIndex !== null) {
         this.hoveredIndex = null
+        this.setHoverOpacity(null)
         this.onHover(null)
       }
       return
@@ -597,6 +620,7 @@ class App {
     if (!hit) {
       if (this.hoveredIndex !== null) {
         this.hoveredIndex = null
+        this.setHoverOpacity(null)
         this.onHover(null)
       }
       return
@@ -607,7 +631,10 @@ class App {
     const halfW = (hit.plane.scale.x * ratio) / 2
     const halfH = (hit.plane.scale.y * ratio) / 2
 
-    this.hoveredIndex = hit.index
+    if (this.hoveredIndex !== hit.index) {
+      this.hoveredIndex = hit.index
+      this.setHoverOpacity(hit.index)
+    }
     this.onHover({
       index: hit.index,
       text: hit.text,
