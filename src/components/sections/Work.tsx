@@ -19,6 +19,27 @@ function galleryImageUrl(p: Project): string {
   return projectThumbUrl(p, `https://picsum.photos/seed/pixellwave-${p.id}/1200/900?grayscale`)
 }
 
+/** How many projects the homepage teases, on both the desktop circular
+ *  gallery and the mobile/tablet marquee — the full roster lives on /work. */
+const GALLERY_ITEM_COUNT = 7
+
+/** Fisher–Yates shuffle of a copy — never mutates the input array. */
+function shuffled<T>(items: T[]): T[] {
+  const arr = [...items]
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+  return arr
+}
+
+/** A fresh random selection each time the caller's useMemo re-runs (i.e.
+ *  once per page load, when `projects` first arrives from Strapi) — falls
+ *  back to however many projects exist if there are fewer than `count`. */
+function pickRandomProjects(projects: Project[], count: number): Project[] {
+  return shuffled(projects).slice(0, count)
+}
+
 function WorkMedia({ index }: { index: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const rotateX = useMotionValue(0)
@@ -65,10 +86,10 @@ function WorkMedia({ index }: { index: string }) {
 }
 
 function WorkTrack({ projects, x }: { projects: Project[]; x: MotionValue<string> }) {
-  // The homepage teases a curated few — the full roster lives on the /work
-  // page. Doubled so the marquee track can translate exactly -50% and loop
-  // seamlessly.
-  const work = projects.slice(0, 3)
+  // A random selection, reshuffled each time `projects` first arrives (see
+  // pickRandomProjects above) — doubled so the marquee track can translate
+  // exactly -50% and loop seamlessly.
+  const work = useMemo(() => pickRandomProjects(projects, GALLERY_ITEM_COUNT), [projects])
   const cards = [...work, ...work]
 
   return (
@@ -113,7 +134,7 @@ export function WorkGallery({
 
   const galleryItems = useMemo(
     () =>
-      projects.slice(0, 3).map((w) => ({
+      pickRandomProjects(projects, GALLERY_ITEM_COUNT).map((w) => ({
         image: galleryImageUrl(w),
         text: w.title,
         tags: w.tags.map((t) => ({ variant: t.highlighted ? ("orange" as const) : ("outline" as const), label: t.label })),
