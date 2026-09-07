@@ -60,7 +60,7 @@ function StudioGalleryDesktop() {
         <CircularGallery
           ref={galleryRef}
           items={STUDIO_PHOTOS}
-          bend={2}
+          bend={1}
           borderRadius={0}
           // Inverted from CircularGallery's portrait default (933.333x1200)
           // to landscape (studio photos read as horizontal shots, unlike
