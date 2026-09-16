@@ -1039,26 +1039,33 @@ header.nav .nav__mobile .nav__link {
    above is) */
 .project-video-pin { position: relative; }
 .project-video-pin__inner { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+/* One attached control cluster (mute + skip share a border instead of
+ * floating as two separate pills) — sits where Skip used to sit alone, same
+ * right/bottom inset as .wrap's own padding (see index.css ~line 509). */
+.project-video-pin__controls {
+  position: absolute; z-index: 2;
+  right: clamp(1rem, 1.2vw, 1.25rem); bottom: clamp(1.5rem, 3vw, 2.5rem);
+  display: flex;
+}
 .project-video-pin__skip, .project-video-pin__mute {
-  position: absolute; z-index: 2; bottom: clamp(1.5rem, 3vw, 2.5rem);
-  border: 1px solid rgba(255, 255, 255, 0.5); border-radius: var(--radius-control);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   background: rgba(0, 0, 0, 0.35); color: var(--pw-white); cursor: pointer;
   transition: border-color var(--dur-base) var(--ease-wave), color var(--dur-base) var(--ease-wave);
 }
 .project-video-pin__skip:hover, .project-video-pin__mute:hover { border-color: var(--pw-orange); color: var(--pw-orange); }
-/* Same left/right inset as .wrap's own padding (see index.css ~line 509) —
-   these buttons sit at the page's edge, not the pinned section's. */
 .project-video-pin__skip {
-  right: clamp(1rem, 1.2vw, 1.25rem);
   padding: 0.6rem 1.25rem; font-size: 0.8rem; font-family: var(--font-mono-accent);
   text-transform: uppercase; letter-spacing: 0.08em;
+  border-radius: 0 var(--radius-control) var(--radius-control) 0;
 }
 /* Icon-only, so a plain square instead of Skip's text padding — same
-   overall height as Skip (0.8rem font * line-height + 2 * 0.6rem padding)
-   so the two sit flush at the same size. */
+ * overall height as Skip (0.8rem font * line-height + 2 * 0.6rem padding)
+ * so the two sit flush at the same size. No right border — Skip's own left
+ * border sits right where the two meet, so there's one shared line instead
+ * of a doubled one. */
 .project-video-pin__mute {
-  left: clamp(1rem, 1.2vw, 1.25rem);
-  width: 2.5rem; height: 2.5rem;
+  width: 2.5rem; height: 2.5rem; border-right: none;
+  border-radius: var(--radius-control) 0 0 var(--radius-control);
   display: flex; align-items: center; justify-content: center;
 }
 

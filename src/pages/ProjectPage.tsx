@@ -158,21 +158,23 @@ function ProjectVideoPinned({ media }: { media: MediaItem }) {
     >
       <div className="project-video-pin__inner">
         <ProjectMedia media={media} muted={muted} />
-        {hasSound && (
-          <button
-            type="button"
-            className="project-video-pin__mute"
-            aria-pressed={!muted}
-            aria-label={muted ? "Unmute" : "Mute"}
-            title={muted ? "Unmute" : "Mute"}
-            onClick={() => setMuted((m) => !m)}
-          >
-            {muted ? <VolumeX size={16} aria-hidden="true" /> : <Volume2 size={16} aria-hidden="true" />}
+        <div className="project-video-pin__controls">
+          {hasSound && (
+            <button
+              type="button"
+              className="project-video-pin__mute"
+              aria-pressed={!muted}
+              aria-label={muted ? "Unmute" : "Mute"}
+              title={muted ? "Unmute" : "Mute"}
+              onClick={() => setMuted((m) => !m)}
+            >
+              {muted ? <VolumeX size={16} aria-hidden="true" /> : <Volume2 size={16} aria-hidden="true" />}
+            </button>
+          )}
+          <button type="button" className="project-video-pin__skip" onClick={handleSkip}>
+            Skip
           </button>
-        )}
-        <button type="button" className="project-video-pin__skip" onClick={handleSkip}>
-          Skip
-        </button>
+        </div>
       </div>
     </section>
   )
