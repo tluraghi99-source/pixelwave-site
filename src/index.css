@@ -1052,23 +1052,31 @@ header.nav .nav__mobile .nav__link {
    * container to stretch them to match — native <button> elements resist
    * flex stretch (they keep sizing to their own content/padding instead),
    * which is why they rendered at two different heights before this. */
-  height: 2.5rem; display: flex; align-items: center; justify-content: center;
+  position: relative; height: 2.5rem; display: flex; align-items: center; justify-content: center;
   border: 1px solid rgba(255, 255, 255, 0.5);
   background: rgba(0, 0, 0, 0.35); color: var(--pw-white); cursor: pointer;
   transition: border-color var(--dur-base) var(--ease-wave), color var(--dur-base) var(--ease-wave);
 }
-.project-video-pin__skip:hover, .project-video-pin__mute:hover { border-color: var(--pw-orange); color: var(--pw-orange); }
+/* Each button keeps its own complete 4-sided border (rather than one of
+ * them going without a border on the shared edge) — Skip's overlaps mute's
+ * by 1px (margin-left below) so the resting state still reads as one
+ * shared line, but z-index puts whichever is hovered on top, so its own
+ * orange border paints over the shared edge instead of that edge staying
+ * the neighbor's un-hovered white. Without this, hovering mute only ever
+ * lit up 3 of its 4 sides. */
+.project-video-pin__skip:hover, .project-video-pin__mute:hover {
+  border-color: var(--pw-orange); color: var(--pw-orange); z-index: 1;
+}
 .project-video-pin__skip {
   padding: 0 1.25rem; font-size: 0.8rem; font-family: var(--font-mono-accent);
   text-transform: uppercase; letter-spacing: 0.08em;
   border-radius: 0 var(--radius-control) var(--radius-control) 0;
+  margin-left: -1px;
 }
 /* Icon-only, so a plain square instead of Skip's text padding — same
- * explicit height as Skip above, so the two sit flush at the same size. No
- * right border — Skip's own left border sits right where the two meet, so
- * there's one shared line instead of a doubled one. */
+ * explicit height as Skip above, so the two sit flush at the same size. */
 .project-video-pin__mute {
-  width: 2.5rem; border-right: none;
+  width: 2.5rem;
   border-radius: var(--radius-control) 0 0 var(--radius-control);
 }
 
