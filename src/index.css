@@ -1048,25 +1048,28 @@ header.nav .nav__mobile .nav__link {
   display: flex;
 }
 .project-video-pin__skip, .project-video-pin__mute {
+  /* Explicit shared height on both, rather than relying on the flex
+   * container to stretch them to match — native <button> elements resist
+   * flex stretch (they keep sizing to their own content/padding instead),
+   * which is why they rendered at two different heights before this. */
+  height: 2.5rem; display: flex; align-items: center; justify-content: center;
   border: 1px solid rgba(255, 255, 255, 0.5);
   background: rgba(0, 0, 0, 0.35); color: var(--pw-white); cursor: pointer;
   transition: border-color var(--dur-base) var(--ease-wave), color var(--dur-base) var(--ease-wave);
 }
 .project-video-pin__skip:hover, .project-video-pin__mute:hover { border-color: var(--pw-orange); color: var(--pw-orange); }
 .project-video-pin__skip {
-  padding: 0.6rem 1.25rem; font-size: 0.8rem; font-family: var(--font-mono-accent);
+  padding: 0 1.25rem; font-size: 0.8rem; font-family: var(--font-mono-accent);
   text-transform: uppercase; letter-spacing: 0.08em;
   border-radius: 0 var(--radius-control) var(--radius-control) 0;
 }
 /* Icon-only, so a plain square instead of Skip's text padding — same
- * overall height as Skip (0.8rem font * line-height + 2 * 0.6rem padding)
- * so the two sit flush at the same size. No right border — Skip's own left
- * border sits right where the two meet, so there's one shared line instead
- * of a doubled one. */
+ * explicit height as Skip above, so the two sit flush at the same size. No
+ * right border — Skip's own left border sits right where the two meet, so
+ * there's one shared line instead of a doubled one. */
 .project-video-pin__mute {
-  width: 2.5rem; height: 2.5rem; border-right: none;
+  width: 2.5rem; border-right: none;
   border-radius: var(--radius-control) 0 0 var(--radius-control);
-  display: flex; align-items: center; justify-content: center;
 }
 
 .project-video-ambient { position: relative; height: 60vh; overflow: hidden; }
