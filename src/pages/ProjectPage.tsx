@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
-import { ArrowUpRight } from "lucide-react"
+import { ArrowUpRight, Volume2, VolumeX } from "lucide-react"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { Footer } from "@/components/sections/Footer"
@@ -163,9 +163,11 @@ function ProjectVideoPinned({ media }: { media: MediaItem }) {
             type="button"
             className="project-video-pin__mute"
             aria-pressed={!muted}
+            aria-label={muted ? "Unmute" : "Mute"}
+            title={muted ? "Unmute" : "Mute"}
             onClick={() => setMuted((m) => !m)}
           >
-            {muted ? "Unmute" : "Mute"}
+            {muted ? <VolumeX size={16} aria-hidden="true" /> : <Volume2 size={16} aria-hidden="true" />}
           </button>
         )}
         <button type="button" className="project-video-pin__skip" onClick={handleSkip}>

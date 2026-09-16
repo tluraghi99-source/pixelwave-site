@@ -1041,17 +1041,26 @@ header.nav .nav__mobile .nav__link {
 .project-video-pin__inner { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 .project-video-pin__skip, .project-video-pin__mute {
   position: absolute; z-index: 2; bottom: clamp(1.5rem, 3vw, 2.5rem);
-  padding: 0.6rem 1.25rem; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: var(--radius-control);
-  background: rgba(0, 0, 0, 0.35); color: var(--pw-white); font-size: 0.8rem;
-  font-family: var(--font-mono-accent);
-  text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.5); border-radius: var(--radius-control);
+  background: rgba(0, 0, 0, 0.35); color: var(--pw-white); cursor: pointer;
   transition: border-color var(--dur-base) var(--ease-wave), color var(--dur-base) var(--ease-wave);
 }
 .project-video-pin__skip:hover, .project-video-pin__mute:hover { border-color: var(--pw-orange); color: var(--pw-orange); }
 /* Same left/right inset as .wrap's own padding (see index.css ~line 509) —
    these buttons sit at the page's edge, not the pinned section's. */
-.project-video-pin__skip { right: clamp(1rem, 1.2vw, 1.25rem); }
-.project-video-pin__mute { left: clamp(1rem, 1.2vw, 1.25rem); }
+.project-video-pin__skip {
+  right: clamp(1rem, 1.2vw, 1.25rem);
+  padding: 0.6rem 1.25rem; font-size: 0.8rem; font-family: var(--font-mono-accent);
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+/* Icon-only, so a plain square instead of Skip's text padding — same
+   overall height as Skip (0.8rem font * line-height + 2 * 0.6rem padding)
+   so the two sit flush at the same size. */
+.project-video-pin__mute {
+  left: clamp(1rem, 1.2vw, 1.25rem);
+  width: 2.5rem; height: 2.5rem;
+  display: flex; align-items: center; justify-content: center;
+}
 
 .project-video-ambient { position: relative; height: 60vh; overflow: hidden; }
 .project-video-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
