@@ -905,7 +905,17 @@ header.nav .nav__mobile .nav__link {
    applies to desktop's own wrap-or-not inconsistency, just via a different
    property since mobile needs an actual stack, not a width cap. */
 @media (max-width: 767px) {
-  .work-page__head { flex-direction: column; align-items: flex-start; }
+  /* stretch, not flex-start — a column flex container's cross-axis (width)
+     sizing comes from align-items, not from min-width:0 the way row-based
+     shrinking does. flex-start left both children at their own natural
+     content width instead of the container's full width, so
+     .work-page__filter-block's pill row was never actually capped by
+     anything and just overflowed the page horizontally (confirmed live:
+     document.documentElement.scrollWidth > clientWidth) instead of
+     scrolling internally within .work-page__filters as intended. Both
+     children are block-level text/flex boxes, so stretching them to full
+     width doesn't change how their own content lines up inside. */
+  .work-page__head { flex-direction: column; align-items: stretch; }
 }
 /* Page title reads bigger than the shared .lead default — desktop only,
    mobile keeps the original size (doubling it there would be too much). */
