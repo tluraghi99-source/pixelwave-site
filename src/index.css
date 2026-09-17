@@ -894,8 +894,18 @@ header.nav .nav__mobile .nav__link {
    down until it wraps to two lines. The title should never give up space;
    let the filter block (which already wraps its own pills) absorb it. */
 .work-page__title { flex-shrink: 0; }
+/* flex-direction: column, not flex-wrap: wrap — wrap only kicks in once
+   content doesn't fit on one line, and Client mode's shorter content (one
+   client pill vs. Category's whole row of tags) fit next to the title
+   often enough that the filter-block shared its line instead of dropping
+   below it, landing flush right against the row's own justify-content:
+   space-between (confirmed live: switching from Category to Client
+   visibly relocated the toggle from under the title to beside it). Forcing
+   the stack unconditionally is the same fix the comment above already
+   applies to desktop's own wrap-or-not inconsistency, just via a different
+   property since mobile needs an actual stack, not a width cap. */
 @media (max-width: 767px) {
-  .work-page__head { flex-wrap: wrap; }
+  .work-page__head { flex-direction: column; align-items: flex-start; }
 }
 /* Page title reads bigger than the shared .lead default — desktop only,
    mobile keeps the original size (doubling it there would be too much). */
