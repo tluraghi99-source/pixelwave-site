@@ -197,7 +197,27 @@ export function Header() {
       transition={{ duration: 0.4, ease: EASE_WAVE }}
     >
       <div className="wrap nav__inner">
-        <a href={isHome ? "#top" : "/"} aria-label="PixellWave home">
+        <a
+          href={isHome ? "#top" : "/"}
+          aria-label="PixellWave home"
+          // Native hash-anchor scrolling landed short of the true top when
+          // clicked from partway down the page — WorkReel's pinned section
+          // (.reel__inner, position: sticky over an 850vh-tall .reel) sits
+          // between here and #top, and the browser's own smooth-scroll-to-
+          // anchor doesn't reliably run to completion when a sticky/pinned
+          // ancestor's layout shifts mid-scroll (it was consistently
+          // stopping right at HERO_REVEAL_END, exactly where that pin's
+          // fixed reveal overlay hands off). A direct scrollTo(0) has no
+          // such dependency on the target element's own position.
+          onClick={
+            isHome
+              ? (e) => {
+                  e.preventDefault()
+                  window.scrollTo({ top: 0, behavior: "smooth" })
+                }
+              : undefined
+          }
+        >
           {/* Separate elements rather than one swapping opacity between a
               MotionValue (home) and a plain number (elsewhere) — framer-motion
               doesn't reliably pick up that type change on the same element,
