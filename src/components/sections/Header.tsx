@@ -67,20 +67,27 @@ export function Header() {
   // just always visible, and the nav hides on scroll-down almost immediately.
   const homeHref = (hash: string) => (isHome ? hash : `/${hash}`)
 
-  // Path hrefs get client-side routing; real in-page anchors get the
-  // cross-page homeHref treatment; bare "#" placeholders stay as-is.
+  // Path hrefs and real in-page anchors (with the cross-page homeHref
+  // treatment) both get client-side routing — a plain <a> to "/#services"
+  // from another page would trigger a full page reload, and the browser's
+  // native on-load hash-scroll fires before this SPA's home route has
+  // actually rendered anything with that id, silently landing at the top
+  // instead of the section (see ScrollToTop, which does the actual
+  // scrolling once <Link> lands us on the right route/hash). Bare "#"
+  // placeholders (not wired to a real target yet) stay a plain, inert <a>.
   const renderLink = (href: string, label: string, key: string, className: string, onClick: () => void) => {
-    if (href.startsWith("/")) {
+    if (href === "#") {
       return (
-        <Link key={key} className={className} to={href} onClick={onClick}>
+        <a key={key} className={className} href={href} onClick={onClick}>
           {label}
-        </Link>
+        </a>
       )
     }
+    const to = href.startsWith("/") ? href : homeHref(href)
     return (
-      <a key={key} className={className} href={href === "#" ? href : homeHref(href)} onClick={onClick}>
+      <Link key={key} className={className} to={to} onClick={onClick}>
         {label}
-      </a>
+      </Link>
     )
   }
 
