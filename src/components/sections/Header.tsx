@@ -214,7 +214,7 @@ export function Header() {
           )}
         </a>
 
-        <div className="nav__menu-btn hidden md:block">
+        <div className="nav__menu-btn">
           <PixelTrail
             pixelSize={10}
             fadeDuration={600}
@@ -229,15 +229,6 @@ export function Header() {
             onClick={() => setOpen((v) => !v)}
           />
         </div>
-
-        <button
-          type="button"
-          aria-label={open ? "Close menu" : "Open menu"}
-          className={`cursor-pointer md:hidden ${open || !onDark ? "text-black" : "text-white"}`}
-          onClick={() => setOpen((v) => !v)}
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
-        </button>
       </div>
 
       <AnimatePresence onExitComplete={releaseScrollLock}>
