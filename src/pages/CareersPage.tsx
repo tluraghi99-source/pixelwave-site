@@ -7,6 +7,7 @@ import { CursorGlow } from "@/components/motion/CursorGlow"
 import { CursorHint } from "@/components/motion/CursorHint"
 import { EASE_WAVE } from "@/lib/motion"
 import { usePageMeta } from "@/hooks/usePageMeta"
+import { submitCareersApplication } from "@/lib/strapi"
 
 // Same wizard shape as ContactPage (detail -> ... -> review -> sent), just a
 // different field set for a job application instead of a project inquiry —
@@ -75,6 +76,8 @@ export function CareersPage() {
   const [cv, setCv] = useState<File | null>(null)
   const [cvError, setCvError] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [sendError, setSendError] = useState(false)
 
   const step = STEPS[stepIndex]
   const isLastStep = stepIndex === STEPS.length - 1
@@ -87,10 +90,16 @@ export function CareersPage() {
           ? cv !== null
           : true
 
-  function handleNext() {
-    if (!canAdvance) return
+  async function handleNext() {
+    if (!canAdvance || sending) return
     if (isLastStep) {
-      setSent(true)
+      if (!cv) return
+      setSending(true)
+      setSendError(false)
+      const ok = await submitCareersApplication({ name, surname, email, phone, role, cv })
+      setSending(false)
+      if (ok) setSent(true)
+      else setSendError(true)
       return
     }
     setStepIndex((i) => i + 1)
@@ -266,15 +275,20 @@ export function CareersPage() {
                       <span className="contact-page__recap-value">{cv?.name}</span>
                       <span className="contact-page__recap-edit">Edit</span>
                     </button>
+                    {sendError && (
+                      <p className="contact-page__send-error">
+                        Something went wrong sending that — please try again.
+                      </p>
+                    )}
                   </div>
                 )}
 
                 <InteractiveHoverButton
-                  text={isLastStep ? "Send it our way" : "Next"}
+                  text={sending ? "Sending…" : isLastStep ? "Send it our way" : "Next"}
                   icon={<ArrowRight size={16} />}
                   onClick={handleNext}
-                  className={`contact-page__next ${canAdvance ? "" : "contact-page__next--disabled"}`}
-                  aria-disabled={!canAdvance}
+                  className={`contact-page__next ${canAdvance && !sending ? "" : "contact-page__next--disabled"}`}
+                  aria-disabled={!canAdvance || sending}
                 />
               </motion.div>
             )}

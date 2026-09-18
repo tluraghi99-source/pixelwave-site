@@ -246,3 +246,69 @@ export async function fetchWorkCategories(): Promise<WorkCategory[]> {
     return []
   }
 }
+
+export interface ContactSubmissionPayload {
+  name: string
+  email: string
+  projectTypes: string[]
+  timeline: string | null
+}
+
+/** Posts a /contact form submission — Strapi saves it (api::contact-
+ *  submission) and emails a notification (see pixelwave-cms's
+ *  src/index.ts bootstrap) independently of each other, so a slow/failed
+ *  email never affects this call. Resolves to false on any network/server
+ *  failure — the caller keeps the user on the current step rather than
+ *  claiming success it can't back up. */
+export async function submitContact(payload: ContactSubmissionPayload): Promise<boolean> {
+  try {
+    const res = await fetch(`${STRAPI_URL}/api/contact-submissions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data: payload }),
+    })
+    return res.ok
+  } catch {
+    return false
+  }
+}
+
+export interface CareersApplicationPayload {
+  name: string
+  surname: string
+  email: string
+  phone: string
+  role: string
+  cv: File
+}
+
+/** Posts a /careers application, including the CV file — a plain JSON
+ *  body can't carry a File, so this is multipart/form-data instead (fetch
+ *  sets the correct Content-Type + boundary on its own when the body is a
+ *  FormData, so it's deliberately not set explicitly here). See
+ *  pixelwave-cms's careers-application controller for why the file field
+ *  is a bare "cv" name, matched against the FormData key below. Resolves
+ *  to false on any network/server failure (missing fields, no CV, etc.). */
+export async function submitCareersApplication(payload: CareersApplicationPayload): Promise<boolean> {
+  try {
+    const formData = new FormData()
+    formData.append(
+      "data",
+      JSON.stringify({
+        name: payload.name,
+        surname: payload.surname,
+        email: payload.email,
+        phone: payload.phone,
+        role: payload.role,
+      })
+    )
+    formData.append("cv", payload.cv)
+    const res = await fetch(`${STRAPI_URL}/api/careers-applications`, {
+      method: "POST",
+      body: formData,
+    })
+    return res.ok
+  } catch {
+    return false
+  }
+}

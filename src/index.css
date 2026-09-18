@@ -1500,6 +1500,7 @@ header.nav .nav__mobile .nav__link {
   transition: color var(--dur-base) var(--ease-wave);
 }
 .contact-page__recap-row:hover .contact-page__recap-edit { color: var(--pw-orange); }
+.contact-page__send-error { font-size: 0.85rem; color: var(--pw-orange); margin: 0.75rem 0 0; }
 .contact-page__next--disabled { opacity: 0.4; pointer-events: none; }
 /* CareersPage's CV step — a hidden native file input behind a styled
    button, since a real <input type="file"> can't be restyled to match

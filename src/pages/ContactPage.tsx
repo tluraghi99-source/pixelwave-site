@@ -8,6 +8,7 @@ import { CursorGlow } from "@/components/motion/CursorGlow"
 import { CursorHint } from "@/components/motion/CursorHint"
 import { EASE_WAVE } from "@/lib/motion"
 import { usePageMeta } from "@/hooks/usePageMeta"
+import { submitContact } from "@/lib/strapi"
 
 const STEPS = [
   { key: "detail", label: "Detail" },
@@ -40,6 +41,8 @@ export function ContactPage() {
   const [projectTypes, setProjectTypes] = useState<string[]>([])
   const [timeline, setTimeline] = useState<string | null>(null)
   const [sent, setSent] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [sendError, setSendError] = useState(false)
 
   const step = STEPS[stepIndex]
   const isLastStep = stepIndex === STEPS.length - 1
@@ -52,10 +55,15 @@ export function ContactPage() {
           ? timeline !== null
           : true
 
-  function handleNext() {
-    if (!canAdvance) return
+  async function handleNext() {
+    if (!canAdvance || sending) return
     if (isLastStep) {
-      setSent(true)
+      setSending(true)
+      setSendError(false)
+      const ok = await submitContact({ name, email, projectTypes, timeline })
+      setSending(false)
+      if (ok) setSent(true)
+      else setSendError(true)
       return
     }
     setStepIndex((i) => i + 1)
@@ -237,15 +245,20 @@ export function ContactPage() {
                       <span className="contact-page__recap-value">{timeline}</span>
                       <span className="contact-page__recap-edit">Edit</span>
                     </button>
+                    {sendError && (
+                      <p className="contact-page__send-error">
+                        Something went wrong sending that — please try again.
+                      </p>
+                    )}
                   </div>
                 )}
 
                 <InteractiveHoverButton
-                  text={isLastStep ? "Send it our way" : "Next"}
+                  text={sending ? "Sending…" : isLastStep ? "Send it our way" : "Next"}
                   icon={<ArrowRight size={16} />}
                   onClick={handleNext}
-                  className={`contact-page__next ${canAdvance ? "" : "contact-page__next--disabled"}`}
-                  aria-disabled={!canAdvance}
+                  className={`contact-page__next ${canAdvance && !sending ? "" : "contact-page__next--disabled"}`}
+                  aria-disabled={!canAdvance || sending}
                 />
               </motion.div>
             )}
