@@ -560,13 +560,28 @@ header.nav[data-theme="light"] .nav__link {
    below — Tailwind's md:hidden utility has the same specificity as a plain
    class selector, so leaving display unconditional here would tie with it
    and could win the cascade on desktop too (same trap .nav__panel's own
-   comment already warns about). */
+   comment already warns about).
+   bottom: 0 (not height: calc(100svh - 76px), tried first) — on iOS
+   Safari, an explicit svh-based height stopped short of the true screen
+   edge whenever the browser's own floating bottom toolbar was showing,
+   leaving a strip of the page's plain white background (and a matching
+   white toolbar tint) below the panel instead of the orange bleeding
+   under it like the rest of the site does. Anchoring with bottom: 0
+   instead lets the fixed element's box reach the actual bottom of the
+   screen the way the browser chrome itself does, so the color extends
+   underneath it. */
 .nav__mobile {
-  position: fixed; top: 76px; left: 0; right: 0; height: calc(100svh - 76px);
+  position: fixed; top: 76px; left: 0; right: 0; bottom: 0;
   background: var(--pw-orange);
   flex-direction: column; justify-content: center;
   gap: clamp(2rem, 8vw, 3rem);
   padding: clamp(1.5rem, 5vw, 2.5rem);
+  /* Now that the panel's box extends under the home-indicator safe area
+     (see bottom: 0 above), pad past it explicitly — otherwise the last
+     link (e.g. "LinkedIn") can end up sitting behind the gesture bar on
+     a tall link list. max() keeps the original padding on devices/browsers
+     without a safe area at all. */
+  padding-bottom: max(clamp(1.5rem, 5vw, 2.5rem), env(safe-area-inset-bottom));
   overflow-y: auto;
   display: none;
 }

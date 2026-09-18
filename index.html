@@ -3,7 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- viewport-fit=cover lets fixed full-bleed elements (e.g. the mobile
+         nav takeover) extend into the safe areas instead of stopping at
+         their edge, so their background can show through under iOS
+         Safari's translucent chrome the way the rest of the site does. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>PixellWave — Your Vision, Our Wave</title>
     <meta
       name="description"
