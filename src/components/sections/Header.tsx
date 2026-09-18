@@ -112,7 +112,22 @@ export function Header() {
     if (open) {
       setMobileBarOrange(true)
     } else {
-      mobileBarTimeoutRef.current = window.setTimeout(() => setMobileBarOrange(false), MOBILE_NAV_EXIT_S * 1000)
+      mobileBarTimeoutRef.current = window.setTimeout(() => {
+        setMobileBarOrange(false)
+        // The same unreliable-exit-callback problem mobileBarOrange itself
+        // works around (see above) can also leave the page's scroll lock on;
+        // releaseScrollLock() is a no-op if onExitComplete already handled it.
+        releaseScrollLock()
+        // Confirmed live on a real iPhone: iOS Safari only repaints the
+        // status-bar/Dynamic-Island tint over the safe area on an actual
+        // scroll event — the theme-color change above and the header's own
+        // background change do NOT trigger it, so that strip stayed orange
+        // indefinitely without this. A 1px nudge and back forces the repaint
+        // with no visible movement.
+        const y = window.scrollY
+        window.scrollTo(0, y + 1)
+        window.scrollTo(0, y)
+      }, MOBILE_NAV_EXIT_S * 1000)
     }
     return () => {
       if (mobileBarTimeoutRef.current) window.clearTimeout(mobileBarTimeoutRef.current)
