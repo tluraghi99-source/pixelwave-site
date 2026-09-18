@@ -671,8 +671,12 @@ header.nav .nav__mobile .nav__link {
   .nav__panel-sublink:hover { color: var(--pw-black); }
 }
 
+/* bottom: 0 (not height: 100svh) for the same reason as .nav__mobile above
+   — an svh-based height stops short of the true screen edge on iOS Safari
+   whenever its floating bottom toolbar is showing, leaving a flat gap
+   instead of the hero's own background bleeding under it. */
 .hero {
-  position: fixed; top: 0; left: 0; right: 0; height: 100svh; overflow: hidden;
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0; overflow: hidden;
   isolation: isolate;
   background: var(--pw-white); color: var(--pw-black);
   z-index: 0;
