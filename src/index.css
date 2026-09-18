@@ -1448,7 +1448,11 @@ header.nav .nav__mobile .nav__link {
    cursor-reactive grid (CursorGlow). */
 .contact-page {
   position: relative;
-  height: 100svh; overflow: hidden;
+  /* dvh (not svh) — this section is the whole page (no footer after it),
+     so it should track the CURRENT visual viewport, growing to bleed
+     under iOS Safari's chrome when it's hidden instead of always sizing
+     for the smaller, chrome-visible case and leaving a flat gap below it. */
+  height: 100dvh; overflow: hidden;
   display: flex; flex-direction: column;
   background: var(--pw-black); color: var(--pw-white);
   border: 1px solid rgba(255, 255, 255, 0.15);
