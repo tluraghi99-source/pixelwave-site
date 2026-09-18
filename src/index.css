@@ -567,11 +567,18 @@ header.nav .nav__mobile .nav__link {
   color: var(--pw-black); text-shadow: none;
 }
 .nav__mobile .nav__link:hover { color: var(--pw-white); }
-.nav__mobile .pw-btn--primary {
-  align-self: flex-start;
-  background: var(--pw-black); color: var(--pw-white); border-color: var(--pw-black);
+.nav__mobile-group { display: flex; flex-direction: column; gap: 0.5rem; }
+/* Same content as the desktop panel's own sublinks (Join us/Instagram/
+   Tiktok/LinkedIn under "Let's chat"), just stacked under one heading
+   column instead of desktop's side-by-side ones — sized well below the
+   giant nav__link headings, matching the same muted-black/hover-to-solid
+   treatment as .nav__panel-sublink. */
+.nav__mobile-sublinks { display: flex; flex-direction: column; gap: 0.4rem; }
+.nav__mobile-sublink {
+  font-size: clamp(1rem, 4vw, 1.25rem); color: rgba(0, 0, 0, 0.55);
+  transition: color 0.2s var(--ease-wave);
 }
-.nav__mobile .pw-btn--primary:hover { background: var(--pw-white); color: var(--pw-black); border-color: var(--pw-white); }
+.nav__mobile-sublink:hover { color: var(--pw-black); }
 
 /* Menu button's own dark shell — always black/bordered regardless of the
    header's light/dark theme, with a hover-triggered pixel-grid glow (reused

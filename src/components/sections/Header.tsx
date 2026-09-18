@@ -2,19 +2,10 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion"
 import { Link, useLocation } from "react-router-dom"
 import { Menu, X } from "lucide-react"
-import { Button } from "@/components/pw/Button"
 import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
 import { BrandLogo } from "@/components/pw/Logo"
 import { PixelTrail } from "@/components/ui/pixel-trail"
 import { EASE_WAVE, HERO_CROSSFADE_RATIO, HERO_NAV_HIDE_AFTER, HERO_REVEAL_END, HERO_REVEAL_START } from "@/lib/motion"
-
-// "Work" goes to the dedicated /work page (like the carousel's "All projects"
-// button); the rest are in-page anchors on the homepage.
-const links = [
-  { label: "Work", href: "/work" },
-  { label: "Services", href: "#services" },
-  { label: "Studio", href: "/studio" },
-]
 
 // Desktop-only full menu panel — columns mirror the top-level nav, filled
 // out with a level of real sub-navigation (mirrors a reference layout).
@@ -300,13 +291,26 @@ export function Header() {
             transition={{ duration: 0.3, ease: EASE_WAVE }}
           >
             <div className="nav__mobile-links">
-              {links.map((link) =>
-                renderLink(link.href, link.label, link.href, "nav__link", () => setOpen(false))
-              )}
+              {/* Same MENU_COLUMNS data as the desktop panel (Join us/
+                  Instagram/Tiktok/LinkedIn under "Let's chat"), just stacked
+                  in one column instead of desktop's side-by-side ones —
+                  "Let's chat" reads as a plain heading like Work/Services/
+                  Studio now, not a standalone button. */}
+              {MENU_COLUMNS.map((col) => (
+                <div className="nav__mobile-group" key={col.label}>
+                  {renderLink(col.href, col.label, col.label, "nav__link", () => setOpen(false))}
+                  {col.links.length > 0 && (
+                    <div className="nav__mobile-sublinks">
+                      {col.links.map((l, i) =>
+                        renderLink(l.href, l.label, `${col.label}-${i}`, "nav__mobile-sublink", () =>
+                          setOpen(false)
+                        )
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-            <Button variant="primary" size="lg" href="/contact" onClick={() => setOpen(false)} className="w-fit">
-              Let's talk
-            </Button>
           </motion.div>
         )}
       </AnimatePresence>
