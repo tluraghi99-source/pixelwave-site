@@ -537,11 +537,19 @@ header.nav {
   color: rgba(255,255,255,0.92); text-shadow: 0 1px 10px rgba(0,0,0,0.5);
   transition: color .2s var(--ease-wave);
 }
-.nav__link:hover { color: var(--pw-cyan); }
+/* Gated to real hover pointers only (also below at .nav__mobile .nav__link,
+   .nav__mobile-sublink, .nav__panel-heading/-sublink, and other plain text
+   links) — on touch, a tap sets a sticky :hover state that holds the
+   hover color until the next unrelated tap elsewhere, instead of the
+   momentary highlight a mouse gives it. Mobile/tablet just keep each
+   link's resting color. */
+@media (hover: hover) {
+  .nav__link:hover { color: var(--pw-cyan); }
+  header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
+}
 header.nav[data-theme="light"] .nav__link {
   color: rgba(0,0,0,0.85); text-shadow: 0 1px 10px rgba(255,255,255,0.6);
 }
-header.nav[data-theme="light"] .nav__link:hover { color: var(--pw-orange); }
 /* Mobile menu — an orange takeover reaching the full viewport height
    (76px top bar + this panel together), not a small dropdown, hugging the
    top bar so the logo/close button stay reachable above it.
@@ -572,7 +580,9 @@ header.nav .nav__mobile .nav__link {
   font-size: clamp(2.75rem, 13vw, 4.25rem); letter-spacing: -0.02em;
   color: var(--pw-black); text-shadow: none;
 }
-.nav__mobile .nav__link:hover { color: var(--pw-white); }
+@media (hover: hover) {
+  .nav__mobile .nav__link:hover { color: var(--pw-white); }
+}
 .nav__mobile-group { display: flex; flex-direction: column; gap: 0.5rem; }
 /* Same content as the desktop panel's own sublinks (Join us/Instagram/
    Tiktok/LinkedIn under "Let's chat"), just stacked under one heading
@@ -584,7 +594,9 @@ header.nav .nav__mobile .nav__link {
   font-size: clamp(1rem, 4vw, 1.25rem); color: rgba(0, 0, 0, 0.55);
   transition: color 0.2s var(--ease-wave);
 }
-.nav__mobile-sublink:hover { color: var(--pw-black); }
+@media (hover: hover) {
+  .nav__mobile-sublink:hover { color: var(--pw-black); }
+}
 
 /* Menu button's own dark shell — always black/bordered regardless of the
    header's light/dark theme, with a hover-triggered pixel-grid glow (reused
@@ -634,10 +646,12 @@ header.nav .nav__mobile .nav__link {
   font-size: clamp(1.4rem, 1.8vw, 2.1rem); font-weight: 500; color: var(--pw-black);
   transition: color .2s var(--ease-wave);
 }
-.nav__panel-heading:hover { color: var(--pw-white); }
 .nav__panel-sublinks { display: flex; flex-direction: column; gap: 0.65rem; }
 .nav__panel-sublink { font-size: 14px; color: rgba(0,0,0,0.55); transition: color .2s var(--ease-wave); }
-.nav__panel-sublink:hover { color: var(--pw-black); }
+@media (hover: hover) {
+  .nav__panel-heading:hover { color: var(--pw-white); }
+  .nav__panel-sublink:hover { color: var(--pw-black); }
+}
 
 .hero {
   position: fixed; top: 0; left: 0; right: 0; height: 100svh; overflow: hidden;
@@ -715,7 +729,9 @@ header.nav .nav__mobile .nav__link {
   letter-spacing: -0.02em; color: var(--text-secondary); padding-right: clamp(2rem, 2.6vw, 4rem); white-space: nowrap;
   transition: color var(--dur-base) var(--ease-wave);
 }
-.ticker__item:hover { color: var(--pw-orange); }
+@media (hover: hover) {
+  .ticker__item:hover { color: var(--pw-orange); }
+}
 .ticker__dot { width: clamp(10px, 0.6vw, 16px); height: clamp(10px, 0.6vw, 16px); border-radius: 50%; background: var(--pw-neutral-80); }
 .ticker__dot--orange { background: var(--pw-orange); }
 
@@ -962,7 +978,9 @@ header.nav .nav__mobile .nav__link {
   font-size: 14px; font-weight: 500; color: var(--text-secondary); cursor: pointer;
   transition: color .2s var(--ease-wave);
 }
-.work-page__filter:hover { color: var(--text-primary); }
+@media (hover: hover) {
+  .work-page__filter:hover { color: var(--text-primary); }
+}
 .work-page__filter.is-active { color: var(--accent-primary); }
 /* min-width: 0 overrides the flex item's default content-based auto
    minimum — without it, .work-page__head can't shrink this block below the
@@ -995,7 +1013,9 @@ header.nav .nav__mobile .nav__link {
   padding-bottom: 3px; border-bottom: 2px solid transparent;
   transition: color .2s var(--ease-wave);
 }
-.work-page__mode-tab:hover { color: var(--text-primary); }
+@media (hover: hover) {
+  .work-page__mode-tab:hover { color: var(--text-primary); }
+}
 .work-page__mode-tab.is-active { color: var(--text-primary); }
 /* Framer Motion layoutId (WorkPage.tsx) animates this span sliding between
    tabs on mode switch, instead of the underline just snapping from one
@@ -1054,7 +1074,9 @@ header.nav .nav__mobile .nav__link {
   text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary);
   transition: color var(--dur-base) var(--ease-wave);
 }
-.project-back:hover { color: var(--pw-orange); }
+@media (hover: hover) {
+  .project-back:hover { color: var(--pw-orange); }
+}
 
 .project-page__title {
   font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em;
@@ -1454,7 +1476,9 @@ header.nav .nav__mobile .nav__link {
   color: var(--text-secondary); text-decoration: none;
   transition: color 0.15s ease;
 }
-.contact-page__quick-contact-link:hover { color: var(--pw-white); }
+@media (hover: hover) {
+  .contact-page__quick-contact-link:hover { color: var(--pw-white); }
+}
 .contact-page__reactive-text {
   display: block;
   font-family: var(--font-display); font-weight: 700;
@@ -1485,7 +1509,9 @@ header.nav .nav__mobile .nav__link {
   font-family: var(--font-text); font-size: 0.85rem; color: var(--text-secondary);
   transition: color var(--dur-base) var(--ease-wave);
 }
-.contact-page__back:hover { color: var(--pw-white); }
+@media (hover: hover) {
+  .contact-page__back:hover { color: var(--pw-white); }
+}
 .contact-page .pw-input { background: var(--surface-raised); border-color: transparent; }
 .contact-page .pw-field__label { display: none; }
 .contact-page__fields { display: flex; gap: 1rem; flex: 1 1 auto; flex-wrap: wrap; }
@@ -1512,7 +1538,9 @@ header.nav .nav__mobile .nav__link {
   font-family: var(--font-text); font-size: 0.85rem; color: var(--text-secondary);
   transition: color var(--dur-base) var(--ease-wave);
 }
-.contact-page__recap-row:hover .contact-page__recap-edit { color: var(--pw-orange); }
+@media (hover: hover) {
+  .contact-page__recap-row:hover .contact-page__recap-edit { color: var(--pw-orange); }
+}
 .contact-page__send-error { font-size: 0.85rem; color: var(--pw-orange); margin: 0.75rem 0 0; }
 .contact-page__next--disabled { opacity: 0.4; pointer-events: none; }
 /* CareersPage's CV step — a hidden native file input behind a styled
@@ -1532,7 +1560,9 @@ header.nav .nav__mobile .nav__link {
 }
 .contact-page__cv-dropzone-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .contact-page__cv-clear { color: inherit; text-decoration: underline; cursor: pointer; }
-.contact-page__cv-clear:hover { color: var(--pw-orange); }
+@media (hover: hover) {
+  .contact-page__cv-clear:hover { color: var(--pw-orange); }
+}
 .contact-page__sent-row { display: flex; align-items: center; gap: 0.6rem; }
 .contact-page__sent-icon { color: var(--pw-orange); flex-shrink: 0; }
 .contact-page__sent-msg { color: var(--text-secondary); margin: 0; }
@@ -1553,13 +1583,15 @@ footer { position: relative; isolation: isolate; background: var(--surface-subtl
 }
 .foot__addr { font-size: clamp(0.9rem, 0.9vw, 1.05rem); color: var(--text-secondary); justify-self: start; }
 .foot__addr a { color: inherit; transition: color var(--dur-base) var(--ease-wave); }
-.foot__addr a:hover { color: var(--pw-orange); }
 .foot__social { display: flex; gap: clamp(1.5rem, 2vw, 3rem); justify-self: center; flex-wrap: wrap; }
 .foot__social-link {
   font-size: clamp(0.9rem, 0.9vw, 1.05rem); color: var(--text-primary);
   transition: color var(--dur-base) var(--ease-wave);
 }
-.foot__social-link:hover { color: var(--pw-orange); }
+@media (hover: hover) {
+  .foot__addr a:hover { color: var(--pw-orange); }
+  .foot__social-link:hover { color: var(--pw-orange); }
+}
 .foot__cta-wrap { justify-self: end; }
 
 .foot__giant {
