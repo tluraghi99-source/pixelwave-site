@@ -42,7 +42,7 @@ const MENU_COLUMNS = [
     label: "Let's chat",
     href: "/contact",
     links: [
-      { label: "Call us", href: "#" },
+      { label: "Join us", href: "/careers" },
       { label: "Instagram", href: "#" },
       { label: "Tiktok", href: "#" },
       { label: "LinkedIn", href: "#" },
