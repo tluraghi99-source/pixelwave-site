@@ -41,10 +41,26 @@ const MENU_COLUMNS = [
   },
 ]
 
+// The mobile takeover's own clip-path exit transition (see its
+// motion.transition below) — shared so the header's orange background can
+// be timed to match it exactly, in both places, from one source of truth.
+const MOBILE_NAV_EXIT_S = 0.45
+
 export function Header() {
   const [open, setOpen] = useState(false)
   const [hidden, setHidden] = useState(false)
   const [onDark, setOnDark] = useState(true)
+  // Mirrors `open`, except on close it stays true for MOBILE_NAV_EXIT_S
+  // longer — long enough for .nav__mobile's own curtain-retract to finish —
+  // via a plain timer rather than AnimatePresence's onExitComplete. A real
+  // iOS Safari device was observed leaving .nav__mobile mounted (invisible,
+  // clipped to nothing) indefinitely after closing, presumably because its
+  // exit animation's completion never resolved there; when the header's
+  // orange background was tied to that panel's DOM presence (`:has()`), the
+  // bar stayed orange forever until a full page reload. A fixed timer always
+  // clears regardless of whether the panel's own exit ever reports done.
+  const [mobileBarOrange, setMobileBarOrange] = useState(false)
+  const mobileBarTimeoutRef = useRef<number>(undefined)
   const lastY = useRef(0)
   const headerRef = useRef<HTMLElement>(null)
   const scrollLockedRef = useRef(false)
@@ -88,6 +104,18 @@ export function Header() {
   // descendant) can swap its color while the panel is up.
   useEffect(() => {
     document.documentElement.classList.toggle("nav-open", open)
+  }, [open])
+
+  useEffect(() => {
+    if (mobileBarTimeoutRef.current) window.clearTimeout(mobileBarTimeoutRef.current)
+    if (open) {
+      setMobileBarOrange(true)
+    } else {
+      mobileBarTimeoutRef.current = window.setTimeout(() => setMobileBarOrange(false), MOBILE_NAV_EXIT_S * 1000)
+    }
+    return () => {
+      if (mobileBarTimeoutRef.current) window.clearTimeout(mobileBarTimeoutRef.current)
+    }
   }, [open])
 
   // Both menus are fixed overlays now (desktop's dropdown panel, mobile's
@@ -189,7 +217,7 @@ export function Header() {
   return (
     <motion.header
       ref={headerRef}
-      className="nav"
+      className={`nav ${mobileBarOrange ? "nav--open" : ""}`}
       data-theme={onDark ? "dark" : "light"}
       animate={{ y: hidden ? "-100%" : "0%" }}
       transition={{ duration: 0.4, ease: EASE_WAVE }}
@@ -293,7 +321,7 @@ export function Header() {
             initial={{ clipPath: "inset(0 0 100% 0)" }}
             animate={{ clipPath: "inset(0 0 0% 0)" }}
             exit={{ clipPath: "inset(0 0 100% 0)" }}
-            transition={{ duration: 0.45, ease: EASE_WAVE }}
+            transition={{ duration: MOBILE_NAV_EXIT_S, ease: EASE_WAVE }}
           >
             <div className="nav__mobile-links">
               {/* Same MENU_COLUMNS data as the desktop panel (Join us/
