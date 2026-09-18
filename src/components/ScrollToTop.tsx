@@ -36,6 +36,19 @@ export function ScrollToTop() {
       return () => clearTimeout(correction)
     }
     window.scrollTo({ top: 0, left: 0, behavior: "instant" })
+    // iOS Safari only repaints position: fixed elements that reach into the
+    // safe area (the homepage hero background, the header, etc. — anything
+    // sized with bottom: 0 instead of a height calc) against their real
+    // on-screen edges in response to an actual scroll event, confirmed live
+    // via the mobile nav menu's own version of this bug (see Header.tsx's
+    // mobileBarOrange effect). Without a nudge here, first load can leave a
+    // flat, graphic-less strip at the screen edges until the visitor
+    // scrolls once themselves. The short delay lets first paint settle.
+    const nudge = setTimeout(() => {
+      window.scrollBy(0, 1)
+      window.scrollBy(0, -1)
+    }, 150)
+    return () => clearTimeout(nudge)
   }, [pathname, hash])
 
   return null
