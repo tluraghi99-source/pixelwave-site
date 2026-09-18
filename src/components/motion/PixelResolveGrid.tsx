@@ -63,10 +63,10 @@ export function PixelResolveGrid({ progress, tileSize = 24, className }: PixelRe
       let stage: Stage = "pending"
       if (dissolveThreshold <= current) {
         stage = "dissolved"
-        el.style.background = "transparent"
+        el.style.opacity = "0"
       } else if (colorThreshold <= current) {
         stage = "colored"
-        el.style.background = "var(--pw-orange)"
+        el.style.opacity = "1"
       }
       container.appendChild(el)
       tiles.push({ el, colorThreshold, dissolveThreshold, stage })
@@ -75,18 +75,26 @@ export function PixelResolveGrid({ progress, tileSize = 24, className }: PixelRe
   }, [cols, rows, tileSize, progress])
 
   useMotionValueEvent(progress, "change", (latest) => {
+    // Rebuilding the array without settled ("dissolved") tiles each tick —
+    // instead of filtering inline in the loop below — means this shrinks
+    // over the animation's lifetime instead of staying at the full tile
+    // count (thousands) for its entire ~1-3s duration.
+    const active: Tile[] = []
     for (const tile of tilesRef.current) {
       if (tile.stage === "pending" && tile.colorThreshold <= latest) {
         tile.stage = "colored"
-        if (!reducedMotion) tile.el.style.transition = "background-color .35s ease"
-        tile.el.style.background = "var(--pw-orange)"
+        if (!reducedMotion) tile.el.style.transition = "opacity .35s ease"
+        tile.el.style.opacity = "1"
       }
       if (tile.stage === "colored" && tile.dissolveThreshold <= latest) {
         tile.stage = "dissolved"
-        if (!reducedMotion) tile.el.style.transition = "background-color .35s ease"
-        tile.el.style.background = "transparent"
+        if (!reducedMotion) tile.el.style.transition = "opacity .35s ease"
+        tile.el.style.opacity = "0"
+        continue
       }
+      active.push(tile)
     }
+    tilesRef.current = active
   })
 
   return <div ref={containerRef} className={`pixel-resolve-grid ${className ?? ""}`.trim()} />

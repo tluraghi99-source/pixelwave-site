@@ -1556,7 +1556,15 @@ footer { position: relative; isolation: isolate; background: var(--surface-subtl
    of this container's own opaque layer. */
 .preloader { position: fixed; inset: 0; z-index: var(--z-modal); overflow: hidden; }
 .pixel-resolve-grid { position: absolute; inset: 0; display: grid; }
-.pixel-resolve-grid__tile { background: var(--pw-black); }
+/* Always orange underneath, hidden via opacity until "colored" — the
+   container's own solid black backdrop (Preloader.tsx's containerBg) shows
+   through in the meantime, reading identically to a literally-black tile.
+   Animating opacity instead of background-color is what makes this cheap
+   with thousands of tiles animating near-simultaneously: opacity is a
+   compositor-only property (no repaint), where background-color forces a
+   full repaint of every animating tile, every frame — the site's own
+   "laggy" preloader was this repaint cost across the whole viewport. */
+.pixel-resolve-grid__tile { background: var(--pw-orange); opacity: 0; }
 .preloader__badge {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2;
   width: 56px; height: 56px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.4);
