@@ -61,6 +61,7 @@ export function Header() {
   // clears regardless of whether the panel's own exit ever reports done.
   const [mobileBarOrange, setMobileBarOrange] = useState(false)
   const mobileBarTimeoutRef = useRef<number>(undefined)
+  const themeColorDefaultRef = useRef<string | null>(null)
   const lastY = useRef(0)
   const headerRef = useRef<HTMLElement>(null)
   const scrollLockedRef = useRef(false)
@@ -117,6 +118,22 @@ export function Header() {
       if (mobileBarTimeoutRef.current) window.clearTimeout(mobileBarTimeoutRef.current)
     }
   }, [open])
+
+  // A screen recording on a real iPhone showed the header's own background
+  // reverting correctly (confirmed via the DOM/CSS above), but iOS Safari's
+  // status-bar/Dynamic Island tint itself stayed orange indefinitely after
+  // that — it only seems to re-sample the page's content color on certain
+  // triggers (e.g. a scroll), not on an ordinary class/background change.
+  // Updating the theme-color meta tag directly gives it an explicit,
+  // immediate signal instead of relying on that sampling.
+  useEffect(() => {
+    const meta = document.querySelector('meta[name="theme-color"]')
+    if (!meta) return
+    if (themeColorDefaultRef.current === null) {
+      themeColorDefaultRef.current = meta.getAttribute("content") ?? "#000000"
+    }
+    meta.setAttribute("content", mobileBarOrange ? "#FF5B00" : themeColorDefaultRef.current)
+  }, [mobileBarOrange])
 
   // Both menus are fixed overlays now (desktop's dropdown panel, mobile's
   // full-screen takeover), so page scroll is locked behind either one.
