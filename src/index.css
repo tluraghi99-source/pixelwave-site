@@ -285,6 +285,17 @@ html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; } /* Chrome/Sa
 
 body {
   margin: 0;
+  /* iOS Safari's chrome (address bar/bottom toolbar) shrinks as you scroll,
+     growing the actual visible viewport past what it was when the page's
+     total height was laid out — several sections size themselves off svh
+     (the smallest, chrome-max-visible case). Past the real end of the
+     document that gap isn't page background at all, it's Safari's own
+     fallback fill using the static theme-color meta tag (#000000) — hence
+     a flat black cutoff instead of the page simply running out. A dvh
+     floor keeps the document at least as tall as whatever the chrome-
+     hidden viewport currently is, so real content (this background
+     included) always reaches the true bottom instead of Safari's fallback. */
+  min-height: 100dvh;
   font-family: var(--font-text);
   font-size: var(--fs-body);
   line-height: var(--lh-body);
