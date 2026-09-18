@@ -285,10 +285,15 @@ export function Header() {
           <motion.div
             key="nav-mobile"
             className="nav__mobile md:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3, ease: EASE_WAVE }}
+            // clip-path, not scaleY like the desktop panel's own "window
+            // shade" — scaling a full-height box with real text content
+            // would visibly squash/stretch the words as it grows/shrinks;
+            // clipping reveals the fully-rendered panel progressively
+            // instead, top-down like a curtain, with zero text distortion.
+            initial={{ clipPath: "inset(0 0 100% 0)" }}
+            animate={{ clipPath: "inset(0 0 0% 0)" }}
+            exit={{ clipPath: "inset(0 0 100% 0)" }}
+            transition={{ duration: 0.45, ease: EASE_WAVE }}
           >
             <div className="nav__mobile-links">
               {/* Same MENU_COLUMNS data as the desktop panel (Join us/
