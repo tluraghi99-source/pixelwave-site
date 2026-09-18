@@ -520,9 +520,15 @@ header.nav {
   padding-right: var(--scroll-comp);
 }
 /* Mobile menu open: the top bar joins the full-screen takeover below it as
-   one solid orange block, instead of a white strip sitting above it. */
+   one solid orange block, instead of a white strip sitting above it.
+   Tied to the panel's own DOM presence (:has), not the `open` boolean —
+   AnimatePresence keeps .nav__mobile mounted for its whole exit animation,
+   so this keeps the bar orange for that entire time too. Gating on `open`
+   directly used to flip the bar back on the same render as the state
+   change, while the panel took another 0.45s to curtain-retract beneath
+   it — two pieces animating out of sync instead of one orange block. */
 @media (max-width: 767px) {
-  header.nav.nav--open { background: var(--pw-orange); }
+  header.nav:has(.nav__mobile) { background: var(--pw-orange); }
 }
 .nav__inner { display: flex; align-items: center; justify-content: space-between; height: 76px; }
 .nav__links { display: flex; gap: 2.25rem; align-items: center; }

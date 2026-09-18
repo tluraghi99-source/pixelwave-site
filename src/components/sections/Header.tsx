@@ -189,7 +189,7 @@ export function Header() {
   return (
     <motion.header
       ref={headerRef}
-      className={`nav ${open ? "nav--open" : ""}`}
+      className="nav"
       data-theme={onDark ? "dark" : "light"}
       animate={{ y: hidden ? "-100%" : "0%" }}
       transition={{ duration: 0.4, ease: EASE_WAVE }}
