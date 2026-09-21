@@ -55,20 +55,14 @@ export function VideoScrubbed({ progress }: { progress: MotionValue<number> }) {
   )
 }
 
-/** Mobile/tablet: no pin/scrub (too heavy on scroll + decode cost) — plays ambiently on loop. */
-export function VideoScrubAmbient() {
+/** Mobile/tablet: the video pins full-screen (see .video-scrub--ambient) and
+ *  scrubs with scroll, same as desktop — just driven by a progress value the
+ *  caller derives from how far the section that slides over it has risen,
+ *  since this section itself is sticky and its own rect never moves. */
+export function VideoScrubAmbient({ progress }: { progress: MotionValue<number> }) {
   return (
     <section className="video-scrub video-scrub--ambient" data-screen-label="Studio Reel">
-      <video
-        className="video-scrub__video"
-        src="/video/hero.mp4"
-        muted
-        playsInline
-        loop
-        autoPlay
-        preload="metadata"
-      />
-      <div className="video-scrub__tint" />
+      <VideoScrubbed progress={progress} />
     </section>
   )
 }

@@ -222,10 +222,16 @@ function WorkReelPinned({ ctaHeadline, projects }: { ctaHeadline: string; projec
  *  place it's always been, just relocated here from HomePage.tsx so
  *  WorkReel owns "show the CTA" for both paths. */
 function WorkReelAmbient({ ctaHeadline, projects }: { ctaHeadline: string; projects: Project[] }) {
+  // The video is sticky, so its own rect never moves — scrub it off the
+  // carousel section instead: 0 when that section is two viewports below the
+  // top (the video just scrolling into view), 1 once it has risen all the
+  // way over the pinned video.
+  const workRef = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({ target: workRef, offset: ["start 200%", "start start"] })
   return (
     <>
-      <VideoScrubAmbient />
-      <WorkAmbient projects={projects} />
+      <VideoScrubAmbient progress={scrollYProgress} />
+      <WorkAmbient projects={projects} sectionRef={workRef} />
       <CtaBand headline={ctaHeadline} />
     </>
   )

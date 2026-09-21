@@ -1,4 +1,4 @@
-import { useMemo, useRef, type PointerEvent, type ReactNode } from "react"
+import { useMemo, useRef, type PointerEvent, type ReactNode, type RefObject } from "react"
 import { useNavigate } from "react-router-dom"
 import { motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform } from "framer-motion"
 import type { MotionValue } from "framer-motion"
@@ -177,8 +177,16 @@ export function WorkHeading(): ReactNode {
 }
 
 /** Mobile/tablet: ambient scroll-linked drift, no pinning (revisit later). */
-export function WorkAmbient({ projects }: { projects: Project[] }) {
-  const sectionRef = useRef<HTMLElement>(null)
+export function WorkAmbient({
+  projects,
+  sectionRef: externalRef,
+}: {
+  projects: Project[]
+  /** Lets a parent (WorkReelAmbient) watch this section's scroll position too. */
+  sectionRef?: RefObject<HTMLElement | null>
+}) {
+  const internalRef = useRef<HTMLElement>(null)
+  const sectionRef = externalRef ?? internalRef
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
