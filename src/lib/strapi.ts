@@ -1,4 +1,19 @@
-export const STRAPI_URL = import.meta.env.VITE_STRAPI_URL ?? "http://localhost:1337"
+const CONFIGURED_STRAPI_URL: string = import.meta.env.VITE_STRAPI_URL ?? "http://localhost:1337"
+
+/** A "localhost" Strapi URL only works on the machine running it — opened
+ *  from a phone on the LAN (http://<mac-ip>:5173), "localhost" is the phone
+ *  itself. When the page was loaded from any other hostname, point at that
+ *  same host instead (Strapi listens on 0.0.0.0). */
+function resolveStrapiUrl(url: string): string {
+  if (typeof window === "undefined") return url
+  const target = new URL(url)
+  const isLoopback = target.hostname === "localhost" || target.hostname === "127.0.0.1"
+  const pageIsLoopback = ["localhost", "127.0.0.1"].includes(window.location.hostname)
+  if (isLoopback && !pageIsLoopback) target.hostname = window.location.hostname
+  return target.origin
+}
+
+export const STRAPI_URL = resolveStrapiUrl(CONFIGURED_STRAPI_URL)
 
 export interface StrapiMedia {
   url: string
