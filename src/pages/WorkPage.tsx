@@ -163,10 +163,8 @@ export function WorkPage() {
     <>
       <main>
         <section className="sec work-page" data-screen-label="All Work">
-          <div className="work-hero" data-screen-label="Work Hero">
-            <CursorGlow className="cursor-glow" variant="light" glow />
-          </div>
-          <CursorGlow className="cursor-glow" variant="light" glow={false} />
+          <div className="work-hero" data-screen-label="Work Hero" />
+          <CursorGlow className="cursor-glow" variant="light" glow />
           <div className="wrap">
             <div className="work-page__head">
               <Reveal delay={0.1}>

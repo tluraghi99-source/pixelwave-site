@@ -934,10 +934,10 @@ header.nav .nav__mobile .nav__link {
 /* Same visual language as the homepage's Hero (interactive pixel-trail),
    just static — there's no header logo to dock into on this page, so no
    scroll-driven shrink/handoff, and it sits in normal flow, not pinned. */
-.work-hero {
-  position: relative; isolation: isolate; height: 50svh; overflow: hidden;
-  background: var(--pw-white); color: var(--pw-black);
-}
+/* Empty spacer only — the section-level CursorGlow (WorkPage.tsx) covers the
+   hero and everything below it as one continuous dot field, so there's no
+   seam where the animated grid used to end at the hero's bottom edge. */
+.work-hero { height: 50svh; }
 /* nowrap above 767px: whether this row wraps must depend on viewport, not on
    which filter list is active. flex-wrap: wrap here would let the browser
    decide based on each child's unwrapped content width — fine for the short
