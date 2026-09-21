@@ -7,6 +7,7 @@ import { CursorGlow } from "@/components/motion/CursorGlow"
 import { Footer } from "@/components/sections/Footer"
 import { useProjects } from "@/hooks/useProjects"
 import { usePageMeta } from "@/hooks/usePageMeta"
+import { useVideoFrames } from "@/hooks/useVideoFrames"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
 
 type MediaItem = { type: "image"; src: string } | { type: "video"; src: string } | { type: "youtube"; videoId: string }
@@ -267,6 +268,22 @@ export function ProjectPage() {
   // while `projects` is still loading or the slug genuinely doesn't match.
   usePageMeta(project ? `${project.title} — PixellWave` : "PixellWave — Your Vision, Our Wave", project?.desc)
 
+  // No uploaded gallery + a self-hosted video hero: fill the carousel with
+  // stills grabbed from that video instead of stock placeholders. While
+  // they're being extracted the gallery stays hidden (no placeholder flash);
+  // if extraction fails it falls back to the placeholders in project.gallery.
+  const framesSrc =
+    project && project.galleryImages.length === 0 && project.hero.type === "video" ? project.hero.src : null
+  const videoFrames = useVideoFrames(framesSrc, 8)
+  const galleryItems: MediaItem[] =
+    !project
+      ? []
+      : framesSrc && videoFrames.status === "ready"
+        ? videoFrames.frames.map((src) => ({ type: "image" as const, src }))
+        : framesSrc && (videoFrames.status === "loading" || videoFrames.status === "idle")
+          ? []
+          : project.gallery
+
   if (!project || !nextProject) {
     return (
       <>
@@ -317,14 +334,14 @@ export function ProjectPage() {
             </Reveal>
           </div>
 
-          {project.gallery.length > 0 && (
+          {galleryItems.length > 0 && (
             <RevealGroup className="project-gallery" stagger={0.1} data-screen-label="Project Gallery">
               <RevealItem>
-                <GalleryRow items={project.gallery.slice(0, Math.ceil(project.gallery.length / 2))} reverse={false} />
+                <GalleryRow items={galleryItems.slice(0, Math.ceil(galleryItems.length / 2))} reverse={false} />
               </RevealItem>
-              {project.gallery.length > 1 && (
+              {galleryItems.length > 1 && (
                 <RevealItem>
-                  <GalleryRow items={project.gallery.slice(Math.ceil(project.gallery.length / 2))} reverse={true} />
+                  <GalleryRow items={galleryItems.slice(Math.ceil(galleryItems.length / 2))} reverse={true} />
                 </RevealItem>
               )}
             </RevealGroup>
