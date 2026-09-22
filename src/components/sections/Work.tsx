@@ -40,7 +40,13 @@ function pickRandomProjects(projects: Project[], count: number): Project[] {
   return shuffled(projects).slice(0, count)
 }
 
-function WorkMedia({ index }: { index: string }) {
+/** Real project thumbnail with the same pointer-tilt effect the numbered
+ *  placeholder used to have on its own — this used to always render just
+ *  the card's index number ("01", "02"...) instead of an image, so mobile/
+ *  tablet visitors never saw an actual project photo in this carousel even
+ *  though the desktop CircularGallery (WorkGallery below) always has. The
+ *  index itself already shows separately, via Card's own pw-card__index. */
+function WorkMedia({ src }: { src: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const rotateX = useMotionValue(0)
   const rotateY = useMotionValue(0)
@@ -66,8 +72,6 @@ function WorkMedia({ index }: { index: string }) {
       ref={ref}
       className="flex h-full w-full items-center justify-center"
       style={{
-        background: "var(--surface-subtle)",
-        color: "var(--pw-neutral-80)",
         rotateX: springX,
         rotateY: springY,
         transformPerspective: 800,
@@ -75,12 +79,7 @@ function WorkMedia({ index }: { index: string }) {
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
     >
-      <span
-        style={{ fontFamily: "var(--font-display)" }}
-        className="text-6xl font-semibold tracking-tight"
-      >
-        {index}
-      </span>
+      <img src={src} alt="" loading="lazy" />
     </motion.div>
   )
 }
@@ -98,7 +97,7 @@ function WorkTrack({ projects, x }: { projects: Project[]; x: MotionValue<string
         <div className="work__card-wrap" key={`${w.id}-${i}`}>
           <Card
             index={w.idx}
-            media={<WorkMedia index={w.idx} />}
+            media={<WorkMedia src={galleryImageUrl(w)} />}
             meta={w.tags.map((t, ti) => (
               <Tag key={ti} variant={t.highlighted ? "orange" : "outline"}>
                 {t.label}
