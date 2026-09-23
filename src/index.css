@@ -832,13 +832,6 @@ header.nav .nav__mobile .nav__link {
 @media (max-width: 768px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 480px) { .team-grid { grid-template-columns: 1fr; } }
 
-/* Blank filler cards (below) only exist to complete the desktop grid's
-   4-wide rows — on a 1-2 column mobile layout they no longer sit alongside
-   real cards, so they'd show up as standalone black rectangles between
-   people instead of a rhythm-break. Hidden below the same breakpoint the
-   nav's own mobile takeover uses. */
-@media (max-width: 767px) { .team-card--blank { display: none; } }
-
 /* Phone-only progressive disclosure (see StudioTeam.tsx's `expanded` state):
    the 3rd real card previews dimmed, the 4th-and-on stay off until "Show
    all" is tapped. The :not() qualifier is what makes .team-grid--expanded
@@ -852,15 +845,11 @@ header.nav .nav__mobile .nav__link {
   .team-grid__show-all-wrap { display: flex; justify-content: center; margin-top: clamp(1.5rem, 5vw, 2rem); }
 }
 
-/* Every real card sits on the same flat orange block (--card-color) —
-   visible as the media's own background before/behind the photo — with
-   white caption text to match. Photos themselves show their natural
-   color (no tint); only .team-card--blank's placeholder beat uses
-   --card-color as more than a backdrop. */
+/* Every card sits on the same flat orange block (--card-color) — visible
+   as the media's own background before/behind the photo — with white
+   caption text to match. Photos themselves show their natural color
+   (grayscale-filtered, not tinted — see .team-card__photo). */
 .team-card--orange { --card-color: var(--pw-orange); --card-text: var(--pw-white); }
-/* A deliberate empty beat in the grid — slightly lighter than the page's
-   own pure black so it still reads as a card, not a missing image. */
-.team-card--blank { --card-color: var(--pw-neutral-10); }
 
 .team-card__media {
   position: relative; aspect-ratio: 4 / 5; overflow: hidden;
