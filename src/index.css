@@ -869,6 +869,9 @@ header.nav .nav__mobile .nav__link {
 .team-card__photo {
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; display: block;
+  /* Forced site-wide, not left to whatever an editor uploads — keeps every
+     card visually consistent regardless of the source photo's own color. */
+  filter: grayscale(1);
   transition: opacity 0.4s var(--ease-wave);
 }
 .team-card__photo--base { opacity: 1; }
