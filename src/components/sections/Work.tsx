@@ -8,6 +8,7 @@ import { Card } from "@/components/pw/Card"
 import { Tag } from "@/components/pw/Tag"
 import { Reveal } from "@/components/motion/Reveal"
 import { wrap } from "@/lib/motion"
+import { shuffle } from "@/lib/array"
 import { CircularGallery, type CircularGalleryHandle } from "@/components/ui/circular-gallery"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
 
@@ -23,29 +24,18 @@ function galleryImageUrl(p: Project): string {
  *  gallery and the mobile/tablet marquee — the full roster lives on /work. */
 const GALLERY_ITEM_COUNT = 7
 
-/** Fisher–Yates shuffle of a copy — never mutates the input array. */
-function shuffled<T>(items: T[]): T[] {
-  const arr = [...items]
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[arr[i], arr[j]] = [arr[j], arr[i]]
-  }
-  return arr
-}
-
 /** A fresh random selection each time the caller's useMemo re-runs (i.e.
  *  once per page load, when `projects` first arrives from Strapi) — falls
  *  back to however many projects exist if there are fewer than `count`. */
 function pickRandomProjects(projects: Project[], count: number): Project[] {
-  return shuffled(projects).slice(0, count)
+  return shuffle(projects).slice(0, count)
 }
 
 /** Real project thumbnail with the same pointer-tilt effect the numbered
  *  placeholder used to have on its own — this used to always render just
  *  the card's index number ("01", "02"...) instead of an image, so mobile/
  *  tablet visitors never saw an actual project photo in this carousel even
- *  though the desktop CircularGallery (WorkGallery below) always has. The
- *  index itself already shows separately, via Card's own pw-card__index. */
+ *  though the desktop CircularGallery (WorkGallery below) always has. */
 function WorkMedia({ src }: { src: string }) {
   const ref = useRef<HTMLDivElement>(null)
   const rotateX = useMotionValue(0)
@@ -96,7 +86,6 @@ function WorkTrack({ projects, x }: { projects: Project[]; x: MotionValue<string
       {cards.map((w, i) => (
         <div className="work__card-wrap" key={`${w.id}-${i}`}>
           <Card
-            index={w.idx}
             media={<WorkMedia src={galleryImageUrl(w)} />}
             meta={w.tags.map((t, ti) => (
               <Tag key={ti} variant={t.highlighted ? "orange" : "outline"}>

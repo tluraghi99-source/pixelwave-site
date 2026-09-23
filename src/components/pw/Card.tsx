@@ -3,21 +3,19 @@ import { Link } from "react-router-dom"
 
 interface CardProps extends Omit<HTMLAttributes<HTMLElement>, "title"> {
   media?: ReactNode
-  index?: string
   title?: ReactNode
   description?: ReactNode
   meta?: ReactNode
   href?: string
   interactive?: boolean
-  /** Default order is index, tags, title (homepage carousel). Set this to
-   *  put the title before the tags instead (used on the /work listing). */
+  /** Default order is tags, title (homepage carousel). Set this to put the
+   *  title before the tags instead (used on the /work listing). */
   titleFirst?: boolean
   children?: ReactNode
 }
 
 export function Card({
   media,
-  index,
   title,
   description,
   meta,
@@ -51,7 +49,6 @@ export function Card({
         </div>
       ) : null}
       <div className="pw-card__body">
-        {index ? <span className="pw-card__index">{index}</span> : null}
         {titleFirst ? (
           <>
             {titleEl}

@@ -27,7 +27,6 @@ export interface ProjectTag {
 
 export interface Project {
   id: string
-  idx: string
   slug: string
   title: string
   desc: string
@@ -93,7 +92,6 @@ interface StrapiProjectRaw {
   bodyDescription: string
   client: string
   year: number
-  order: number
   tags: StrapiTagRaw[]
   heroMedia: StrapiMediaRaw | null
   cover: StrapiMediaRaw | null
@@ -106,7 +104,6 @@ interface StrapiProjectRaw {
 function mapProject(raw: StrapiProjectRaw): Project {
   return {
     id: raw.documentId,
-    idx: String(raw.order).padStart(2, "0"),
     slug: raw.slug,
     title: raw.title,
     desc: raw.description,
@@ -130,13 +127,14 @@ function mapProject(raw: StrapiProjectRaw): Project {
   }
 }
 
-/** Fetches all published projects, sorted by their editorial `order`.
- *  Resolves to `[]` on any network/parse failure — callers render an
- *  empty state rather than an error message. */
+/** Fetches all published projects. No editorial ordering — callers (see
+ *  WorkPage.tsx, Work.tsx) shuffle for display, so the fetch itself just
+ *  needs a stable order to sort from. Resolves to `[]` on any network/parse
+ *  failure — callers render an empty state rather than an error message. */
 export async function fetchProjects(): Promise<Project[]> {
   try {
     const res = await fetch(
-      `${STRAPI_URL}/api/projects?populate=tags,heroMedia,cover,galleryImages,workCategories&sort=order:asc,documentId:asc&pagination[pageSize]=100`
+      `${STRAPI_URL}/api/projects?populate=tags,heroMedia,cover,galleryImages,workCategories&sort=documentId:asc&pagination[pageSize]=100`
     )
     if (!res.ok) return []
     const json = await res.json()

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react"
 import { RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { useTeamMembers } from "@/hooks/useTeamMembers"
 import type { TeamMember } from "@/lib/strapi"
+import { shuffle } from "@/lib/array"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { Button } from "@/components/pw/Button"
 
@@ -17,16 +18,6 @@ function withPhotos(m: TeamMember) {
 }
 
 type TeamMemberWithPhotos = ReturnType<typeof withPhotos>
-
-/** Fisher–Yates shuffle of a copy — never mutates the input. */
-function shuffle<T>(arr: T[]): T[] {
-  const copy = [...arr]
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[copy[i], copy[j]] = [copy[j], copy[i]]
-  }
-  return copy
-}
 
 /** A fixed-but-random layout, reshuffled only once per fetched member list
  *  (called from a useMemo below keyed on it). The grid simply ends after

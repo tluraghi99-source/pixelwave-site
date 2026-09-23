@@ -12,6 +12,7 @@ import { EASE_WAVE } from "@/lib/motion"
 import { useProjects } from "@/hooks/useProjects"
 import { useWorkCategories } from "@/hooks/useWorkCategories"
 import { usePageMeta } from "@/hooks/usePageMeta"
+import { shuffle } from "@/lib/array"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
 
 /** Shared chain (see strapi.ts's projectThumbUrl) — a small grid card is
@@ -104,7 +105,10 @@ export function WorkPage() {
     "All Projects — PixellWave",
     "Browse every PixellWave project — video, photo, branding, web design, social and events work, filterable by category or client."
   )
-  const projects = useProjects()
+  const fetchedProjects = useProjects()
+  // Reshuffled once per fetch (like the Studio team grid), not on every
+  // render — a fixed-but-random order rather than the deleted `order` field.
+  const projects = useMemo(() => shuffle(fetchedProjects), [fetchedProjects])
   const workCategories = useWorkCategories()
 
   // The fixed Video/Photo/Branding/Web Design/Social/Events taxonomy (see
@@ -256,7 +260,6 @@ export function WorkPage() {
                 {visibleProjects.map((p) => (
                   <RevealItem key={p.id}>
                     <Card
-                      index={p.idx}
                       titleFirst
                       media={<img src={gridThumbUrl(p)} alt={p.title} />}
                       meta={p.tags.map((t, ti) => (
