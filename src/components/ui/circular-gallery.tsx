@@ -93,6 +93,12 @@ const CLICK_DRAG_THRESHOLD_PX = 6
  *  on top of it) while hovered. */
 const HOVER_OPACITY = 0.6
 
+/** Below these, scroll position / hover-dim opacity are close enough to
+ *  their targets that redrawing another frame would be imperceptible —
+ *  used to decide when the render loop can stop (see App.update). */
+const SCROLL_SETTLE_EPSILON = 0.01
+const OPACITY_SETTLE_EPSILON = 0.001
+
 // touchstart/touchmove have their position in `touches`; touchend's `touches`
 // is already empty by the time it fires (the touch has ended) — its
 // position lives in `changedTouches` instead. clientXOf/clientYOf cover the
@@ -458,7 +464,7 @@ class App {
     this.onResize()
     this.createGeometry()
     this.createMedias(items, bend, borderRadius, cardWidth, cardHeight)
-    this.update()
+    this.startLoop()
     this.addEventListeners()
   }
 
@@ -524,6 +530,7 @@ class App {
     const total = this.medias?.[0]?.widthTotal ?? 0
     this.externalOffset = progress * (total / 2)
     this.scroll.target = this.externalOffset + this.manualOffset
+    this.startLoop()
   }
 
   onTouchDown(e: MouseEvent | TouchEvent) {
@@ -531,6 +538,7 @@ class App {
     this.dragStartOffset = this.manualOffset
     this.start = clientXOf(e)
     this.startY = clientYOf(e)
+    this.startLoop()
   }
 
   onTouchMove(e: MouseEvent | TouchEvent) {
@@ -539,6 +547,7 @@ class App {
     const distance = (this.start - x) * (this.scrollSpeed * 0.025)
     this.manualOffset = this.dragStartOffset + distance
     this.scroll.target = this.externalOffset + this.manualOffset
+    this.startLoop()
   }
 
   onTouchUp(e: MouseEvent | TouchEvent) {
@@ -568,6 +577,7 @@ class App {
     const snapped = width * itemIndex
     this.manualOffset = relative < 0 ? -snapped : snapped
     this.scroll.target = this.externalOffset + this.manualOffset
+    this.startLoop()
   }
 
   /** Only meaningful for real pointers — coarse (touch) devices have no hover concept. */
@@ -575,6 +585,11 @@ class App {
     if (window.matchMedia("(pointer: coarse)").matches) return
     const rect = this.container.getBoundingClientRect()
     this.mouse = { x: e.clientX - rect.left, y: e.clientY - rect.top }
+    // Hover detection itself only runs inside update() (see updateHover),
+    // so once the loop has settled and stopped, moving onto a new card
+    // needs this to kick it awake again — otherwise the hover dim/caption
+    // would freeze at whatever it last was.
+    this.startLoop()
   }
 
   onPointerLeave() {
@@ -671,18 +686,45 @@ class App {
     if (this.medias) {
       this.medias.forEach((media) => media.onResize({ screen: this.screen, viewport: this.viewport }))
     }
+    // Recomputing screen/viewport doesn't render on its own — if the loop
+    // had already settled and stopped, a resize (e.g. rotating the device)
+    // would otherwise leave the canvas showing a stale frame at the old size.
+    this.startLoop()
+  }
+
+  /** Schedules update() if it isn't already scheduled — a no-op while a
+   *  frame is already pending, so callers can call this freely without
+   *  double-scheduling. */
+  startLoop() {
+    if (this.raf) return
+    this.raf = window.requestAnimationFrame(this.update)
   }
 
   update() {
     this.scroll.current = lerp(this.scroll.current, this.scroll.target, this.scroll.ease)
     const direction = this.scroll.current > this.scroll.last ? "right" : "left"
+    let unsettled = Math.abs(this.scroll.target - this.scroll.current) > SCROLL_SETTLE_EPSILON
     if (this.medias) {
-      this.medias.forEach((media) => media.update(this.scroll, direction))
+      this.medias.forEach((media) => {
+        media.update(this.scroll, direction)
+        if (Math.abs(media.targetOpacity - media.opacity) > OPACITY_SETTLE_EPSILON) unsettled = true
+      })
     }
     this.updateHover()
     this.renderer.render({ scene: this.scene, camera: this.camera })
     this.scroll.last = this.scroll.current
-    this.raf = window.requestAnimationFrame(this.update)
+    // Dragging keeps going regardless of the epsilon checks above — a held,
+    // motionless drag has nothing left to settle but must stay ready for
+    // the next onTouchMove. Otherwise, once scroll and every card's hover
+    // dim have caught up to their targets, further frames would be
+    // pixel-identical — stop, rather than rendering this WebGL scene at
+    // 60fps forever. setProgress/onTouch*/onPointerMove/onResize above all
+    // call startLoop() to wake it back up when something actually changes.
+    if (unsettled || this.isDown) {
+      this.raf = window.requestAnimationFrame(this.update)
+    } else {
+      this.raf = 0
+    }
   }
 
   addEventListeners() {
