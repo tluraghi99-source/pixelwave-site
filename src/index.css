@@ -852,10 +852,11 @@ header.nav .nav__mobile .nav__link {
   .team-grid__show-all-wrap { display: flex; justify-content: center; margin-top: clamp(1.5rem, 5vw, 2rem); }
 }
 
-/* Every card sits on the same flat orange block (--card-color) with the
-   photo tinted toward it (mix-blend-mode: color keeps the photo's own
-   luminance/detail, just recolors its hue), rather than a plain grayscale
-   crop. */
+/* Every real card sits on the same flat orange block (--card-color) —
+   visible as the media's own background before/behind the photo — with
+   white caption text to match. Photos themselves show their natural
+   color (no tint); only .team-card--blank's placeholder beat uses
+   --card-color as more than a backdrop. */
 .team-card--orange { --card-color: var(--pw-orange); --card-text: var(--pw-white); }
 /* A deliberate empty beat in the grid — slightly lighter than the page's
    own pure black so it still reads as a card, not a missing image. */
@@ -878,10 +879,6 @@ header.nav .nav__mobile .nav__link {
    flourish is meant to skip (see Services.tsx's own (hover: hover) gate). */
 @media (hover: hover) {
   .team-card:hover .team-card__photo--hover { opacity: 1; }
-}
-.team-card__tint {
-  position: absolute; inset: 0; background: var(--card-color);
-  mix-blend-mode: color; opacity: 0.6; pointer-events: none;
 }
 .team-card__scrim {
   position: absolute; inset: 0; pointer-events: none;

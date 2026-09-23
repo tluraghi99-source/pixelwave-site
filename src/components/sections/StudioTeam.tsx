@@ -72,7 +72,6 @@ function TeamCard({ member }: { member: TeamMemberWithPhotos }) {
           aria-hidden="true"
           loading="lazy"
         />
-        <div className="team-card__tint" aria-hidden="true" />
         <div className="team-card__scrim" aria-hidden="true" />
         <div className="team-card__caption">
           <span className="team-card__name">{member.name}</span>
