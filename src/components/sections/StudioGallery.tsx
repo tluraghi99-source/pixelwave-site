@@ -6,13 +6,13 @@ import { Reveal } from "@/components/motion/Reveal"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { CircularGallery, type CircularGalleryHandle } from "@/components/ui/circular-gallery"
 
-// Temporary stand-in photography (Lorem Picsum) until real studio photos are
-// ready — same posture as Work.tsx's GALLERY_ITEMS and StudioTeam's
-// TEAM_WITH_PHOTOS. No caption text: these are atmosphere shots, not
-// cataloged items — an empty `text` suppresses circular-gallery.tsx's hover
-// scrim (see the onHover tweak there).
-const STUDIO_PHOTOS = Array.from({ length: 8 }, (_, i) => ({
-  image: `https://picsum.photos/seed/pixellwave-studio-${i}/1200/900?grayscale`,
+// Real studio photos (public/images/studio), used as-is for now — some are
+// multi-shot collages rather than single clean frames, fine as a stand-in
+// until final art direction picks/crops individual shots. No caption text:
+// these are atmosphere shots, not cataloged items — an empty `text`
+// suppresses circular-gallery.tsx's hover scrim (see the onHover tweak there).
+const STUDIO_PHOTOS = Array.from({ length: 7 }, (_, i) => ({
+  image: `/images/studio/studio-${String(i + 1).padStart(2, "0")}.webp`,
   text: "",
 }))
 
