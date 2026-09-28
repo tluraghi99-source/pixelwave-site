@@ -1299,7 +1299,7 @@ header.nav .nav__mobile .nav__link {
    renders invisible (black-on-black). Same fix .reel__content already
    applies for the homepage's own dark carousel section. */
 .studio-gallery { position: relative; isolation: isolate; padding-top: clamp(3rem, 6vw, 6rem); padding-bottom: clamp(6rem, 12vw, 12rem); color: var(--pw-white); }
-.studio-gallery__wrap { height: clamp(360px, 42vw, 640px); width: 100%; margin-top: 2rem; position: relative; }
+.studio-gallery__wrap { height: clamp(432px, 50.4vw, 768px); width: 100%; margin-top: 2rem; position: relative; }
 .studio-gallery__canvas { display: block; }
 
 /* Mobile/tablet — plain image tiles instead of full project Cards, since
