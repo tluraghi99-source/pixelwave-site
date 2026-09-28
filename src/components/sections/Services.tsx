@@ -1,17 +1,37 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion"
 import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Tag } from "@/components/pw/Tag"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { SERVICES } from "@/data/services"
+import { useProjects } from "@/hooks/useProjects"
+import { shuffle } from "@/lib/array"
+import { projectThumbUrl, type Project } from "@/lib/strapi"
 
-// Temporary stand-in photography (Lorem Picsum) until real service imagery is
-// ready — same posture as Work.tsx's GALLERY_ITEMS.
-const SERVICES_WITH_IMAGES = SERVICES.map((s) => ({
-  ...s,
-  image: `https://picsum.photos/seed/pixellwave-svc-${s.num}/800/600?grayscale`,
-}))
+/** Only projects with a real still image (cover, or an image hero) — the
+ *  shared thumb chain would otherwise hand back a stock placeholder. */
+function hasRealThumb(p: Project): boolean {
+  return !!p.cover || (p.heroMediaType === "image" && !!p.heroMedia)
+}
+
+/** One random project image per service, drawn from the projects assigned
+ *  that service's Work Category (service names match the category names).
+ *  Reshuffled once per page load; prefers images not already used by an
+ *  earlier service, and falls back to any project with an image, then to the
+ *  old stock placeholder while Strapi is empty/loading. */
+function pickServiceImages(projects: Project[]): string[] {
+  const withThumb = projects.filter(hasRealThumb)
+  const used = new Set<string>()
+  return SERVICES.map((service) => {
+    const matching = shuffle(withThumb.filter((p) => p.workCategories.some((c) => c.toLowerCase() === service.name.toLowerCase())))
+    const pool = matching.length > 0 ? matching : shuffle(withThumb)
+    const pick = pool.find((p) => !used.has(p.id)) ?? pool[0]
+    if (!pick) return `https://picsum.photos/seed/pixellwave-svc-${service.num}/800/600?grayscale`
+    used.add(pick.id)
+    return projectThumbUrl(pick, "")
+  })
+}
 
 function isHoverCapable() {
   return typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches
@@ -23,7 +43,7 @@ function ServiceRow({
   onMouseEnter,
   onClick,
 }: {
-  service: (typeof SERVICES_WITH_IMAGES)[number]
+  service: (typeof SERVICES)[number] & { image: string }
   isOpen: boolean
   onMouseEnter: () => void
   onClick: () => void
@@ -126,6 +146,11 @@ function ServiceRow({
 
 export function Services() {
   const [openIdx, setOpenIdx] = useState<number | null>(null)
+  const projects = useProjects()
+  const servicesWithImages = useMemo(() => {
+    const images = pickServiceImages(projects)
+    return SERVICES.map((s, i) => ({ ...s, image: images[i] }))
+  }, [projects])
 
   return (
     <section id="services" className="sec sec--dark" data-theme="dark" data-screen-label="Services">
@@ -141,7 +166,7 @@ export function Services() {
           }}
         >
           <RevealGroup stagger={0.1}>
-            {SERVICES_WITH_IMAGES.map((s, i) => (
+            {servicesWithImages.map((s, i) => (
               <RevealItem key={s.num}>
                 <ServiceRow
                   service={s}
