@@ -469,14 +469,12 @@ a { color: var(--text-link); text-decoration: none; }
   transition:transform var(--dur-base) var(--ease-wave),box-shadow var(--dur-base) var(--ease-wave),border-color var(--dur-base) var(--ease-wave);
 }
 .pw-card--interactive{cursor:pointer;}
-.pw-card--interactive:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--border-subtle);}
 .pw-card__media{
   position:relative;overflow:hidden;background:var(--surface-subtle);
   flex: 3 1 0%; /* image is 3/4 — 75% — of the card's height */
 }
 .pw-card__media img{width:100%;height:100%;object-fit:cover;display:block;
   transition:transform var(--dur-reveal) var(--ease-wave);}
-.pw-card--interactive:hover .pw-card__media img{transform:scale(1.04);}
 
 /* description + "View project" live over the image, hidden until hover */
 .pw-card__overlay{
@@ -488,12 +486,21 @@ a { color: var(--text-link); text-decoration: none; }
   transition:clip-path var(--dur-slow) var(--ease-wave);
   pointer-events:none;
 }
-.pw-card--interactive:hover .pw-card__overlay{clip-path:inset(0 0 0 0);}
 .pw-card__overlay-content{
   opacity:0;transition:opacity var(--dur-base) var(--ease-wave);
 }
-.pw-card--interactive:hover .pw-card__overlay-content{opacity:1;transition-delay:.15s;}
 .pw-card__overlay .pw-card__desc{color:rgba(255,255,255,0.85);}
+/* Gated to real hover pointers only — on touch, a tap sets a sticky :hover
+   state that would otherwise hold the lift/zoom/overlay-reveal open until
+   tapped elsewhere, instead of the plain tap-and-navigate this card is
+   meant to do on mobile (see the .team-card gate above for the same
+   pattern). */
+@media (hover: hover) {
+  .pw-card--interactive:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--border-subtle);}
+  .pw-card--interactive:hover .pw-card__media img{transform:scale(1.04);}
+  .pw-card--interactive:hover .pw-card__overlay{clip-path:inset(0 0 0 0);}
+  .pw-card--interactive:hover .pw-card__overlay-content{opacity:1;transition-delay:.15s;}
+}
 
 .pw-card__body{display:flex;flex-direction:column;justify-content:center;gap:.4rem;padding:var(--space-4) var(--space-5);flex:1 1 0%;}
 .pw-card__meta{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
