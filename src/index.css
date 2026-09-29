@@ -1205,6 +1205,10 @@ header.nav .nav__mobile .nav__link {
 
 .project-video-ambient { position: relative; height: 60vh; overflow: hidden; }
 .project-video-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Standalone here (no adjacent Skip button, unlike the desktop pin — see
+   ProjectVideoAmbient's comment), so all four corners round instead of
+   just the left two. */
+.project-video-ambient .project-video-pin__mute { border-radius: var(--radius-control); }
 
 .project-overview { padding-block: clamp(2.5rem, 4vw, 4rem); }
 /* Body-section text (project.bodyDesc) only — double .secbody's shared
@@ -1250,6 +1254,17 @@ header.nav .nav__mobile .nav__link {
    box widths instead of the old fixed 1:1 square + object-fit: cover crop. */
 .project-gallery__item img, .project-gallery__item video {
   height: 100%; width: auto; display: block;
+}
+/* 32vw's 320px floor was tuned for desktop, where it's still a fraction of
+   the viewport — on a phone-width screen that same 320px is most of the
+   screen (both rows stacked ran well past one screenful before you'd even
+   scrolled to see the second), and the fixed 34s loop duration crosses a
+   much smaller viewport far more slowly than it visually reads on desktop.
+   Rescale both down together so a mobile/tablet visitor sees a normal-
+   looking filmstrip instead of two oversized, sluggish rows. */
+@media (max-width: 1023px) {
+  .project-gallery__item { height: clamp(140px, 42vw, 280px); margin-right: 0.5rem; }
+  .project-gallery__track { animation-duration: 16s; }
 }
 @keyframes project-gallery-rtl { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes project-gallery-ltr { from { transform: translateX(-50%); } to { transform: translateX(0); } }

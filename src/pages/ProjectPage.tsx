@@ -183,11 +183,33 @@ function ProjectVideoPinned({ media }: { media: MediaItem }) {
 
 /** Mobile/tablet: no pin — the video/image just renders as a plain full-width
  *  block in normal document flow, same fallback shape every other pinned
- *  desktop section on this site already uses (see WorkReel.tsx). */
+ *  desktop section on this site already uses (see WorkReel.tsx). Still gets
+ *  its own mute button, same as the desktop pin — a self-hosted or YouTube
+ *  hero autoplays muted either way, and mobile visitors had no way to turn
+ *  the sound on before this. No Skip button here: that only ever skips past
+ *  the desktop pin's scroll-lock, which doesn't exist in this plain-flow
+ *  layout. */
 function ProjectVideoAmbient({ media }: { media: MediaItem }) {
+  const [muted, setMuted] = useState(true)
+  const hasSound = media.type === "video" || media.type === "youtube"
+
   return (
     <div className="project-video-ambient" data-screen-label="Project Video">
-      <ProjectMedia media={media} />
+      <ProjectMedia media={media} muted={muted} />
+      {hasSound && (
+        <div className="project-video-pin__controls">
+          <button
+            type="button"
+            className="project-video-pin__mute"
+            aria-pressed={!muted}
+            aria-label={muted ? "Unmute" : "Mute"}
+            title={muted ? "Unmute" : "Mute"}
+            onClick={() => setMuted((m) => !m)}
+          >
+            {muted ? <VolumeX size={16} aria-hidden="true" /> : <Volume2 size={16} aria-hidden="true" />}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
@@ -213,6 +235,13 @@ function GalleryRow({ items, reverse }: { items: MediaItem[]; reverse: boolean }
   const trackRef = useRef<HTMLDivElement>(null)
 
   function setHovered(hovered: boolean) {
+    // A tap on a touch device fires a synthetic mouseenter without a
+    // reliable matching mouseleave, which would otherwise stick this
+    // carousel at its slowed-down rate until tapped elsewhere — a hover
+    // affordance that isn't intuitive on a touchscreen to begin with, since
+    // there's no pointer resting on it between taps. Real hover pointers
+    // only (same check WorkMedia's tilt effect above uses).
+    if (window.matchMedia("(pointer: coarse)").matches) return
     for (const anim of trackRef.current?.getAnimations() ?? []) {
       anim.playbackRate = hovered ? GALLERY_HOVER_RATE : 1
     }
