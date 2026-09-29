@@ -802,11 +802,22 @@ header.nav .nav__mobile .nav__link {
   color: var(--pw-black);
   white-space: nowrap;
 }
-/* Real logo files, forced flat black regardless of source color so the
-   wall reads as one consistent mark. */
+/* Real logo files, desaturated to read as one consistent mark. Deliberately
+   NOT `filter: brightness(0)` — that flattens every opaque pixel to pure
+   black regardless of its original luminance, so any logo whose icon mark
+   uses opaque white for its internal negative space (rather than true alpha
+   transparency — common in brand-supplied assets meant for a white
+   background, e.g. BNP Paribas' white star cutout, UniCredit's ring) loses
+   that detail entirely and renders as a featureless solid blob. grayscale
+   removes hue only (keeps each pixel's original luminance), and
+   mix-blend-mode: multiply then composites against this section's white
+   background — white pixels multiply out to invisible (matching the page),
+   while darker pixels multiply down toward black, so the logo's internal
+   contrast (and thus its actual shape) survives. */
 .client-logos__item--logo {
   display: block; height: clamp(2rem, 2.9vw, 2.75rem); width: auto;
-  filter: brightness(0);
+  filter: grayscale(1);
+  mix-blend-mode: multiply;
 }
 
 /* Studio page (src/pages/StudioPage.tsx) — dark throughout. */
