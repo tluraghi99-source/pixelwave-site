@@ -560,13 +560,22 @@ class App {
     const endX = clientEndXOf(e)
     const endY = clientEndYOf(e)
     const moved = Math.hypot(endX - this.start, endY - this.startY)
+    let navigated = false
     if (moved <= CLICK_DRAG_THRESHOLD_PX && this.onItemClick) {
       const rect = this.container.getBoundingClientRect()
       const hit = this.hitTest(endX - rect.left, endY - rect.top)
-      if (hit?.href) this.onItemClick(hit.href)
+      if (hit?.href) {
+        this.onItemClick(hit.href)
+        navigated = true
+      }
     }
 
-    this.onCheck()
+    // Skip the snap-to-center correction when the tap just navigated away —
+    // re-centering a gallery on the page the visitor is leaving is a
+    // pointless, visible jump right as the tap registers. Still runs for
+    // every other release (a plain tap that missed a card, or a drag) so
+    // the gallery settles on a card as before.
+    if (!navigated) this.onCheck()
   }
 
   onCheck() {
