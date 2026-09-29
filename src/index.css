@@ -923,9 +923,38 @@ header.nav .nav__mobile .nav__link {
 }
 
 .work__head { display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; flex-wrap: wrap; }
-.work__carousel { overflow: hidden; width: 100%; margin-top: 3rem; cursor: grab; }
-.work__track { display: flex; gap: clamp(1.5rem, 0.94vw, 3rem); width: max-content; will-change: transform; padding-inline: clamp(1.25rem, 2.5vw, 4rem); }
-.work__card-wrap { flex: 0 0 clamp(280px, 9.4vw, 520px); }
+/* Native horizontal scroller (was an auto-drifting track tied to page
+   scroll, with no way to move it yourself — see WorkAmbient in Work.tsx).
+   Scrollbar hidden the same way html/body hide theirs site-wide, since this
+   is a one-off scroll container, not the page — same treatment as
+   .studio-gallery__carousel below. */
+.work__carousel {
+  overflow-x: auto; overflow-y: hidden; width: 100%; margin-top: 3rem;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.work__carousel::-webkit-scrollbar { display: none; }
+.work__track { display: flex; gap: clamp(1.5rem, 0.94vw, 3rem); width: max-content; padding-inline: clamp(1.25rem, 2.5vw, 4rem); }
+.work__card-wrap { flex: 0 0 clamp(280px, 9.4vw, 520px); scroll-snap-align: start; }
+/* Match the desktop WorkGallery's look (CircularGallery, WorkGallery in
+   Work.tsx): plain, chrome-less image tiles instead of the shared .pw-card's
+   boxed/bordered card. Desktop reveals its title/tags as a caption
+   (.gallery-caption in circular-gallery.tsx) only on cursor hover — there's
+   no touch equivalent to that hover, so here the same caption content is
+   permanently overlaid on the image instead of tucked below it in its own
+   box. Card.tsx renders meta before title by default; titleFirst (passed in
+   Work.tsx) swaps that so the title sits on top of the tag, matching this
+   overlay's reading order. */
+.work__carousel .pw-card { position: relative; background: transparent; border: none; border-radius: 0; }
+.work__carousel .pw-card__media { position: absolute; inset: 0; }
+.work__carousel .pw-card__body {
+  position: absolute; inset: auto 0 0 0; z-index: 1;
+  padding: var(--space-4) var(--space-5) var(--space-5);
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.55) 45%, rgba(0, 0, 0, 0.85) 100%);
+  color: var(--pw-white);
+}
+.work__carousel .pw-card__title { color: var(--pw-white); }
 
 /* /work listing page — first section on the page, so it needs its own
    clearance under the fixed header rather than relying on .sec's padding-top.
@@ -1322,11 +1351,12 @@ header.nav .nav__mobile .nav__link {
 
 /* Mobile/tablet — plain image tiles instead of full project Cards, since
    studio photos aren't clickable items. A native horizontal scroller (was
-   an auto-drifting track tied to page scroll — same structure as
-   .work__carousel/.work__track in Work.tsx's WorkAmbient — with no way to
-   move it yourself; swapped for real touch/trackpad scrolling here so you
-   can browse it on your own). Scrollbar hidden the same way html/body hide
-   theirs site-wide, since this is a one-off scroll container, not the page. */
+   an auto-drifting track tied to page scroll, with no way to move it
+   yourself; swapped for real touch/trackpad scrolling here so you can
+   browse it on your own — same change Work.tsx's own mobile carousel later
+   got too, see .work__carousel above). Scrollbar hidden the same way
+   html/body hide theirs site-wide, since this is a one-off scroll
+   container, not the page. */
 .studio-gallery__carousel {
   overflow-x: auto; overflow-y: hidden; width: 100%; margin-top: 3rem;
   -webkit-overflow-scrolling: touch;

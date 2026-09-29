@@ -1,13 +1,12 @@
 import { useMemo, useRef, type PointerEvent, type ReactNode, type RefObject } from "react"
 import { useNavigate } from "react-router-dom"
-import { motion, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform } from "framer-motion"
+import { motion, useMotionValue, useMotionValueEvent, useSpring } from "framer-motion"
 import type { MotionValue } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
 import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Card } from "@/components/pw/Card"
 import { Tag } from "@/components/pw/Tag"
 import { Reveal } from "@/components/motion/Reveal"
-import { wrap } from "@/lib/motion"
 import { shuffle } from "@/lib/array"
 import { CircularGallery, type CircularGalleryHandle } from "@/components/ui/circular-gallery"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
@@ -74,18 +73,20 @@ function WorkMedia({ src }: { src: string }) {
   )
 }
 
-function WorkTrack({ projects, x }: { projects: Project[]; x: MotionValue<string> }) {
+function WorkTrack({ projects }: { projects: Project[] }) {
   // A random selection, reshuffled each time `projects` first arrives (see
-  // pickRandomProjects above) — doubled so the marquee track can translate
-  // exactly -50% and loop seamlessly.
+  // pickRandomProjects above). No doubling — that only ever existed to hide
+  // the seam of the old infinite scroll-linked loop (see WorkAmbient); a
+  // real native-scroll list needs a real start and end, not a repeat (same
+  // reasoning as StudioGallery's own track).
   const work = useMemo(() => pickRandomProjects(projects, GALLERY_ITEM_COUNT), [projects])
-  const cards = [...work, ...work]
 
   return (
-    <motion.div className="work__track" style={{ x }}>
-      {cards.map((w, i) => (
-        <div className="work__card-wrap" key={`${w.id}-${i}`}>
+    <div className="work__track">
+      {work.map((w) => (
+        <div className="work__card-wrap" key={w.id}>
           <Card
+            titleFirst
             media={<WorkMedia src={galleryImageUrl(w)} />}
             meta={w.tags.map((t, ti) => (
               <Tag key={ti} variant={t.highlighted ? "orange" : "outline"}>
@@ -102,7 +103,7 @@ function WorkTrack({ projects, x }: { projects: Project[]; x: MotionValue<string
           </Card>
         </div>
       ))}
-    </motion.div>
+    </div>
   )
 }
 
@@ -164,7 +165,11 @@ export function WorkHeading(): ReactNode {
   )
 }
 
-/** Mobile/tablet: ambient scroll-linked drift, no pinning (revisit later). */
+/** Mobile/tablet: no WebGL, no pinning — a native horizontal scroller (was
+ *  an auto-drifting track tied to page scroll, with no way to move it
+ *  yourself; swapped for real touch/trackpad scrolling so you can browse it
+ *  on your own — same change StudioGallery's own mobile track already got,
+ *  see .studio-gallery__carousel in index.css). */
 export function WorkAmbient({
   projects,
   sectionRef: externalRef,
@@ -175,12 +180,6 @@ export function WorkAmbient({
 }) {
   const internalRef = useRef<HTMLElement>(null)
   const sectionRef = externalRef ?? internalRef
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  })
-  const rawX = useTransform(scrollYProgress, [0, 1], [0, -300])
-  const x = useTransform(rawX, (v) => `${wrap(-50, 0, v)}%`)
 
   return (
     <section
@@ -194,7 +193,7 @@ export function WorkAmbient({
         <WorkHeading />
       </div>
       <Reveal delay={0.2} className="work__carousel">
-        <WorkTrack projects={projects} x={x} />
+        <WorkTrack projects={projects} />
       </Reveal>
     </section>
   )
