@@ -48,7 +48,19 @@ export function VideoScrubbed({ progress }: { progress: MotionValue<number> }) {
         muted
         playsInline
         preload="auto"
-        onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
+        onLoadedMetadata={(e) => {
+          const video = e.currentTarget
+          setDuration(video.duration)
+          // iOS Safari never decodes/paints a frame for a video.currentTime
+          // seek until the video has actually played at least once — a
+          // scrubbed-but-never-played video just stays black there (this is
+          // desktop-only-tested code, so the bug only shows up on a real
+          // phone). muted + playsInline means this silent kick — play,
+          // then immediately pause — is allowed without a user gesture, and
+          // unblocks every seek after it. Harmless on browsers that don't
+          // need it (Chrome/Android already paint from a cold seek).
+          video.play()?.then(() => video.pause())?.catch(() => {})
+        }}
       />
       <div className="video-scrub__tint" />
     </>
