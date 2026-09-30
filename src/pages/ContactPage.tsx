@@ -134,9 +134,11 @@ export function ContactPage() {
               <span className="contact-page__reactive-text">{reactive.text}</span>
             </div>
           </div>
-          {/* Desktop only, first step only — quick-access info for anyone who'd
-             rather not fill out the form. Placeholder href/values until real
-             contact details are set, same posture as the nav menu's "Call us". */}
+          {/* First step only, every width (mobile reflows above the reactive
+             text instead of hiding — see index.css) — quick-access info for
+             anyone who'd rather not fill out the form. Placeholder
+             href/values until real contact details are set, same posture as
+             the nav menu's "Call us". */}
           {!sent && step.key === "detail" && (
             <div className="contact-page__quick-contact">
               <a className="contact-page__quick-contact-link" href="#">

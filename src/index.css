@@ -1563,10 +1563,13 @@ header.nav .nav__mobile .nav__link {
 /* Vertically centered against .contact-page__content-main as a whole (the
    small eyebrow plus the huge reactive text below it) via the parent's
    align-items: center — reads as level with the reactive text specifically,
-   since that's what dominates the column's height. Desktop + first step
-   only (hidden below, and conditionally rendered in ContactPage.tsx) —
-   there's no room next to the big reactive text on a fixed 100svh mobile
-   screen. */
+   since that's what dominates the column's height. First step only
+   (conditionally rendered in ContactPage.tsx) on every width — mobile used
+   to hide this outright (no room beside the big reactive text on a fixed
+   100dvh screen), but it's now reflowed below that text instead, right
+   above .contact-page__strip's top border, so it stays visible everywhere
+   without competing with the headline for the same vertical space. See
+   the mobile override below. */
 .contact-page__quick-contact {
   display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem;
   flex-shrink: 0; text-align: right;
@@ -1672,7 +1675,24 @@ header.nav .nav__mobile .nav__link {
   .contact-page__strip-row { gap: 1rem; }
   .contact-page__recap-row { flex-wrap: wrap; }
   .contact-page__recap-label { flex-basis: 100%; }
-  .contact-page__quick-contact { display: none; }
+  /* Reflowed below the reactive text instead of beside it, where it doesn't
+     fit at this width — sitting right above .contact-page__strip's top
+     border, directly over the name/email boxes rather than crowding the
+     headline above it. content-main grows to fill the space above it
+     (its own internal justify-content: center keeps the eyebrow/reactive
+     text centered within that space, same as before), leaving
+     quick-contact at its natural height right at the bottom edge. align-
+     items switches to stretch, not the base row layout's center, so
+     content-main keeps its natural left-aligned text instead of getting
+     centered now that align-items governs the horizontal axis instead of
+     the vertical one. */
+  .contact-page__content { flex-direction: column; align-items: stretch; gap: 1rem; }
+  .contact-page__content-main { flex: 1 1 auto; }
+  .contact-page__quick-contact {
+    flex-direction: row; flex-wrap: wrap; align-items: center;
+    gap: 0.4rem 0.75rem; text-align: left; width: 100%;
+  }
+  .contact-page__quick-contact-link { font-size: 0.8rem; }
 }
 
 footer { position: relative; isolation: isolate; background: var(--surface-subtle); color: var(--pw-black); overflow-x: hidden; }
