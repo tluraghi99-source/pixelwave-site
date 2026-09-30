@@ -22,6 +22,11 @@ function seekTo(video: HTMLVideoElement, time: number): Promise<void> {
   })
 }
 
+// Safety net for the iOS quirk below: if extraction hasn't finished by
+// this point, something's stuck (or just very slow) — fail out to the
+// caller's fallback rather than leaving the gallery section blank forever.
+const EXTRACT_TIMEOUT_MS = 12_000
+
 /** Grabs `count` evenly spaced still frames from a video, client-side, as
  *  object URLs. Needs the video host to send CORS headers (Strapi's uploads
  *  do) — a tainted canvas can't be read back, in which case this reports
@@ -46,12 +51,28 @@ export function useVideoFrames(src: string | null, count: number): VideoFramesSt
     video.playsInline = true
     video.preload = "auto"
     video.src = src
+    // iOS Safari never reliably decodes frames — sometimes never even
+    // fires the events this hook waits on — for a <video> that's neither
+    // in the document nor ever played (this element was previously kept
+    // fully detached). Both matter: attached-but-unplayed still hangs on a
+    // real iPhone, same as the scroll-scrubbed hero video did (see
+    // VideoScrub.tsx) before its own muted play()+pause() kick-start.
+    // Zero-size and out of flow, so it never affects layout or paints
+    // anything visible.
+    video.style.cssText = "position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;"
+    document.body.appendChild(video)
 
     async function extract() {
       await new Promise<void>((resolve, reject) => {
         video.addEventListener("loadeddata", () => resolve(), { once: true })
         video.addEventListener("error", () => reject(new Error("video load failed")), { once: true })
       })
+      // Silent kick-start (allowed without a user gesture: muted + playsInline)
+      // — unblocks every seek below, exactly like VideoScrub.tsx's video.
+      await video.play().then(
+        () => video.pause(),
+        () => {}
+      )
       const { duration, videoWidth, videoHeight } = video
       if (!Number.isFinite(duration) || duration <= 0 || !videoWidth || !videoHeight) {
         throw new Error("video has no usable dimensions/duration")
@@ -74,7 +95,11 @@ export function useVideoFrames(src: string | null, count: number): VideoFramesSt
       if (!cancelled) setState({ status: "ready", frames: urls.slice() })
     }
 
-    extract().catch(() => {
+    const timeout = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error("frame extraction timed out")), EXTRACT_TIMEOUT_MS)
+    })
+
+    Promise.race([extract(), timeout]).catch(() => {
       if (!cancelled) setState({ status: "failed", frames: [] })
     })
 
@@ -82,6 +107,7 @@ export function useVideoFrames(src: string | null, count: number): VideoFramesSt
       cancelled = true
       video.removeAttribute("src")
       video.load()
+      video.remove()
       urls.forEach((u) => URL.revokeObjectURL(u))
     }
   }, [src, count])
