@@ -913,12 +913,18 @@ header.nav .nav__mobile .nav__link {
    actually happen (a static, non-positioned element paints below a sticky
    one regardless of DOM order) — the 40%-black background is a deliberate
    tint, not full coverage, so the pinned video keeps showing through
-   underneath instead of being hidden outright. data-theme="dark" on the
-   section (Work.tsx) keeps the heading/card text legible against it. */
+   underneath instead of being hidden outright. Explicit color, not just
+   data-theme="dark" on the section (Work.tsx): body's own light-theme
+   `color` (a concrete black) is what .lead — which sets no color of its
+   own — actually inherits, and that concrete value doesn't get repainted
+   by data-theme redefining --text-primary deeper in the tree. Same fix
+   .reel__content/.studio-gallery already apply for their own dark
+   sections. */
 @media (max-width: 1023px) {
   .work-ambient {
     position: relative; z-index: 1;
     background: rgba(0, 0, 0, 0.4);
+    color: var(--pw-white);
   }
 }
 
