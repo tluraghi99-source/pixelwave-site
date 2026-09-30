@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion"
 import { Link, useLocation } from "react-router-dom"
 import { Menu, X } from "lucide-react"
+import { useScreenSize } from "@/components/hooks/use-screen-size"
 import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
 import { BrandLogo } from "@/components/pw/Logo"
 import { PixelTrail } from "@/components/ui/pixel-trail"
@@ -62,6 +63,16 @@ export function Header() {
   const [mobileBarOrange, setMobileBarOrange] = useState(false)
   const mobileBarTimeoutRef = useRef<number>(undefined)
   const themeColorDefaultRef = useRef<string | null>(null)
+  // mobileBarOrange flips true whenever `open` does, on every viewport —
+  // its own CSS effect (the orange bar) only actually shows under 768px,
+  // gated by a media query there instead of here. The logo-hiding effect
+  // below needs the same "narrow enough for the full-screen mobile panel"
+  // check explicitly, since aria-hidden/tabIndex have no CSS-media-query
+  // equivalent — without this the logo would go aria-hidden and keyboard-
+  // unreachable on desktop too, despite staying visibly on screen there
+  // (the desktop nav is a small dropdown, not a takeover panel covering it).
+  const screenSize = useScreenSize()
+  const hideLogo = mobileBarOrange && screenSize.lessThan("md")
   const lastY = useRef(0)
   const headerRef = useRef<HTMLElement>(null)
   const scrollLockedRef = useRef(false)
@@ -257,7 +268,16 @@ export function Header() {
       <div className="wrap nav__inner">
         <a
           href={isHome ? "#top" : "/"}
+          // Hidden while the full-screen mobile menu is open — tied to
+          // mobileBarOrange (via hideLogo) rather than the raw `open` boolean
+          // so it stays hidden through the panel's own close animation too,
+          // matching how long the bar itself stays solid orange (see
+          // mobileBarOrange's own comment above), instead of popping back in
+          // while the bar is still mid-retract.
+          className={`nav__logo${hideLogo ? " nav__logo--hidden" : ""}`}
           aria-label="PixellWave home"
+          aria-hidden={hideLogo}
+          tabIndex={hideLogo ? -1 : undefined}
           // Native hash-anchor scrolling landed short of the true top when
           // clicked from partway down the page — WorkReel's pinned section
           // (.reel__inner, position: sticky over an 850vh-tall .reel) sits

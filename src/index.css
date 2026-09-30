@@ -551,6 +551,12 @@ header.nav {
   header.nav.nav--open { background: var(--pw-orange); }
 }
 .nav__inner { display: flex; align-items: center; justify-content: space-between; height: 76px; }
+/* Faded out (not display: none, which would collapse the flex layout and
+   shove the menu button over) while the full-screen mobile menu is open —
+   Header.tsx's hideLogo already only adds this class under 768px, so no
+   media query needed here too. */
+.nav__logo { transition: opacity var(--dur-base) var(--ease-wave); }
+.nav__logo--hidden { opacity: 0; pointer-events: none; }
 .nav__links { display: flex; gap: 2.25rem; align-items: center; }
 .nav__link {
   font-size: 14px; font-weight: 500; letter-spacing: 0.02em;
