@@ -94,6 +94,18 @@ export function Hero({ introDone }: HeroProps) {
           src={logoWordmark}
           alt="PixellWave"
           className="hero__bigmark-img"
+          // Intrinsic size from the SVG's own viewBox (0 0 7075.3 1826.47,
+          // rounded) — logo-wordmark.svg carries no width/height of its own,
+          // so without these the <img> has no aspect ratio until the SVG
+          // actually loads, and CSS's width:75vw;height:auto only resolves
+          // a real height at that point too. The browser turns width/height
+          // attributes into a default aspect-ratio, reserving this element's
+          // box immediately instead of collapsing it to 0 height and then
+          // snapping open on load — that snap was this page's single
+          // largest layout shift (a Lighthouse CLS score of ~1, effectively
+          // all of it, traced to exactly this element).
+          width={7075}
+          height={1826}
           style={{ scale: bigScale, opacity: bigOpacity, x: bigX, y: bigY }}
         />
       </motion.div>
