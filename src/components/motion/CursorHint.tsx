@@ -16,17 +16,34 @@ interface CursorHintProps {
   autoHideMs?: number
   /** Also dismiss the instant the page actually scrolls, in addition to the
    *  autoHideMs fallback — appropriate when the hint's own text is itself
-   *  the action being suggested. */
+   *  the action being suggested. Ignored when `visible` is passed. */
   dismissOnScroll?: boolean
+  /** Caller-driven show/hide, replacing the internal auto-hide-timer/
+   *  dismissOnScroll logic entirely — for a hint that should track some
+   *  external state (e.g. a scroll-progress range) instead of "goes away
+   *  after a timer or the first scroll event" (WorkReel's pinned "Keep
+   *  scrolling" needs this: the visitor is already scrolling by the time
+   *  it mounts, so dismissOnScroll's first-scroll-event rule would hide it
+   *  almost immediately). Omit for the default self-managed behavior. */
+  visible?: boolean
 }
 
 /** Small text label that trails the cursor on arrival, fine-pointer (desktop)
  *  only — a one-time nudge, not a persistent nag. Fades on a fixed timer
  *  (and optionally on first scroll) rather than on first mouse move, so it
- *  reads even if the visitor's mouse is already resting somewhere. */
-export function CursorHint({ text, variant = "glow", autoHideMs = DEFAULT_AUTO_HIDE_MS, dismissOnScroll = false }: CursorHintProps) {
+ *  reads even if the visitor's mouse is already resting somewhere — unless
+ *  `visible` is passed, in which case the caller owns timing entirely. */
+export function CursorHint({
+  text,
+  variant = "glow",
+  autoHideMs = DEFAULT_AUTO_HIDE_MS,
+  dismissOnScroll = false,
+  visible: controlledVisible,
+}: CursorHintProps) {
   const [enabled, setEnabled] = useState(false)
-  const [visible, setVisible] = useState(true)
+  const [internalVisible, setInternalVisible] = useState(true)
+  const isControlled = controlledVisible !== undefined
+  const visible = isControlled ? controlledVisible : internalVisible
   const x = useMotionValue(-200)
   const y = useMotionValue(-200)
   const springX = useSpring(x, { stiffness: 500, damping: 40, mass: 0.5 })
@@ -51,18 +68,23 @@ export function CursorHint({ text, variant = "glow", autoHideMs = DEFAULT_AUTO_H
       x.set(e.clientX + 18)
       y.set(e.clientY - 12)
     }
-    function handleScroll() {
-      setVisible(false)
-    }
     window.addEventListener("mousemove", handleMove)
+
+    if (isControlled) {
+      return () => window.removeEventListener("mousemove", handleMove)
+    }
+
+    function handleScroll() {
+      setInternalVisible(false)
+    }
     if (dismissOnScroll) window.addEventListener("scroll", handleScroll, { passive: true })
-    const timer = setTimeout(() => setVisible(false), autoHideMs)
+    const timer = setTimeout(() => setInternalVisible(false), autoHideMs)
     return () => {
       window.removeEventListener("mousemove", handleMove)
       if (dismissOnScroll) window.removeEventListener("scroll", handleScroll)
       clearTimeout(timer)
     }
-  }, [enabled, x, y, autoHideMs, dismissOnScroll])
+  }, [enabled, x, y, autoHideMs, dismissOnScroll, isControlled])
 
   if (!enabled) return null
 

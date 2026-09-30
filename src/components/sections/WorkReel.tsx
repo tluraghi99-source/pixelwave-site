@@ -1,5 +1,5 @@
-import { useRef } from "react"
-import { cubicBezier, motion, useMotionValue, useScroll, useTransform } from "framer-motion"
+import { useRef, useState } from "react"
+import { cubicBezier, motion, useMotionValue, useMotionValueEvent, useScroll, useTransform } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
 import { EASE_WAVE, HERO_REVEAL_END, HERO_REVEAL_START } from "@/lib/motion"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
@@ -10,6 +10,7 @@ import { WorkHeading, WorkGallery, WorkAmbient } from "@/components/sections/Wor
 import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Button } from "@/components/pw/Button"
 import { CtaBand } from "@/components/sections/CtaBand"
+import { CursorHint } from "@/components/motion/CursorHint"
 
 // The video's reveal is a fixed overlay, not part of the pin's own document
 // flow (see reel__reveal-overlay below) — it rides the same global
@@ -136,6 +137,23 @@ function WorkReelPinned({ ctaHeadline, projects }: { ctaHeadline: string; projec
   // cut on that end too.
   const overlayVisible = useTransform(scrollY, (v) => (v > 0 && v < vh * HERO_REVEAL_END ? 1 : 0))
   const reelVisible = useTransform(scrollY, (v) => (v >= vh * HERO_REVEAL_END ? 1 : 0))
+  // "Keep scrolling" cursor hint (see CursorHint's `visible` prop): up from
+  // the pin's very first frame through the carousel's own entrance
+  // (ENTRANCE_END_FRACTION, where its fade/rise-in finishes — "some frame
+  // after it appears"). Plain React state, not a MotionValue, since
+  // CursorHint's visibility branches an AnimatePresence child in and out of
+  // the tree rather than animating a style property. Gated on scrollY too,
+  // not just scrollYProgress — scrollYProgress reads a clamped 0 both
+  // before the pin has ever been reached and right at its first frame, so
+  // without this the hint would already be mounted at page load, well
+  // before the pin (and its video) are anywhere near the viewport.
+  const [showScrollHint, setShowScrollHint] = useState(false)
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setShowScrollHint(latest >= vh * HERO_REVEAL_END && scrollYProgress.get() < ENTRANCE_END_FRACTION)
+  })
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    setShowScrollHint(scrollY.get() >= vh * HERO_REVEAL_END && latest < ENTRANCE_END_FRACTION)
+  })
   // The overlay only ever shows the video's first frame — real scrubbing
   // starts only once the pin (below) takes over.
   const overlayProgress = useMotionValue(0)
@@ -213,6 +231,7 @@ function WorkReelPinned({ ctaHeadline, projects }: { ctaHeadline: string; projec
           </motion.div>
         </motion.div>
       </section>
+      <CursorHint text="Keep scrolling" variant="bounce" visible={showScrollHint} />
     </>
   )
 }
