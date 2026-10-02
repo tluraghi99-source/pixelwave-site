@@ -295,7 +295,6 @@ body {
      floor keeps the document at least as tall as whatever the chrome-
      hidden viewport currently is, so real content (this background
      included) always reaches the true bottom instead of Safari's fallback. */
-  min-height: 100dvh;
   font-family: var(--font-text);
   font-size: var(--fs-body);
   line-height: var(--lh-body);
@@ -305,6 +304,12 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
+/* The dvh floor described above, applied only once the app has actually
+   rendered into #root. On plain `body` it made the still-empty page a
+   full-viewport box that then jumped when the real content mounted — one
+   layout shift of 1.0 (Lighthouse's entire CLS score), measured at ~40ms,
+   before anything was visible. */
+body:has(#root > *) { min-height: 100dvh; }
 
 .pw-hero {
   font-family: var(--font-display);
