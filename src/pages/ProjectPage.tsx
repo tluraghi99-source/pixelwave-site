@@ -8,7 +8,7 @@ import { Footer } from "@/components/sections/Footer"
 import { useProjects } from "@/hooks/useProjects"
 import { usePageMeta } from "@/hooks/usePageMeta"
 import { useVideoFrames } from "@/hooks/useVideoFrames"
-import { projectThumbUrl, type Project } from "@/lib/strapi"
+import { mediaUrl, projectThumbUrl, type Project } from "@/lib/strapi"
 
 type MediaItem = { type: "image"; src: string } | { type: "video"; src: string } | { type: "youtube"; videoId: string }
 
@@ -55,7 +55,7 @@ function withMedia(p: Project): ProjectWithMedia {
     p.galleryImages.length > 0
       ? p.galleryImages.map((m) => ({
           type: m.mime.startsWith("video/") ? ("video" as const) : ("image" as const),
-          src: m.url,
+          src: mediaUrl(m, 1000),
         }))
       : Array.from({ length: 8 }, (_, i) => ({
           type: "image" as const,

@@ -1,10 +1,13 @@
 import { useMemo, useState } from "react"
 import { RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { useTeamMembers } from "@/hooks/useTeamMembers"
-import type { TeamMember } from "@/lib/strapi"
+import { mediaUrl, type TeamMember } from "@/lib/strapi"
 import { shuffle } from "@/lib/array"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { Button } from "@/components/pw/Button"
+
+/** Team cards are about 300-450 CSS px wide. */
+const TEAM_PHOTO_WIDTH = 600
 
 /** Falls back to today's exact Picsum placeholder pattern when Strapi's
  *  photo/photoHover are empty — each field checked independently, since an
@@ -12,8 +15,8 @@ import { Button } from "@/components/pw/Button"
 function withPhotos(m: TeamMember) {
   return {
     ...m,
-    photo: m.photo?.url ?? `https://picsum.photos/seed/pixelwave-team-${m.id}/600/750`,
-    photoHover: m.photoHover?.url ?? `https://picsum.photos/seed/pixelwave-team-${m.id}-alt/600/750`,
+    photo: (m.photo ? mediaUrl(m.photo, TEAM_PHOTO_WIDTH) : null) ?? `https://picsum.photos/seed/pixelwave-team-${m.id}/600/750`,
+    photoHover: (m.photoHover ? mediaUrl(m.photoHover, TEAM_PHOTO_WIDTH) : null) ?? `https://picsum.photos/seed/pixelwave-team-${m.id}-alt/600/750`,
   }
 }
 

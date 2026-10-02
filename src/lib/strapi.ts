@@ -15,9 +15,20 @@ function resolveStrapiUrl(url: string): string {
 
 export const STRAPI_URL = resolveStrapiUrl(CONFIGURED_STRAPI_URL)
 
+/** One of the resized copies Strapi generates for every uploaded raster
+ *  image (thumbnail/small/medium/large) — much lighter than the original,
+ *  which can be several MB. */
+export interface MediaFormat {
+  url: string
+  width: number
+}
+
 export interface StrapiMedia {
   url: string
   mime: string
+  /** Resized copies, narrowest first. Empty for videos, SVGs and anything
+   *  Strapi didn't resize — those just use `url`. */
+  formats: MediaFormat[]
 }
 
 export interface ProjectTag {
@@ -64,9 +75,9 @@ export interface Project {
  *  this exact chain — pulled into one place after the three drifted out
  *  of sync with each other once (Work.tsx was missed when this fallback
  *  chain was first introduced elsewhere). */
-export function projectThumbUrl(p: Project, placeholder: string): string {
-  if (p.cover) return p.cover.url
-  if (p.heroMediaType === "image" && p.heroMedia) return p.heroMedia.url
+export function projectThumbUrl(p: Project, placeholder: string, targetWidth = THUMB_TARGET_WIDTH): string {
+  if (p.cover) return mediaUrl(p.cover, targetWidth)
+  if (p.heroMediaType === "image" && p.heroMedia) return mediaUrl(p.heroMedia, targetWidth)
   return placeholder
 }
 
@@ -76,6 +87,20 @@ export function strapiMediaUrl(url: string): string {
   return url.startsWith("http") ? url : `${STRAPI_URL}${url}`
 }
 
+/** The lightest copy that still covers `targetWidth` CSS pixels (pick a bit
+ *  above the rendered size to stay sharp on high-density screens): the
+ *  narrowest resized format at least that wide, else the widest one there
+ *  is, else the original (videos, SVGs, anything Strapi didn't resize).
+ *  Serving originals straight from the CMS was the biggest performance
+ *  cost on the Work, Studio and project pages — several MB per photo. */
+export function mediaUrl(media: StrapiMedia, targetWidth: number): string {
+  const format = media.formats.find((f) => f.width >= targetWidth) ?? media.formats[media.formats.length - 1]
+  return format ? format.url : media.url
+}
+
+/** Card/grid/carousel thumbnails render well under this many CSS pixels. */
+const THUMB_TARGET_WIDTH = 700
+
 interface StrapiTagRaw {
   label: string
   highlighted: boolean
@@ -83,6 +108,14 @@ interface StrapiTagRaw {
 interface StrapiMediaRaw {
   url: string
   mime: string
+  formats?: Record<string, { url: string; width: number }> | null
+}
+
+function mapMedia(raw: StrapiMediaRaw): StrapiMedia {
+  const formats = Object.values(raw.formats ?? {})
+    .map((f) => ({ url: strapiMediaUrl(f.url), width: f.width }))
+    .sort((a, b) => a.width - b.width)
+  return { url: strapiMediaUrl(raw.url), mime: raw.mime, formats }
 }
 interface StrapiProjectRaw {
   documentId: string
@@ -112,9 +145,9 @@ function mapProject(raw: StrapiProjectRaw): Project {
     year: raw.year,
     tags: raw.tags.map((t) => ({ label: t.label, highlighted: t.highlighted })),
     heroMedia: raw.heroMedia
-      ? { url: strapiMediaUrl(raw.heroMedia.url), mime: raw.heroMedia.mime }
+      ? mapMedia(raw.heroMedia)
       : null,
-    cover: raw.cover ? { url: strapiMediaUrl(raw.cover.url), mime: raw.cover.mime } : null,
+    cover: raw.cover ? mapMedia(raw.cover) : null,
     // Defensive default for an unbackfilled environment (a fresh prod DB,
     // a restored dump, any project created outside this codebase's own
     // backfill) — reproduces Task 1's backfill rule exactly, so a project
@@ -122,7 +155,7 @@ function mapProject(raw: StrapiProjectRaw): Project {
     // video instead of silently becoming a broken <img src="…mp4">.
     heroMediaType: raw.heroMediaType ?? (raw.heroMedia?.mime.startsWith("video/") ? "video" : "image"),
     heroYoutubeUrl: raw.heroMediaYoutubeUrl,
-    galleryImages: raw.galleryImages.map((m) => ({ url: strapiMediaUrl(m.url), mime: m.mime })),
+    galleryImages: raw.galleryImages.map(mapMedia),
     workCategories: raw.workCategories.map((c) => c.name),
   }
 }
@@ -168,10 +201,8 @@ function mapTeamMember(raw: StrapiTeamMemberRaw): TeamMember {
     order: raw.order,
     name: raw.name,
     role: raw.role,
-    photo: raw.photo ? { url: strapiMediaUrl(raw.photo.url), mime: raw.photo.mime } : null,
-    photoHover: raw.photoHover
-      ? { url: strapiMediaUrl(raw.photoHover.url), mime: raw.photoHover.mime }
-      : null,
+    photo: raw.photo ? mapMedia(raw.photo) : null,
+    photoHover: raw.photoHover ? mapMedia(raw.photoHover) : null,
   }
 }
 
@@ -207,7 +238,7 @@ function mapClientLogo(raw: StrapiClientLogoRaw): ClientLogo {
   return {
     id: raw.documentId,
     name: raw.name,
-    logo: raw.logo ? { url: strapiMediaUrl(raw.logo.url), mime: raw.logo.mime } : null,
+    logo: raw.logo ? mapMedia(raw.logo) : null,
   }
 }
 
