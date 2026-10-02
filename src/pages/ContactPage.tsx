@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { Link } from "react-router-dom"
 import { AnimatePresence, motion } from "framer-motion"
 import { ArrowLeft, ArrowRight, Check } from "lucide-react"
 import { Input } from "@/components/pw/Input"
@@ -32,14 +33,15 @@ function formatProjectTypes(types: string[]): string {
 
 export function ContactPage() {
   usePageMeta(
-    "Contact — PixellWave",
-    "Start a project with PixellWave. Tell us what you need and we'll get back to you."
+    "Contact — PixelWave",
+    "Start a project with PixelWave. Tell us what you need and we'll get back to you."
   )
   const [stepIndex, setStepIndex] = useState(0)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [projectTypes, setProjectTypes] = useState<string[]>([])
   const [timeline, setTimeline] = useState<string | null>(null)
+  const [consent, setConsent] = useState(false)
   const [sent, setSent] = useState(false)
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState(false)
@@ -53,7 +55,7 @@ export function ContactPage() {
         ? projectTypes.length > 0
         : step.key === "when"
           ? timeline !== null
-          : true
+          : consent
 
   async function handleNext() {
     if (!canAdvance || sending) return
@@ -136,15 +138,17 @@ export function ContactPage() {
           </div>
           {/* First step only, every width (mobile reflows above the reactive
              text instead of hiding — see index.css) — quick-access info for
-             anyone who'd rather not fill out the form. Placeholder
-             href/values until real contact details are set, same posture as
-             the nav menu's "Call us". */}
+             anyone who'd rather not fill out the form. The values themselves
+             are still placeholders until the real business email/phone are
+             set, same posture as the nav menu's "Call us" — but the links
+             are now real mailto:/tel:, not dead hrefs, so tap-to-call/email
+             already works the moment real values replace these. */}
           {!sent && step.key === "detail" && (
             <div className="contact-page__quick-contact">
-              <a className="contact-page__quick-contact-link" href="#">
-                hello@pixellwave.com
+              <a className="contact-page__quick-contact-link" href="mailto:info@pixelwave.it">
+                info@pixelwave.it
               </a>
-              <a className="contact-page__quick-contact-link" href="#">
+              <a className="contact-page__quick-contact-link" href="tel:+10000000000">
                 +1 (000) 000-0000
               </a>
             </div>
@@ -247,6 +251,28 @@ export function ContactPage() {
                       <span className="contact-page__recap-value">{timeline}</span>
                       <span className="contact-page__recap-edit">Edit</span>
                     </button>
+                    {/* Required, unchecked by default — GDPR consent for the
+                       name/email/project details submitted above. Gates the
+                       final submit via canAdvance, same as every earlier
+                       step's own required field. */}
+                    <label className="contact-page__consent">
+                      <input
+                        type="checkbox"
+                        className="contact-page__consent-input"
+                        checked={consent}
+                        onChange={(e) => setConsent(e.target.checked)}
+                      />
+                      <span className="contact-page__consent-box" aria-hidden="true">
+                        <Check size={12} strokeWidth={3} />
+                      </span>
+                      <span>
+                        I've read and accept the{" "}
+                        <Link to="/privacy" target="_blank" rel="noopener noreferrer">
+                          Privacy Policy
+                        </Link>
+                        .
+                      </span>
+                    </label>
                     {sendError && (
                       <p className="contact-page__send-error">
                         Something went wrong sending that — please try again.

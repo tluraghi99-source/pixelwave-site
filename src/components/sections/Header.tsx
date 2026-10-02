@@ -35,9 +35,9 @@ const MENU_COLUMNS = [
     href: "/contact",
     links: [
       { label: "Join us", href: "/careers" },
-      { label: "Instagram", href: "#" },
-      { label: "Tiktok", href: "#" },
-      { label: "LinkedIn", href: "#" },
+      { label: "Instagram", href: "https://www.instagram.com/pixelwave_studio/" },
+      { label: "YouTube", href: "https://www.youtube.com/@PixelWaveStudio" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/company/pixelwavestudio/" },
     ],
   },
 ]
@@ -275,7 +275,7 @@ export function Header() {
           // mobileBarOrange's own comment above), instead of popping back in
           // while the bar is still mid-retract.
           className={`nav__logo${hideLogo ? " nav__logo--hidden" : ""}`}
-          aria-label="PixellWave home"
+          aria-label="PixelWave home"
           aria-hidden={hideLogo}
           tabIndex={hideLogo ? -1 : undefined}
           // Native hash-anchor scrolling landed short of the true top when
@@ -377,7 +377,7 @@ export function Header() {
           >
             <div className="nav__mobile-links">
               {/* Same MENU_COLUMNS data as the desktop panel (Join us/
-                  Instagram/Tiktok/LinkedIn under "Let's chat"), just stacked
+                  Instagram/YouTube/LinkedIn under "Let's chat"), just stacked
                   in one column instead of desktop's side-by-side ones —
                   "Let's chat" reads as a plain heading like Work/Services/
                   Studio now, not a standalone button. */}

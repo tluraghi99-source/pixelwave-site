@@ -1,4 +1,5 @@
 import { useRef, useState } from "react"
+import { Link } from "react-router-dom"
 import { AnimatePresence, motion } from "framer-motion"
 import { ArrowLeft, ArrowRight, Check, Upload } from "lucide-react"
 import { Input } from "@/components/pw/Input"
@@ -64,8 +65,8 @@ function CvUpload({ file, onChange }: { file: File | null; onChange: (file: File
 
 export function CareersPage() {
   usePageMeta(
-    "Join Us — PixellWave",
-    "Apply to join the PixellWave team. Tell us about yourself and attach your CV."
+    "Join Us — PixelWave",
+    "Apply to join the PixelWave team. Tell us about yourself and attach your CV."
   )
   const [stepIndex, setStepIndex] = useState(0)
   const [name, setName] = useState("")
@@ -75,6 +76,7 @@ export function CareersPage() {
   const [role, setRole] = useState("")
   const [cv, setCv] = useState<File | null>(null)
   const [cvError, setCvError] = useState<string | null>(null)
+  const [consent, setConsent] = useState(false)
   const [sent, setSent] = useState(false)
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState(false)
@@ -88,7 +90,7 @@ export function CareersPage() {
         ? role.trim() !== ""
         : step.key === "cv"
           ? cv !== null
-          : true
+          : consent
 
   async function handleNext() {
     if (!canAdvance || sending) return
@@ -275,6 +277,28 @@ export function CareersPage() {
                       <span className="contact-page__recap-value">{cv?.name}</span>
                       <span className="contact-page__recap-edit">Edit</span>
                     </button>
+                    {/* Required, unchecked by default — GDPR consent for the
+                       personal data and CV submitted above. Gates the final
+                       submit via canAdvance, same as every earlier step's
+                       own required field. */}
+                    <label className="contact-page__consent">
+                      <input
+                        type="checkbox"
+                        className="contact-page__consent-input"
+                        checked={consent}
+                        onChange={(e) => setConsent(e.target.checked)}
+                      />
+                      <span className="contact-page__consent-box" aria-hidden="true">
+                        <Check size={12} strokeWidth={3} />
+                      </span>
+                      <span>
+                        I've read and accept the{" "}
+                        <Link to="/privacy" target="_blank" rel="noopener noreferrer">
+                          Privacy Policy
+                        </Link>
+                        .
+                      </span>
+                    </label>
                     {sendError && (
                       <p className="contact-page__send-error">
                         Something went wrong sending that — please try again.

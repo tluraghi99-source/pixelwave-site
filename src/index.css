@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ===========================================================================
-   PixellWave webfonts — Halyard substitute
+   PixelWave webfonts — Halyard substitute
    Brand typeface is Halyard (Adobe Fonts / Typekit) — not redistributable.
    Substituted with Hanken Grotesk, self-hosted variable woff2.
    =========================================================================== */
@@ -27,7 +27,7 @@
 }
 
 /* ===========================================================================
-   PixellWave — Color System
+   PixelWave — Color System
    Five core colors: Pixell Orange, Wave Cyan, Ink Black, Pure White, Studio Grey.
    Orange = primary action. Cyan = secondary accent. Neutrals carry the layout.
    Never pair orange & cyan at full saturation directly — separate with B/W/grey.
@@ -130,7 +130,7 @@
 }
 
 /* ===========================================================================
-   PixellWave — Typography
+   PixelWave — Typography
    Display family = headlines; Text family = body/UI. Same webfont, two roles.
    =========================================================================== */
 
@@ -176,7 +176,7 @@
 }
 
 /* ===========================================================================
-   PixellWave — Spacing, Radii, Shadows, Motion
+   PixelWave — Spacing, Radii, Shadows, Motion
    Base unit: 8px grid. Generous section padding (96–160px) for the sleek feel.
    =========================================================================== */
 
@@ -232,7 +232,7 @@
 }
 
 /* ===========================================================================
-   Bridge — map PixellWave tokens onto Tailwind/shadcn utility color names
+   Bridge — map PixelWave tokens onto Tailwind/shadcn utility color names
    so bg-background, text-foreground, bg-primary, etc. resolve to the brand.
    =========================================================================== */
 
@@ -266,7 +266,7 @@
 }
 
 /* ===========================================================================
-   PixellWave — base element styles & helpers.
+   PixelWave — base element styles & helpers.
    =========================================================================== */
 
 *,
@@ -357,7 +357,7 @@ body {
 a { color: var(--text-link); text-decoration: none; }
 
 /* ===========================================================================
-   PixellWave — component styles (Button, Tag, Card, Input, SectionLabel)
+   PixelWave — component styles (Button, Tag, Card, Input, SectionLabel)
    =========================================================================== */
 
 .pw-seclabel{display:inline-flex;align-items:center;gap:.75rem;font-family:var(--font-text);}
@@ -519,7 +519,7 @@ a { color: var(--text-link); text-decoration: none; }
 }
 
 /* ===========================================================================
-   PixellWave — page layout (site-specific, not part of the shared kit)
+   PixelWave — page layout (site-specific, not part of the shared kit)
    =========================================================================== */
 
 .wrap {
@@ -1305,13 +1305,13 @@ header.nav .nav__mobile .nav__link {
 /* video-scrub+carousel pin — starts already fully open (the iris itself runs
    earlier, as a fixed overlay directly on the hero, not in here — see
    reel__reveal-overlay below) — scrubs the video to its last frame, holds it
-   there undimmed through a short frozen pause, fades a black background in
-   slowly (scroll-linked), then the carousel starts fading in at 65% through
-   that black fade and keeps scrolling on top (WorkReel.tsx); 850vh =
-   PIN_HEIGHT_VH there, kept in sync by hand. No background here — while
-   .reel__inner is still hidden (pre-handoff) the fixed hero/overlay need to
-   show through. */
-.reel { position: relative; height: 850vh; }
+   there undimmed through a short frozen pause, then the carousel starts
+   fading in the instant that hold ends (same moment the black background
+   behind it starts its own slow fade-in) and keeps scrolling on top
+   (WorkReel.tsx); 720vh = PIN_HEIGHT_VH there, kept in sync by hand. No
+   background here — while .reel__inner is still hidden (pre-handoff) the
+   fixed hero/overlay need to show through. */
+.reel { position: relative; height: 720vh; }
 .reel__inner { position: sticky; top: 0; height: 100svh; overflow: hidden; }
 /* Fixed reveal overlay — sits directly on the hero (not part of .reel's own
    document flow), so the video's iris opens in place from the very first
@@ -1644,6 +1644,39 @@ header.nav .nav__mobile .nav__link {
 @media (hover: hover) {
   .contact-page__recap-row:hover .contact-page__recap-edit { color: var(--pw-orange); }
 }
+/* GDPR consent, review step only, both ContactPage and CareersPage (shared
+   .contact-page* classes) — accent-color is broadly supported and is the
+   simplest way to brand a native checkbox without hand-building a custom
+   one for a single control. */
+.contact-page__consent {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  margin-top: 0.85rem; padding-top: 0.85rem; border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: var(--font-text); font-size: 0.85rem; color: var(--text-secondary);
+  cursor: pointer;
+}
+/* Native input stays for a11y/functionality but is visually hidden — same
+   sr-only technique as .contact-page__cv-input below — replaced by the
+   square .contact-page__consent-box, sharp corners and orange fill to match
+   the site's own control language (.pw-input, .pw-btn) instead of the
+   browser's default checkbox UI. */
+.contact-page__consent-input { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.contact-page__consent-box {
+  display: flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; flex-shrink: 0; margin-top: 0.1rem;
+  border: var(--border-width-strong) solid var(--border-subtle);
+  color: transparent;
+  transition: background var(--dur-base) var(--ease-wave), border-color var(--dur-base) var(--ease-wave), color var(--dur-base) var(--ease-wave);
+}
+.contact-page__consent-input:checked + .contact-page__consent-box { background: var(--pw-orange); border-color: var(--pw-orange); color: var(--pw-black); }
+.contact-page__consent-input:focus-visible + .contact-page__consent-box { outline: none; box-shadow: 0 0 0 3px var(--focus-ring); }
+@media (hover: hover) {
+  .contact-page__consent:hover .contact-page__consent-box { border-color: var(--text-tertiary); }
+  .contact-page__consent:hover .contact-page__consent-input:checked + .contact-page__consent-box { border-color: var(--pw-orange); }
+}
+.contact-page__consent a { color: var(--pw-white); text-decoration: underline; text-underline-offset: 2px; }
+@media (hover: hover) {
+  .contact-page__consent a:hover { color: var(--pw-orange); }
+}
 .contact-page__send-error { font-size: 0.85rem; color: var(--pw-orange); margin: 0.75rem 0 0; }
 .contact-page__next--disabled { opacity: 0.4; pointer-events: none; }
 /* CareersPage's CV step — a hidden native file input behind a styled
@@ -1730,8 +1763,18 @@ footer { position: relative; isolation: isolate; background: var(--surface-subtl
   .foot__social, .foot__cta-wrap { justify-self: start; }
 }
 
+.foot__legal {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;
+  padding: 0 clamp(1rem, 1.2vw, 1.25rem) clamp(1.5rem, 2vw, 2rem);
+  font-size: 0.8rem; color: var(--text-secondary);
+}
+.foot__legal a { color: inherit; transition: color var(--dur-base) var(--ease-wave); }
+@media (hover: hover) {
+  .foot__legal a:hover { color: var(--pw-orange); }
+}
+
 /* ===========================================================================
-   PixellWave — motion primitives (preloader, scroll progress, split-text, marquee)
+   PixelWave — motion primitives (preloader, scroll progress, split-text, marquee)
    =========================================================================== */
 
 /* background is JS-driven (Preloader.tsx) — starts solid black (matching the
@@ -1833,6 +1876,50 @@ html.nav-open .cursor-dot { background: var(--pw-black); }
 .marquee { overflow: hidden; width: 100%; }
 .marquee__track { display: flex; width: max-content; will-change: transform; }
 .marquee__group { display: flex; align-items: center; flex-shrink: 0; }
+
+/* 404 page — position: relative + isolation: isolate is required here, not
+   optional, for the exact reason .cursor-glow's own comment above gives:
+   without a stacking context on this host, the glow canvas (z-index: -1)
+   escapes to the nearest ancestor that has one instead of painting behind
+   this page's own content. */
+.not-found {
+  position: relative; isolation: isolate; min-height: 100dvh; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  background: var(--pw-black); color: var(--pw-white);
+  padding-block: clamp(6rem, 10vw, 8rem);
+}
+.not-found__content { position: relative; z-index: 2; max-width: 640px; display: flex; flex-direction: column; align-items: center; }
+.not-found__mascot { display: block; width: clamp(168px, 23.5vw, 269px); height: auto; margin-bottom: clamp(1rem, 2vw, 1.5rem); }
+.not-found .lead { text-align: center; }
+.not-found .secbody { text-align: center; margin-left: auto; margin-right: auto; }
+.not-found__actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: clamp(2rem, 3vw, 2.5rem); }
+
+/* Privacy Policy — long-form prose, unlike every other page on this site.
+   isolation: isolate for the same reason .not-found needs it (see its own
+   comment above): .cursor-glow's canvas needs a stacking context on its
+   host or it escapes behind the wrong ancestor. */
+.legal-page { position: relative; isolation: isolate; background: var(--pw-black); color: var(--pw-white); padding-block: clamp(6rem, 10vw, 8rem) clamp(4rem, 6vw, 6rem); }
+.legal-page__content { position: relative; z-index: 2; max-width: 68ch; }
+.legal-page__eyebrow { margin: 0; font-family: var(--font-mono-accent); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); }
+.legal-page__title { margin: 0.5rem 0 0; font-family: var(--font-display); font-weight: var(--fw-black); font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.02em; }
+.legal-page__updated { margin: 1rem 0 0; font-size: 0.9rem; color: var(--text-secondary); }
+.legal-page__notice {
+  margin: 2rem 0 0; padding: 1rem 1.25rem;
+  background: rgba(255, 91, 0, 0.1); border: 1px solid rgba(255, 91, 0, 0.4); border-radius: 4px;
+  font-size: 0.95rem; line-height: 1.5;
+}
+.legal-page__content h2 { margin: 2.5rem 0 1rem; font-family: var(--font-display); font-weight: var(--fw-bold); font-size: 1.35rem; letter-spacing: -0.01em; }
+.legal-page__content p { margin: 1rem 0 0; font-size: 1rem; line-height: 1.6; color: rgba(255, 255, 255, 0.75); }
+.legal-page__content ul { margin: 1rem 0 0; padding-left: 1.25rem; font-size: 1rem; line-height: 1.6; color: rgba(255, 255, 255, 0.75); }
+.legal-page__content li + li { margin-top: 0.5rem; }
+.legal-page__content strong { color: var(--pw-white); }
+.legal-page__content a { color: var(--pw-white); text-decoration: underline; text-underline-offset: 2px; }
+@media (hover: hover) {
+  .legal-page__content a:hover { color: var(--pw-orange); }
+}
+.legal-page__todo { background: rgba(255, 91, 0, 0.25); color: var(--pw-orange); padding: 0.1rem 0.35rem; border-radius: 3px; font-style: normal; }
+.legal-page__back { margin-top: 3rem; }
 
 @layer base {
   * {

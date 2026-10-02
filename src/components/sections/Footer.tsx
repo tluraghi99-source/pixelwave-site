@@ -1,4 +1,5 @@
 import { useRef } from "react"
+import { Link } from "react-router-dom"
 import { motion, useScroll, useTransform } from "framer-motion"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { FitText } from "@/components/motion/FitText"
@@ -94,6 +95,11 @@ export function Footer() {
           aria-hidden="true"
         />
       )}
+
+      <div className="wrap foot__legal">
+        <span>© {new Date().getFullYear()} PixelWave. All rights reserved.</span>
+        <Link to="/privacy">Privacy Policy</Link>
+      </div>
     </footer>
   )
 }

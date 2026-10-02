@@ -21,6 +21,10 @@ const ProjectPage = lazy(() => import("@/pages/ProjectPage").then((m) => ({ defa
 const StudioPage = lazy(() => import("@/pages/StudioPage").then((m) => ({ default: m.StudioPage })))
 const ContactPage = lazy(() => import("@/pages/ContactPage").then((m) => ({ default: m.ContactPage })))
 const CareersPage = lazy(() => import("@/pages/CareersPage").then((m) => ({ default: m.CareersPage })))
+const NotFoundPage = lazy(() => import("@/pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })))
+const PrivacyPolicyPage = lazy(() =>
+  import("@/pages/PrivacyPolicyPage").then((m) => ({ default: m.PrivacyPolicyPage }))
+)
 
 function App() {
   return (
@@ -42,6 +46,12 @@ function App() {
           <Route path="/studio" element={<StudioPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/careers" element={<CareersPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          {/* Catch-all — any URL that doesn't match one of the routes above
+              (a typo, an old bookmark, a dead external link) used to render
+              nothing at all: no route matched, so React Router mounted
+              nothing. */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </>
