@@ -1,0 +1,19 @@
+---
+# cPanel Git Version Control deployment script.
+# Runs (in order) every time you click "Deploy HEAD Commit" in cPanel,
+# with the working directory set to this repo's clone path on the VPS.
+#
+# Before this works, fill in the two placeholders below:
+#   - CPANEL_USERNAME : your cPanel account username
+#   - NODE_VERSION    : the Node version cPanel's "Setup Node.js App"
+#                        gives you for this app (22, per the host's message)
+#
+# On most cPanel/VPS setups, Node isn't on PATH by default for shell
+# tasks — you activate it via the nodevenv script cPanel generates when
+# you create a Node.js App. Ask your host for the exact activate path if
+# this one doesn't match (it usually follows this pattern).
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/CPANEL_USERNAME/public_html/
+    - source /home/CPANEL_USERNAME/nodevenv/repositories/pixellwave-site/NODE_VERSION/bin/activate && npm ci && npm run build
+    - /bin/cp -R dist/. $DEPLOYPATH
