@@ -68,13 +68,16 @@ export function PrivacyPolicyPage() {
             </li>
             <li>
               <strong>Careers form</strong> (/careers) — your name, surname, email address, phone
-              number, the role you're applying for, and the CV file you upload.
+              number, the role you're applying for, and the CV file you upload. The CV is sent to
+              us by email and is not kept on our servers once that email has been sent.
             </li>
           </ul>
           <p>
-            We don't use cookies or any analytics/tracking on this site at the time of writing.
-            If that changes (for example, if analytics are added later), this page — and a
-            cookie-consent banner — will be updated before that happens, not after.
+            We don't use cookies. To understand how the site is used (which pages are visited,
+            roughly where from), we use Umami, a privacy-focused analytics service that works
+            without cookies and without building profiles of individual visitors. If that
+            changes, this page — and a cookie-consent banner, if one becomes necessary — will be
+            updated before it happens, not after.
           </p>
 
           <h2>3. Why we collect it, and on what basis</h2>
@@ -87,6 +90,10 @@ export function PrivacyPolicyPage() {
           </p>
 
           <h2>4. How long we keep it</h2>
+          <p>
+            CV files uploaded through the Careers form are deleted from our server as soon as
+            they have been emailed to us; they remain only in our mailbox.
+          </p>
           <p>
             <TODO>
               Retention period — e.g. "12 months after our last contact with you, unless a
@@ -104,6 +111,10 @@ export function PrivacyPolicyPage() {
             <li>
               <strong>Google Workspace / Gmail</strong>, used to send us an email notification
               when a form is submitted.
+            </li>
+            <li>
+              <strong>Umami</strong>, used for anonymous site statistics —{" "}
+              <TODO>confirm Umami Cloud's data region and sign the data-processing terms</TODO>.
             </li>
           </ul>
           <p>

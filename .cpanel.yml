@@ -15,5 +15,5 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/CPANEL_USERNAME/public_html/
-    - source /home/CPANEL_USERNAME/nodevenv/repositories/pixellwave-site/NODE_VERSION/bin/activate && npm ci && STRAPI_URL=https://cms.pixelwave.it npm run build
+    - source /home/CPANEL_USERNAME/nodevenv/repositories/pixelwave-site/NODE_VERSION/bin/activate && npm ci && STRAPI_URL=https://cms.pixelwave.it npm run build
     - /bin/cp -R dist/. $DEPLOYPATH
