@@ -21,7 +21,7 @@ export function BrandLogo({
   return (
     <img
       src={variant === "icon" ? logoIconWhite : logoWordmark}
-      alt="PixellWave"
+      alt="PixelWave"
       className={className}
       style={{
         display: "block",

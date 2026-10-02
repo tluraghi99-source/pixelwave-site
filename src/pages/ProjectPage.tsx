@@ -38,7 +38,7 @@ function parseYoutubeId(url: string): string | null {
 function withMedia(p: Project): ProjectWithMedia {
   const placeholderHero: MediaItem = {
     type: "image",
-    src: `https://picsum.photos/seed/pixellwave-${p.id}-hero/1600/900?grayscale`,
+    src: `https://picsum.photos/seed/pixelwave-${p.id}-hero/1600/900?grayscale`,
   }
 
   let hero: MediaItem
@@ -59,7 +59,7 @@ function withMedia(p: Project): ProjectWithMedia {
         }))
       : Array.from({ length: 8 }, (_, i) => ({
           type: "image" as const,
-          src: `https://picsum.photos/seed/pixellwave-${p.id}-g${i}/900/700?grayscale`,
+          src: `https://picsum.photos/seed/pixelwave-${p.id}-g${i}/900/700?grayscale`,
         }))
 
   // Used only as a static <img> "next project" teaser (and, via the same
@@ -67,7 +67,7 @@ function withMedia(p: Project): ProjectWithMedia {
   // cover -> heroMedia (only when it's an image) -> Picsum placeholder.
   // Never a video or YouTube embed here, regardless of heroMediaType — a
   // small teaser/grid card is never a sensible place to autoplay either.
-  const thumb = projectThumbUrl(p, `https://picsum.photos/seed/pixellwave-${p.id}-hero/400/300?grayscale`)
+  const thumb = projectThumbUrl(p, `https://picsum.photos/seed/pixelwave-${p.id}-hero/400/300?grayscale`)
 
   return { ...p, hero, gallery, thumb }
 }
@@ -295,7 +295,7 @@ export function ProjectPage() {
   // Called unconditionally, above the not-found return below, so hook order
   // never changes across renders — falls back to the site-wide title/desc
   // while `projects` is still loading or the slug genuinely doesn't match.
-  usePageMeta(project ? `${project.title} — PixellWave` : "PixellWave — Your Vision, Our Wave", project?.desc)
+  usePageMeta(project ? `${project.title} — PixelWave` : "PixelWave — Your Vision, Our Wave", project?.desc)
 
   // No uploaded gallery + a self-hosted video hero: fill the carousel with
   // stills grabbed from that video instead of stock placeholders. While

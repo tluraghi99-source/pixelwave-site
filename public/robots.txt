@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://pixellwave.it/sitemap.xml
+Sitemap: https://pixelwave.it/sitemap.xml

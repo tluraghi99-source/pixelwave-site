@@ -13,7 +13,7 @@
 // hosting discussion); both default to today's known values.
 import { writeFile } from "node:fs/promises"
 
-const SITE_URL = process.env.SITE_URL ?? "https://pixellwave.it"
+const SITE_URL = process.env.SITE_URL ?? "https://pixelwave.it"
 const STRAPI_URL = process.env.STRAPI_URL ?? "http://localhost:1337"
 
 const STATIC_ROUTES = ["/", "/work", "/studio", "/contact"]

@@ -12,8 +12,8 @@ import { Button } from "@/components/pw/Button"
 function withPhotos(m: TeamMember) {
   return {
     ...m,
-    photo: m.photo?.url ?? `https://picsum.photos/seed/pixellwave-team-${m.id}/600/750`,
-    photoHover: m.photoHover?.url ?? `https://picsum.photos/seed/pixellwave-team-${m.id}-alt/600/750`,
+    photo: m.photo?.url ?? `https://picsum.photos/seed/pixelwave-team-${m.id}/600/750`,
+    photoHover: m.photoHover?.url ?? `https://picsum.photos/seed/pixelwave-team-${m.id}-alt/600/750`,
   }
 }
 

@@ -19,7 +19,7 @@ import { projectThumbUrl, type Project } from "@/lib/strapi"
  *  never a sensible place to autoplay a video or a YouTube embed,
  *  regardless of what the project's actual hero media is. */
 function gridThumbUrl(p: Project): string {
-  return projectThumbUrl(p, `https://picsum.photos/seed/pixellwave-${p.id}/900/1200?grayscale`)
+  return projectThumbUrl(p, `https://picsum.photos/seed/pixelwave-${p.id}/900/1200?grayscale`)
 }
 
 const FADE_WIDTH = 20 // px
@@ -102,8 +102,8 @@ function FilterRow({ children }: { children: ReactNode }) {
 
 export function WorkPage() {
   usePageMeta(
-    "All Projects — PixellWave",
-    "Browse every PixellWave project — video, photo, branding, web design, social and events work, filterable by category or client."
+    "All Projects — PixelWave",
+    "Browse every PixelWave project — video, photo, branding, web design, social and events work, filterable by category or client."
   )
   const fetchedProjects = useProjects()
   // Reshuffled once per fetch (like the Studio team grid), not on every

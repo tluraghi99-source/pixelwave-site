@@ -16,7 +16,7 @@ import { projectThumbUrl, type Project } from "@/lib/strapi"
  *  no image heroMedia) falls through to the placeholder, same as every
  *  other project-thumbnail call site. */
 function galleryImageUrl(p: Project): string {
-  return projectThumbUrl(p, `https://picsum.photos/seed/pixellwave-${p.id}/1200/900?grayscale`)
+  return projectThumbUrl(p, `https://picsum.photos/seed/pixelwave-${p.id}/1200/900?grayscale`)
 }
 
 /** How many projects the homepage teases, on both the desktop circular

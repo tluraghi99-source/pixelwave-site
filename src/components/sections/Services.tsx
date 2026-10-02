@@ -27,7 +27,7 @@ function pickServiceImages(projects: Project[]): string[] {
     const matching = shuffle(withThumb.filter((p) => p.workCategories.some((c) => c.toLowerCase() === service.name.toLowerCase())))
     const pool = matching.length > 0 ? matching : shuffle(withThumb)
     const pick = pool.find((p) => !used.has(p.id)) ?? pool[0]
-    if (!pick) return `https://picsum.photos/seed/pixellwave-svc-${service.num}/800/600?grayscale`
+    if (!pick) return `https://picsum.photos/seed/pixelwave-svc-${service.num}/800/600?grayscale`
     used.add(pick.id)
     return projectThumbUrl(pick, "")
   })

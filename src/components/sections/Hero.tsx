@@ -30,7 +30,7 @@ export function Hero({ introDone }: HeroProps) {
 
   const measure = useCallback(() => {
     const source = wrapRef.current
-    const target = document.querySelector('a[aria-label="PixellWave home"]')
+    const target = document.querySelector('a[aria-label="PixelWave home"]')
     if (!source || !target) return
     const sourceRect = source.getBoundingClientRect()
     const targetRect = target.getBoundingClientRect()
@@ -92,7 +92,7 @@ export function Hero({ introDone }: HeroProps) {
         <motion.img
           ref={imgRef}
           src={logoWordmark}
-          alt="PixellWave"
+          alt="PixelWave"
           className="hero__bigmark-img"
           // Intrinsic size from the SVG's own viewBox (0 0 7075.3 1826.47,
           // rounded) — logo-wordmark.svg carries no width/height of its own,

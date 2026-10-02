@@ -9,8 +9,8 @@ import { Footer } from "@/components/sections/Footer"
 
 export function HomePage() {
   usePageMeta(
-    "PixellWave — Your Vision, Our Wave",
-    "PixellWave is a creative studio for video, photo, branding, web design, social and events — from concept to final delivery."
+    "PixelWave — Your Vision, Our Wave",
+    "PixelWave is a creative studio for video, photo, branding, web design, social and events — from concept to final delivery."
   )
   const [introDone, setIntroDone] = useState(false)
 
