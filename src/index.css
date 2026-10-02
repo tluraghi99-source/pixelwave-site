@@ -982,7 +982,9 @@ header.nav .nav__mobile .nav__link {
    — both need the exact same gap value to keep the filter row's footprint
    matching a card's actual width; a plain variable keeps them from quietly
    drifting apart if either changes later. */
-.work-page { position: relative; isolation: isolate; padding-top: 0; --work-grid-gap: clamp(1rem, 1.2vw, 1.25rem); }
+/* min-height: the grid only renders once projects arrive; a full screen keeps
+   the footer below the fold until then so it doesn't jump when they do. */
+.work-page { position: relative; isolation: isolate; padding-top: 0; min-height: 100svh; --work-grid-gap: clamp(1rem, 1.2vw, 1.25rem); }
 /* Same visual language as the homepage's Hero (interactive pixel-trail),
    just static — there's no header logo to dock into on this page, so no
    scroll-driven shrink/handoff, and it sits in normal flow, not pinned. */
@@ -1056,6 +1058,10 @@ header.nav .nav__mobile .nav__link {
   max-width: 100%;
   overflow-x: auto; -webkit-overflow-scrolling: touch;
   scrollbar-width: none; -ms-overflow-style: none;
+  /* One pill row (14px at the body's 1.5 line-height) — the pills arrive
+     with the fetched categories/clients, so without this the row grows from
+     empty and nudges the grid down. */
+  min-height: 21px;
 }
 .work-page__filters::-webkit-scrollbar { display: none; }
 .work-page__filter {
@@ -1137,7 +1143,10 @@ header.nav .nav__mobile .nav__link {
 /* project detail page */
 /* Starts at the vertical midpoint of the viewport, same convention as
    .work-hero on /work and .studio-stats__hero on /studio. */
-.project-page { padding-top: 50svh; background: var(--pw-black); color: var(--pw-white); }
+/* min-height: while the project is still loading the page is an empty shell —
+   a full screen of it keeps the footer below the fold so it doesn't jump
+   when the content arrives. */
+.project-page { padding-top: 50svh; min-height: 100svh; background: var(--pw-black); color: var(--pw-white); }
 .project-page__hero-glow { position: relative; isolation: isolate; }
 /* .project-page's own padding-top (above) is what creates the 50svh gap
    before this element's box even starts — sized to just this element's

@@ -5,7 +5,7 @@ import { ArrowUpRight, Volume2, VolumeX } from "lucide-react"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { Footer } from "@/components/sections/Footer"
-import { useProjects } from "@/hooks/useProjects"
+import { useProjectsStatus } from "@/hooks/useProjects"
 import { usePageMeta } from "@/hooks/usePageMeta"
 import { useVideoFrames } from "@/hooks/useVideoFrames"
 import { mediaUrl, projectThumbUrl, type Project } from "@/lib/strapi"
@@ -281,7 +281,7 @@ function GalleryRow({ items, reverse }: { items: MediaItem[]; reverse: boolean }
 
 export function ProjectPage() {
   const { slug } = useParams<{ slug: string }>()
-  const projects = useProjects()
+  const { projects, loaded } = useProjectsStatus()
 
   const { project, nextProject } = useMemo(() => {
     const index = projects.findIndex((p) => p.slug === slug)
@@ -312,6 +312,19 @@ export function ProjectPage() {
         : framesSrc && (videoFrames.status === "loading" || videoFrames.status === "idle")
           ? []
           : project.gallery
+
+  // Still fetching: an empty, full-height shell instead of "Project not
+  // found" — otherwise that message (and the footer right under it) shows
+  // for a moment and then jumps away when the real page mounts, the page's
+  // whole layout shift.
+  if (!loaded) {
+    return (
+      <>
+        <main className="project-page" data-theme="dark" aria-busy="true" />
+        <Footer />
+      </>
+    )
+  }
 
   if (!project || !nextProject) {
     return (
