@@ -2,8 +2,9 @@ import { useEffect } from "react"
 import { motion, useMotionValue, useSpring } from "framer-motion"
 import { Marquee } from "@/components/motion/Marquee"
 import { CursorGlow } from "@/components/motion/CursorGlow"
+import { SERVICES } from "@/data/services"
 
-const ITEMS = ["Web Design", "Brand Identity", "Motion", "Development", "Design Systems"]
+const ITEMS = SERVICES.map((service) => service.name)
 
 /** Ticker items tilt toward whichever side of the viewport the cursor is on. */
 const MAX_ROTATION = 5
