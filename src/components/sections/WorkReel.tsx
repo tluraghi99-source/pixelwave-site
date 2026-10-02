@@ -24,11 +24,13 @@ const VIDEO_VH = 250
  *  the black fade-in below starts. */
 const FROZEN_HOLD_VH = 30
 /** The black background's own fade-in — deliberately long and slow, scrubbed
- *  1:1 with scroll rather than time. The carousel begins its own entrance at
- *  65% through this span (see CAROUSEL_ENTRANCE_START_GLOBAL below), not at
- *  its end, and keeps fading in on its own past that point. */
+ *  1:1 with scroll rather than time. The carousel begins its own entrance
+ *  the instant the frozen hold ends and this fade starts (desktop only —
+ *  see CAROUSEL_ENTRANCE_START_GLOBAL below), not partway through it, and
+ *  keeps fading/rising in on its own past that point while the blackout
+ *  continues behind it. */
 const BLACK_FADE_VH = 200
-const CAROUSEL_START_FRACTION_OF_FADE = 0.65
+const CAROUSEL_START_FRACTION_OF_FADE = 0
 const CAROUSEL_VH = 220
 /** The blackout never goes fully opaque — it settles at a dimmed 60%, so the
  *  video's last frame stays faintly visible underneath rather than reading
@@ -68,15 +70,17 @@ const PIN_SCROLL_VH = PIN_HEIGHT_VH / 100 - 1
  *  the full frame — a centered iris opening, driven by the exact same
  *  progress value as the hero mark's dock and the header logo's crossfade,
  *  so all three land together instead of merely "around the same time." */
-const REVEAL_CLIP_START = "inset(45% 42% 45% 42%)"
+const REVEAL_CLIP_START = "inset(50% 50% 50% 50%)"
 const REVEAL_CLIP_END = "inset(0% 0% 0% 0%)"
 /** Heading settles in place (small rise), same as before. */
 const HEADING_RISE_START = 48
 const HEADING_RISE_END = 0
 const FADE_EASE = cubicBezier(...EASE_WAVE)
 /** How much of the carousel's own scroll budget (CAROUSEL_VH) the entrance
- *  fade/rise itself consumes, once the video scrub is fully done. */
-const ENTRANCE_FADE_VH = 40
+ *  fade/rise itself consumes, once the video scrub is fully done — 40vh
+ *  stretched 20% longer per feedback that the fade-in/move-up read as too
+ *  quick. */
+const ENTRANCE_FADE_VH = 48
 
 /** Clamped 0→1 local progress of v within [start, end]. */
 function clampedProgress(v: number, start: number, end: number) {
@@ -260,8 +264,15 @@ export function WorkReel({ ctaHeadline }: { ctaHeadline: string }) {
   const screenSize = useScreenSize()
   const isDesktop = screenSize.greaterThanOrEqual("lg")
   const projects = useProjects()
+  // WorkReelPinned is the most intense motion anywhere on the site — a
+  // 720vh scroll-hijack driving video scrub, a blackout fade, and a
+  // parallax carousel entrance. prefers-reduced-motion skips straight to
+  // the plain, non-pinned flow every mobile/tablet visitor already gets,
+  // same check StudioStats/PixelResolveGrid already use elsewhere.
+  const reducedMotion =
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
-  return isDesktop ? (
+  return isDesktop && !reducedMotion ? (
     <WorkReelPinned ctaHeadline={ctaHeadline} projects={projects} />
   ) : (
     <WorkReelAmbient ctaHeadline={ctaHeadline} projects={projects} />
