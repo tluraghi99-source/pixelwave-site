@@ -62,7 +62,8 @@ export function PrivacyPolicyPage() {
           <p>We only collect what each form on this site actually asks for:</p>
           <ul>
             <li>
-              <strong>Contact form</strong> (/contact) — your name, email address, the project
+              <strong>Contact form</strong> (/contact) — your name, email address, phone
+              number (optional), the project
               type(s) you select, and the timeline you select.
             </li>
             <li>

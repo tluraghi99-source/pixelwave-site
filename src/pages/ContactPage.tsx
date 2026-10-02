@@ -9,6 +9,7 @@ import { CursorGlow } from "@/components/motion/CursorGlow"
 import { CursorHint } from "@/components/motion/CursorHint"
 import { EASE_WAVE } from "@/lib/motion"
 import { usePageMeta } from "@/hooks/usePageMeta"
+import { SERVICES } from "@/data/services"
 import { submitContact } from "@/lib/strapi"
 
 const STEPS = [
@@ -18,7 +19,9 @@ const STEPS = [
   { key: "review", label: "Review" },
 ] as const
 
-const PROJECT_TYPES = ["Web Design", "Brand Identity", "Motion", "Development"]
+// Same list as the homepage Services section, so the form never offers
+// something the site doesn't list (or misses something it does).
+const PROJECT_TYPES = SERVICES.map((service) => service.name)
 const TIMELINES = ["ASAP", "1–3 months", "3–6 months", "Not sure yet"]
 
 /** Joins selected types with " + ", breaking to a new line after every third
@@ -39,6 +42,7 @@ export function ContactPage() {
   const [stepIndex, setStepIndex] = useState(0)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
   const [projectTypes, setProjectTypes] = useState<string[]>([])
   const [timeline, setTimeline] = useState<string | null>(null)
   const [consent, setConsent] = useState(false)
@@ -62,7 +66,7 @@ export function ContactPage() {
     if (isLastStep) {
       setSending(true)
       setSendError(false)
-      const ok = await submitContact({ name, email, projectTypes, timeline })
+      const ok = await submitContact({ name, email, phone: phone.trim(), projectTypes, timeline })
       setSending(false)
       if (ok) setSent(true)
       else setSendError(true)
@@ -199,6 +203,13 @@ export function ContactPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
+                    <Input
+                      label="Phone (optional)"
+                      type="tel"
+                      placeholder="Phone number (optional)"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
                   </div>
                 )}
 
@@ -235,9 +246,10 @@ export function ContactPage() {
                 {step.key === "review" && (
                   <div className="contact-page__recap">
                     <button type="button" className="contact-page__recap-row" onClick={() => setStepIndex(0)}>
-                      <span className="contact-page__recap-label">Name &amp; email</span>
+                      <span className="contact-page__recap-label">Name &amp; contact</span>
                       <span className="contact-page__recap-value">
                         {name} · {email}
+                        {phone.trim() !== "" && ` · ${phone.trim()}`}
                       </span>
                       <span className="contact-page__recap-edit">Edit</span>
                     </button>

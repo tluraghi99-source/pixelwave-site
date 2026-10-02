@@ -263,6 +263,8 @@ export async function fetchWorkCategories(): Promise<WorkCategory[]> {
 export interface ContactSubmissionPayload {
   name: string
   email: string
+  /** Optional — empty string when left blank. */
+  phone: string
   projectTypes: string[]
   timeline: string | null
 }
