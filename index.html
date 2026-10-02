@@ -3,17 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <!-- viewport-fit=cover lets fixed full-bleed elements (e.g. the mobile
          nav takeover) extend into the safe areas instead of stopping at
          their edge, so their background can show through under iOS
          Safari's translucent chrome the way the rest of the site does. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>PixellWave — Your Vision, Our Wave</title>
+    <title>PixelWave — Your Vision, Our Wave</title>
     <meta
       name="description"
-      content="PixellWave is a creative studio for video, photo, branding, web design, social and events — from concept to final delivery."
+      content="PixelWave is a creative studio for video, photo, branding, web design, social and events — from concept to final delivery."
     />
-    <link rel="canonical" href="https://pixellwave.it/" />
+    <link rel="canonical" href="https://pixelwave.it/" />
     <meta name="theme-color" content="#000000" />
 
     <!-- Open Graph — this static baseline is what every page shows when
@@ -23,30 +24,44 @@
          per-page <title>/description that DOES vary — search engines like
          Google run JS and do pick that up, unlike link-preview crawlers. -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="PixellWave" />
+    <meta property="og:site_name" content="PixelWave" />
     <meta property="og:locale" content="en_US" />
-    <meta property="og:url" content="https://pixellwave.it/" />
-    <meta property="og:title" content="PixellWave — Your Vision, Our Wave" />
+    <meta property="og:url" content="https://pixelwave.it/" />
+    <meta property="og:title" content="PixelWave — Your Vision, Our Wave" />
     <meta
       property="og:description"
       content="A creative studio for video, photo, branding, web design, social and events — from concept to final delivery."
     />
-    <meta property="og:image" content="https://pixellwave.it/og-image.png" />
+    <meta property="og:image" content="https://pixelwave.it/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
 
     <!-- Twitter/X reads Open Graph too, but only with this card type set
          does it render the large image instead of a small thumbnail. -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="PixellWave — Your Vision, Our Wave" />
+    <meta name="twitter:title" content="PixelWave — Your Vision, Our Wave" />
     <meta
       name="twitter:description"
       content="A creative studio for video, photo, branding, web design, social and events — from concept to final delivery."
     />
-    <meta name="twitter:image" content="https://pixellwave.it/og-image.png" />
+    <meta name="twitter:image" content="https://pixelwave.it/og-image.png" />
 
     <link rel="preload" as="font" type="font/woff2" href="/src/assets/fonts/hanken-grotesk.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="/src/assets/fonts/hanken-grotesk-italic.woff2" crossorigin />
+
+    <!-- Umami analytics — cookieless, so no consent banner is required.
+         Skipped on localhost/LAN dev hosts (see src/lib/strapi.ts for the
+         same LAN-IP dev pattern) so local testing doesn't pollute the
+         real visitor stats. -->
+    <script>
+      if (!/^(localhost|127\.0\.0\.1|(\d{1,3}\.){3}\d{1,3})$/.test(location.hostname)) {
+        var umamiScript = document.createElement("script")
+        umamiScript.defer = true
+        umamiScript.src = "https://cloud.umami.is/script.js"
+        umamiScript.setAttribute("data-website-id", "f0773df9-e771-483f-ba6f-34026573f6a2")
+        document.head.appendChild(umamiScript)
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
