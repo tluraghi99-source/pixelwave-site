@@ -73,11 +73,10 @@ export function PrivacyPolicyPage() {
             </li>
           </ul>
           <p>
-            We don't use cookies. To understand how the site is used (which pages are visited,
-            roughly where from), we use Umami, a privacy-focused analytics service that works
-            without cookies and without building profiles of individual visitors. If that
-            changes, this page — and a cookie-consent banner, if one becomes necessary — will be
-            updated before it happens, not after.
+            Statistics and advertising cookies (Google Analytics, Google Ads, Meta pixel) are used
+            only if you accept them in the cookie banner; until then nothing is requested from
+            those services. See the <Link to="/cookies">Cookie Policy</Link> for the details and to
+            change your choice.
           </p>
 
           <h2>3. Why we collect it, and on what basis</h2>
@@ -113,14 +112,15 @@ export function PrivacyPolicyPage() {
               when a form is submitted.
             </li>
             <li>
-              <strong>Umami</strong>, used for anonymous site statistics —{" "}
-              <TODO>confirm Umami Cloud's data region and sign the data-processing terms</TODO>.
+              <strong>Google (Tag Manager, Analytics, Ads)</strong> and{" "}
+              <strong>Meta (pixel)</strong>, for statistics and advertising measurement — only if
+              you accept the corresponding cookies.
             </li>
           </ul>
           <p>
             <TODO>
               Confirm whether data-processing agreements (DPAs) are in place with each of the
-              above, and note here if either transfers data outside the EU.
+              above, and note here if any transfers data outside the EU (Google and Meta may).
             </TODO>
           </p>
 

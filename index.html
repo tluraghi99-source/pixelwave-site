@@ -48,20 +48,6 @@
 
     <link rel="preload" as="font" type="font/woff2" href="/src/assets/fonts/hanken-grotesk.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="/src/assets/fonts/hanken-grotesk-italic.woff2" crossorigin />
-
-    <!-- Umami analytics — cookieless, so no consent banner is required.
-         Skipped on localhost/LAN dev hosts (see src/lib/strapi.ts for the
-         same LAN-IP dev pattern) so local testing doesn't pollute the
-         real visitor stats. -->
-    <script>
-      if (!/^(localhost|127\.0\.0\.1|(\d{1,3}\.){3}\d{1,3})$/.test(location.hostname)) {
-        var umamiScript = document.createElement("script")
-        umamiScript.defer = true
-        umamiScript.src = "https://cloud.umami.is/script.js"
-        umamiScript.setAttribute("data-website-id", "f0773df9-e771-483f-ba6f-34026573f6a2")
-        document.head.appendChild(umamiScript)
-      }
-    </script>
   </head>
   <body>
     <div id="root"></div>

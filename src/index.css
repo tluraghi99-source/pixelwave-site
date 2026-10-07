@@ -1940,3 +1940,58 @@ html.nav-open .cursor-dot { background: var(--pw-black); }
     @apply border-border outline-ring/50;
   }
 }
+
+/* ===========================================================================
+   PixelWave — cookie consent banner (CookieConsent.tsx)
+   Sharp corners, white border on black, same custom checkbox as the forms.
+   Accept / Reject / Customize are deliberately the same size and style.
+   =========================================================================== */
+.cookie-banner {
+  position: fixed; z-index: var(--z-overlay);
+  left: clamp(1rem, 1.2vw, 1.25rem); bottom: clamp(1rem, 1.2vw, 1.25rem);
+  width: min(26rem, calc(100vw - 2rem));
+  max-height: calc(100svh - 2rem); overflow-y: auto;
+  padding: 1.1rem 1.25rem 1.25rem;
+  background: var(--pw-black); color: var(--pw-white);
+  border: var(--border-width-strong) solid var(--pw-white);
+  font-family: var(--font-text);
+}
+.cookie-banner:focus { outline: none; }
+.cookie-banner__title {
+  margin: 0 0 0.5rem; font-family: var(--font-mono-accent); font-size: 0.7rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-secondary);
+}
+.cookie-banner__text { margin: 0 0 1rem; font-size: 0.875rem; line-height: 1.5; color: var(--pw-neutral-80); }
+.cookie-banner__text a { color: var(--pw-white); text-decoration: underline; text-underline-offset: 2px; }
+.cookie-banner__list { list-style: none; margin: 0 0 1rem; padding: 0; display: flex; flex-direction: column; gap: 0.85rem; }
+.cookie-banner__toggle { display: flex; align-items: flex-start; gap: 0.65rem; cursor: pointer; }
+.cookie-banner__input { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.cookie-banner__box {
+  display: flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; flex-shrink: 0; margin-top: 0.1rem;
+  border: var(--border-width-strong) solid var(--border-subtle); color: transparent;
+  transition: background var(--dur-base) var(--ease-wave), border-color var(--dur-base) var(--ease-wave), color var(--dur-base) var(--ease-wave);
+}
+.cookie-banner__input:checked + .cookie-banner__box { background: var(--pw-orange); border-color: var(--pw-orange); color: var(--pw-black); }
+.cookie-banner__input:disabled + .cookie-banner__box { opacity: 0.6; }
+.cookie-banner__input:focus-visible + .cookie-banner__box { box-shadow: 0 0 0 3px var(--focus-ring); }
+.cookie-banner__toggle-title { display: block; font-size: 0.9rem; font-weight: 600; }
+.cookie-banner__toggle-desc { display: block; margin-top: 0.15rem; font-size: 0.8rem; line-height: 1.45; color: var(--text-secondary); }
+.cookie-banner__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.cookie-banner__actions .pw-btn { flex: 1 1 0; min-width: 7rem; }
+@media (max-width: 640px) {
+  .cookie-banner { left: 0; right: 0; bottom: 0; width: auto; border-left: 0; border-right: 0; border-bottom: 0; padding-bottom: calc(1.25rem + env(safe-area-inset-bottom)); }
+}
+
+.foot__legal-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem; }
+.foot__legal-button {
+  padding: 0; border: 0; background: none; cursor: pointer;
+  font: inherit; color: inherit; transition: color var(--dur-base) var(--ease-wave);
+}
+@media (hover: hover) {
+  .foot__legal-button:hover { color: var(--pw-orange); }
+}
+.legal-page__link-button {
+  padding: 0; border: 0; background: none; cursor: pointer;
+  font: inherit; color: var(--pw-orange); text-decoration: underline; text-underline-offset: 2px;
+}

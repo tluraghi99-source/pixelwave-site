@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react"
 import { Route, Routes } from "react-router-dom"
 import { ScrollProgress } from "@/components/ScrollProgress"
 import { ScrollToTop } from "@/components/ScrollToTop"
+import { CookieConsent } from "@/components/CookieConsent"
 import { CustomCursor } from "@/components/motion/CustomCursor"
 import { Header } from "@/components/sections/Header"
 import { HomePage } from "@/pages/HomePage"
@@ -22,6 +23,9 @@ const StudioPage = lazy(() => import("@/pages/StudioPage").then((m) => ({ defaul
 const ContactPage = lazy(() => import("@/pages/ContactPage").then((m) => ({ default: m.ContactPage })))
 const CareersPage = lazy(() => import("@/pages/CareersPage").then((m) => ({ default: m.CareersPage })))
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })))
+const CookiePolicyPage = lazy(() =>
+  import("@/pages/CookiePolicyPage").then((m) => ({ default: m.CookiePolicyPage }))
+)
 const PrivacyPolicyPage = lazy(() =>
   import("@/pages/PrivacyPolicyPage").then((m) => ({ default: m.PrivacyPolicyPage }))
 )
@@ -47,6 +51,7 @@ function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/careers" element={<CareersPage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/cookies" element={<CookiePolicyPage />} />
           {/* Catch-all — any URL that doesn't match one of the routes above
               (a typo, an old bookmark, a dead external link) used to render
               nothing at all: no route matched, so React Router mounted
@@ -54,6 +59,7 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
+      <CookieConsent />
     </>
   )
 }
