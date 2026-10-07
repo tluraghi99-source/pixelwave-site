@@ -1,0 +1,18 @@
+# Single-page app: any path that isn't a real file or folder (/contact,
+# /work/some-project, /privacy ...) is served index.html so a refresh or a
+# direct link works instead of returning a 404.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Hashed build files never change under the same name: cache them for a year.
+<IfModule mod_headers.c>
+  <FilesMatch "^.*\.(js|css|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
