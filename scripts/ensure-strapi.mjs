@@ -1,12 +1,21 @@
 // Runs before `vite` (see package.json "dev"): starts the sibling Strapi CMS
 // if nothing is listening on its port yet, so the site never comes up empty.
 import { spawn } from "node:child_process"
-import { existsSync, openSync } from "node:fs"
+import { existsSync, openSync, readFileSync } from "node:fs"
 import net from "node:net"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 
 const PORT = 1337
+
+// With VITE_DEV_CMS_PROXY in .env.local the preview reads the live CMS
+// (see vite.config.ts), so there's no local Strapi to keep running.
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..")
+const envLocal = path.join(projectRoot, ".env.local")
+if (existsSync(envLocal) && /^VITE_DEV_CMS_PROXY=\S+/m.test(readFileSync(envLocal, "utf8"))) {
+  console.log("[strapi] preview reads the live CMS (VITE_DEV_CMS_PROXY) — local Strapi not started")
+  process.exit(0)
+}
 const cmsDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../pixelwave-cms")
 
 function isListening() {

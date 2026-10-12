@@ -1,4 +1,13 @@
-const CONFIGURED_STRAPI_URL: string = import.meta.env.VITE_STRAPI_URL ?? "http://localhost:1337"
+/** "same-origin" (dev only, see vite.config.ts's VITE_DEV_CMS_PROXY) means the
+ *  CMS is reached through the dev server itself, which forwards read
+ *  requests to the live CMS. */
+const RAW_STRAPI_URL: string = import.meta.env.VITE_STRAPI_URL ?? "http://localhost:1337"
+const CONFIGURED_STRAPI_URL: string =
+  RAW_STRAPI_URL === "same-origin"
+    ? typeof window !== "undefined"
+      ? window.location.origin
+      : "http://localhost:5173"
+    : RAW_STRAPI_URL
 
 /** A "localhost" Strapi URL only works on the machine running it — opened
  *  from a phone on the LAN (http://<mac-ip>:5173), "localhost" is the phone
