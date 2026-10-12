@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { motion, useScroll, useTransform } from "framer-motion"
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion"
 import logoWordmark from "@/assets/logo-wordmark.svg"
 import { EASE_WAVE, HERO_CROSSFADE_RATIO, HERO_REVEAL_END, HERO_REVEAL_START } from "@/lib/motion"
 import { CursorGlow } from "@/components/motion/CursorGlow"
@@ -76,6 +76,12 @@ export function Hero({ introDone }: HeroProps) {
   const bigY = useTransform(revealProgress, [0, 1], [0, dock.y])
   const bigOpacity = useTransform(revealProgress, [HERO_CROSSFADE_RATIO, 1], [1, 0])
 
+  // Small bobbing arrow in the bottom-right corner: a visual cue to scroll.
+  // Gone within the first ~10% of a viewport of scrolling, since by then the
+  // visitor clearly already has.
+  const reducedMotion = useReducedMotion()
+  const arrowOpacity = useTransform(scrollY, [0, vh * 0.1], [1, 0])
+
   return (
     <section className="hero" data-screen-label="Hero">
       <CursorGlow className="cursor-glow" variant="light" glow />
@@ -109,6 +115,23 @@ export function Hero({ introDone }: HeroProps) {
           style={{ scale: bigScale, opacity: bigOpacity, x: bigX, y: bigY }}
         />
       </motion.div>
+
+      {introDone && (
+        <motion.div className="hero__scroll-arrow" style={{ opacity: arrowOpacity }} aria-hidden="true">
+          <motion.span
+            className="hero__scroll-arrow-icon"
+            animate={reducedMotion ? undefined : { y: [0, -10, 0] }}
+            transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+          >
+            {/* A thin stem with a sharp V head, square ends — same hard-edged
+                language as the rest of the site, not a rounded icon. */}
+            <svg width="18" height="34" viewBox="0 0 18 34" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
+              <line x1="9" y1="2" x2="9" y2="31" />
+              <polyline points="2,23 9,31 16,23" />
+            </svg>
+          </motion.span>
+        </motion.div>
+      )}
     </section>
   )
 }

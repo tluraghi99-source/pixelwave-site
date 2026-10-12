@@ -133,7 +133,17 @@ export function WorkPage() {
   const [mode, setMode] = useState<"category" | "client">(
     searchParams.get("mode") === "client" ? "client" : "category"
   )
-  const [activeCategories, setActiveCategories] = useState<Set<string>>(new Set())
+  // /work?category=Video (or several, comma-separated) opens with those
+  // categories already selected — the homepage's Services links use it.
+  const [activeCategories, setActiveCategories] = useState<Set<string>>(
+    () =>
+      new Set(
+        (searchParams.get("category") ?? "")
+          .split(",")
+          .map((c) => c.trim())
+          .filter(Boolean)
+      )
+  )
   const [activeClient, setActiveClient] = useState<string | null>(null)
 
   function toggleCategory(category: string) {

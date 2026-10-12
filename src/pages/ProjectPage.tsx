@@ -10,7 +10,14 @@ import { usePageMeta } from "@/hooks/usePageMeta"
 import { useVideoFrames } from "@/hooks/useVideoFrames"
 import { mediaUrl, projectThumbUrl, type Project } from "@/lib/strapi"
 
-type MediaItem = { type: "image"; src: string } | { type: "video"; src: string } | { type: "youtube"; videoId: string }
+type MediaItem =
+  | { type: "image"; src: string }
+  | { type: "video"; src: string }
+  | { type: "youtube"; videoId: string }
+  | { type: "skeleton" }
+
+/** Stills taken from a video hero when no gallery was uploaded. */
+const VIDEO_FRAME_COUNT = 8
 
 interface ProjectWithMedia extends Project {
   hero: MediaItem
@@ -122,6 +129,7 @@ function ProjectMedia({ media, muted = true }: { media: MediaItem; muted?: boole
       />
     )
   }
+  if (media.type === "skeleton") return null
   return <img className="project-video-media" src={media.src} alt="" />
 }
 
@@ -260,6 +268,8 @@ function GalleryRow({ items, reverse }: { items: MediaItem[]; reverse: boolean }
           <video src={item.src} autoPlay loop muted playsInline />
         ) : item.type === "image" ? (
           <img src={item.src} alt="" loading="lazy" />
+        ) : item.type === "skeleton" ? (
+          <div className="project-gallery__skeleton" aria-hidden="true" />
         ) : null}
       </div>
     ))
@@ -298,20 +308,27 @@ export function ProjectPage() {
   usePageMeta(project ? `${project.title} — PixelWave` : "PixelWave — Your Vision, Our Wave", project?.desc)
 
   // No uploaded gallery + a self-hosted video hero: fill the carousel with
-  // stills grabbed from that video instead of stock placeholders. While
-  // they're being extracted the gallery stays hidden (no placeholder flash);
-  // if extraction fails it falls back to the placeholders in project.gallery.
+  // stills grabbed from that video. Extraction takes a while (it has to
+  // pull and seek through a large video), so the full set of slots shows
+  // right away as soft placeholders and each one fills in as its frame is
+  // ready — instead of an empty page for several seconds. If extraction
+  // yields nothing at all the gallery is simply left out: unrelated stock
+  // photos on a client's project page would be worse than no gallery.
   const framesSrc =
     project && project.galleryImages.length === 0 && project.hero.type === "video" ? project.hero.src : null
-  const videoFrames = useVideoFrames(framesSrc, 8)
+  const videoFrames = useVideoFrames(framesSrc, VIDEO_FRAME_COUNT)
   const galleryItems: MediaItem[] =
     !project
       ? []
-      : framesSrc && videoFrames.status === "ready"
-        ? videoFrames.frames.map((src) => ({ type: "image" as const, src }))
-        : framesSrc && (videoFrames.status === "loading" || videoFrames.status === "idle")
+      : framesSrc
+        ? videoFrames.status === "failed"
           ? []
-          : project.gallery
+          : videoFrames.status === "ready"
+            ? videoFrames.frames.map((src) => ({ type: "image" as const, src }))
+            : Array.from({ length: VIDEO_FRAME_COUNT }, (_, i): MediaItem =>
+                videoFrames.frames[i] ? { type: "image", src: videoFrames.frames[i] } : { type: "skeleton" }
+              )
+        : project.gallery
 
   // Still fetching: an empty, full-height shell instead of "Project not
   // found" — otherwise that message (and the footer right under it) shows

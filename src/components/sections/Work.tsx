@@ -23,11 +23,36 @@ function galleryImageUrl(p: Project): string {
  *  gallery and the mobile/tablet marquee — the full roster lives on /work. */
 const GALLERY_ITEM_COUNT = 7
 
+/** The carousel needs at least this many projects to look like a carousel. */
+const MIN_CAROUSEL_PROJECTS = 3
+
+/** Only projects from the current year are eligible ("Recent waves"). If
+ *  that leaves fewer than MIN_CAROUSEL_PROJECTS (e.g. early in a new year,
+ *  before much has been added), the most recent earlier years are added
+ *  until there are enough — an almost-empty carousel would be worse than a
+ *  slightly older one. Projects with no year set are never picked by year.
+ *  `year` is a parameter only so the rule can be tested. */
+export function eligibleRecentProjects(projects: Project[], year = new Date().getFullYear()): Project[] {
+  const withYear = projects.filter((p): p is Project & { year: number } => typeof p.year === "number")
+  const current = withYear.filter((p) => p.year === year)
+  if (current.length >= MIN_CAROUSEL_PROJECTS) return current
+
+  const older = withYear.filter((p) => p.year < year).sort((a, b) => b.year - a.year)
+  const result = [...current]
+  for (const project of older) {
+    if (result.length >= MIN_CAROUSEL_PROJECTS && project.year !== result[result.length - 1].year) break
+    result.push(project)
+  }
+  // Nothing has a year at all: better to show something than an empty gallery.
+  return result.length > 0 ? result : projects
+}
+
 /** A fresh random selection each time the caller's useMemo re-runs (i.e.
- *  once per page load, when `projects` first arrives from Strapi) — falls
- *  back to however many projects exist if there are fewer than `count`. */
+ *  once per page load, when `projects` first arrives from Strapi) — drawn
+ *  only from eligibleRecentProjects, and falls back to however many exist
+ *  if there are fewer than `count`. */
 function pickRandomProjects(projects: Project[], count: number): Project[] {
-  return shuffle(projects).slice(0, count)
+  return shuffle(eligibleRecentProjects(projects)).slice(0, count)
 }
 
 /** Real project thumbnail with the same pointer-tilt effect the numbered

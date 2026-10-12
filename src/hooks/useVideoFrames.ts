@@ -25,7 +25,7 @@ function seekTo(video: HTMLVideoElement, time: number): Promise<void> {
 // Safety net for the iOS quirk below: if extraction hasn't finished by
 // this point, something's stuck (or just very slow) — fail out to the
 // caller's fallback rather than leaving the gallery section blank forever.
-const EXTRACT_TIMEOUT_MS = 12_000
+const EXTRACT_TIMEOUT_MS = 30_000
 
 /** Grabs `count` evenly spaced still frames from a video, client-side, as
  *  object URLs. Needs the video host to send CORS headers (Strapi's uploads
@@ -91,6 +91,9 @@ export function useVideoFrames(src: string | null, count: number): VideoFramesSt
         const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.85))
         if (!blob) throw new Error("canvas is tainted or empty")
         urls.push(URL.createObjectURL(blob))
+        // Hand frames over as they're ready so the gallery fills in one by
+        // one instead of staying empty until the very last seek.
+        if (!cancelled) setState({ status: "loading", frames: urls.slice() })
       }
       if (!cancelled) setState({ status: "ready", frames: urls.slice() })
     }
@@ -100,7 +103,9 @@ export function useVideoFrames(src: string | null, count: number): VideoFramesSt
     })
 
     Promise.race([extract(), timeout]).catch(() => {
-      if (!cancelled) setState({ status: "failed", frames: [] })
+      if (cancelled) return
+      // Slow or interrupted partway: keep whatever was extracted so far.
+      setState(urls.length > 0 ? { status: "ready", frames: urls.slice() } : { status: "failed", frames: [] })
     })
 
     return () => {

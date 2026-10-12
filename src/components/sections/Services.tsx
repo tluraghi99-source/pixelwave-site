@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react"
+import { Link } from "react-router-dom"
 import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion"
+import { ArrowUpRight } from "lucide-react"
 import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Tag } from "@/components/pw/Tag"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
@@ -62,6 +64,10 @@ function ServiceRow({
   const springX = useSpring(x, { stiffness: 500, damping: 40, mass: 0.5 })
   const springY = useSpring(y, { stiffness: 500, damping: 40, mass: 0.5 })
 
+  // Service names are the same strings as the Work Categories, so this lands
+  // on /work with that category already selected (see WorkPage's ?category=).
+  const workHref = `/work?category=${encodeURIComponent(service.name)}`
+
   return (
     <div
       className={`svc-row${isOpen ? " svc-row--open" : ""}`}
@@ -73,8 +79,16 @@ function ServiceRow({
       onClick={onClick}
     >
       <div className="svc-row__head">
-        <span
+        <Link
+          to={workHref}
           className="svc-row__name"
+          // Touch devices have no hover, so a tap on the name is how a row
+          // opens (the row's own onClick) — navigating there would make the
+          // description unreachable. They use the "See projects" link inside
+          // the opened row instead.
+          onClick={(e) => {
+            if (!isHoverCapable()) e.preventDefault()
+          }}
           onMouseEnter={(e) => {
             if (!isHoverCapable()) return
             // Jumping x/y alone isn't enough — springX/springY are what's
@@ -95,7 +109,7 @@ function ServiceRow({
           onMouseLeave={() => setNameHovered(false)}
         >
           {service.name}
-        </span>
+        </Link>
         <span className="svc-row__plus" aria-hidden="true" />
       </div>
       <AnimatePresence>
@@ -133,6 +147,9 @@ function ServiceRow({
                   </div>
                 ))}
               </div>
+              <Link to={workHref} className="svc-row__link">
+                See {service.name} projects <ArrowUpRight size={16} aria-hidden="true" />
+              </Link>
             </div>
             <div className="svc-row__image">
               <img src={service.image} alt={service.name} loading="lazy" />
