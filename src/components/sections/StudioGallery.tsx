@@ -1,4 +1,4 @@
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
 import { useMotionValueEvent, useScroll } from "framer-motion"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
 import { SectionLabel } from "@/components/pw/SectionLabel"
@@ -79,22 +79,91 @@ function StudioGalleryDesktop() {
   )
 }
 
-/** Mobile/tablet: no WebGL, no pinning — a plain horizontal track, once
- *  driven by page-scroll drift (structurally identical to WorkAmbient's
- *  WorkTrack in Work.tsx) with no way to move it yourself. Now a native
- *  scroll container instead (see .studio-gallery__carousel), so a swipe
- *  moves it directly — which is also why the photo list is no longer
- *  duplicated: that doubling existed only to hide the seam of the old
- *  infinite scroll-linked loop, and a real scrollable list needs a real
- *  start and end, not a repeat. */
-function StudioGalleryTrack() {
+/** How many times the photo list is repeated end to end in the mobile
+ *  carousel. A native scroll container has a real start and end, so to make
+ *  it loop the list is laid out several times and the scroll position is
+ *  quietly moved by whole repeats once it settles — the content under the
+ *  viewport is identical, so nothing visibly jumps. */
+const LOOP_COPIES = 5
+
+/** Mobile/tablet: no WebGL, no pinning — a native horizontal scroll
+ *  container (a swipe moves it directly) that loops forever instead of
+ *  running out into black after the last photo. */
+function StudioGalleryLoopingCarousel() {
+  const scrollerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const scroller = scrollerRef.current
+    if (!scroller) return
+
+    const items = Array.from(scroller.querySelectorAll<HTMLElement>(".studio-gallery__item"))
+    const perSet = STUDIO_PHOTOS.length
+    if (items.length < perSet * 2) return
+
+    // One repeat's width, measured (not computed) so the gap and padding
+    // can change in CSS without this drifting out of sync.
+    const setWidth = items[perSet].offsetLeft - items[0].offsetLeft
+    if (setWidth <= 0) return
+
+    // Start in the middle repeat, so there is room to move both ways.
+    scroller.scrollLeft = setWidth * Math.floor(LOOP_COPIES / 2)
+
+    let touching = false
+    let timer: number | undefined
+
+    function recenter() {
+      if (touching || !scroller) return
+      const low = setWidth * (Math.floor(LOOP_COPIES / 2) - 0.5)
+      const high = low + setWidth
+      let pos = scroller.scrollLeft
+      while (pos < low) pos += setWidth
+      while (pos >= high) pos -= setWidth
+      if (pos !== scroller.scrollLeft) {
+        // Snapping would fight the reposition; same content, so it's invisible.
+        scroller.style.scrollSnapType = "none"
+        scroller.scrollLeft = pos
+        requestAnimationFrame(() => {
+          scroller.style.scrollSnapType = ""
+        })
+      }
+    }
+
+    function onScroll() {
+      window.clearTimeout(timer)
+      timer = window.setTimeout(recenter, 120)
+    }
+    function onTouchStart() {
+      touching = true
+    }
+    function onTouchEnd() {
+      touching = false
+      onScroll()
+    }
+
+    scroller.addEventListener("scroll", onScroll, { passive: true })
+    scroller.addEventListener("touchstart", onTouchStart, { passive: true })
+    scroller.addEventListener("touchend", onTouchEnd, { passive: true })
+    scroller.addEventListener("touchcancel", onTouchEnd, { passive: true })
+    return () => {
+      window.clearTimeout(timer)
+      scroller.removeEventListener("scroll", onScroll)
+      scroller.removeEventListener("touchstart", onTouchStart)
+      scroller.removeEventListener("touchend", onTouchEnd)
+      scroller.removeEventListener("touchcancel", onTouchEnd)
+    }
+  }, [])
+
   return (
-    <div className="studio-gallery__track">
-      {STUDIO_PHOTOS.map((photo, i) => (
-        <div className="studio-gallery__item" key={i}>
-          <img src={photo.image} alt="" loading="lazy" />
-        </div>
-      ))}
+    <div className="studio-gallery__carousel" ref={scrollerRef}>
+      <div className="studio-gallery__track">
+        {Array.from({ length: LOOP_COPIES }, (_, copy) =>
+          STUDIO_PHOTOS.map((photo, i) => (
+            <div className="studio-gallery__item" key={`${copy}-${i}`} aria-hidden={copy === 0 ? undefined : true}>
+              <img src={photo.image} alt="" loading="lazy" />
+            </div>
+          ))
+        )}
+      </div>
     </div>
   )
 }
@@ -106,8 +175,8 @@ function StudioGalleryAmbient() {
       <div className="wrap">
         <StudioGalleryHeading />
       </div>
-      <Reveal delay={0.2} className="studio-gallery__carousel">
-        <StudioGalleryTrack />
+      <Reveal delay={0.2}>
+        <StudioGalleryLoopingCarousel />
       </Reveal>
     </section>
   )
