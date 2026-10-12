@@ -721,14 +721,12 @@ header.nav .nav__mobile .nav__link {
 }
 .hero__scroll-arrow {
   position: absolute; z-index: 2; pointer-events: none;
-  /* Same margins as the wordmark (.hero__bigmark): its letters sit 0.345vw
-     above the image's own bottom edge (the SVG has a little padding under
-     the baseline: 32.5 of 1826.5 units at 75vw wide), and this arrow's drawn
-     line ends 2px above its SVG's bottom — so the arrow's lowest point lands
-     exactly on the letters' baseline. It bobs upward from there only, so it
-     never dips under the margin. */
+  /* Same bottom margin as the wordmark (.hero__bigmark): the arrow's lowest
+     point lands on the bottom edge of the wordmark's image box. Its drawn
+     line ends 2px above its own SVG's bottom, hence the -2px. It bobs
+     upward from there only, so it never dips under the margin. */
   right: calc(clamp(1rem, 1.2vw, 1.25rem) - 1px);
-  bottom: calc(clamp(1rem, 1.2vw, 1.25rem) + 0.345vw - 2px);
+  bottom: calc(clamp(1rem, 1.2vw, 1.25rem) - 2px);
   color: var(--pw-orange);
 }
 .hero__scroll-arrow-icon { display: block; line-height: 0; }

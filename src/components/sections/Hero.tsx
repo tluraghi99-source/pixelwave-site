@@ -125,9 +125,9 @@ export function Hero({ introDone }: HeroProps) {
           >
             {/* A thin stem with a sharp V head, square ends — same hard-edged
                 language as the rest of the site, not a rounded icon. */}
-            <svg width="18" height="34" viewBox="0 0 18 34" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="square" strokeLinejoin="miter">
-              <line x1="9" y1="2" x2="9" y2="31" />
-              <polyline points="2,23 9,31 16,23" />
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="square" strokeLinejoin="miter">
+              <line x1="8" y1="2" x2="8" y2="13" />
+              <polyline points="3,8 8,13 13,8" />
             </svg>
           </motion.span>
         </motion.div>
