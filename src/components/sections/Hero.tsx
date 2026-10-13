@@ -84,7 +84,7 @@ export function Hero({ introDone }: HeroProps) {
 
   return (
     <section className="hero" data-screen-label="Hero">
-      <CursorGlow className="cursor-glow" variant="light" glow />
+      <CursorGlow className="cursor-glow" variant="light" glow ambient />
       {introDone && <CursorHint text="Scroll" variant="bounce" autoHideMs={6000} dismissOnScroll />}
 
       <motion.div
