@@ -3,6 +3,8 @@
 # with the working directory set to this repo's clone path on the VPS.
 deployment:
   tasks:
+    - ulimit -a
+    - ulimit -v unlimited || true
     - export DEPLOYPATH=/home/pixelwave/public_html/
     - export PATH=/opt/cpanel/ea-nodejs22/bin:$PATH
     - export NODE_OPTIONS=--disable-wasm-trap-handler
