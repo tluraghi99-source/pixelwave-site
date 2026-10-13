@@ -5,6 +5,7 @@ deployment:
   tasks:
     - export DEPLOYPATH=/home/pixelwave/public_html/
     - export PATH=/opt/cpanel/ea-nodejs22/bin:$PATH
+    - export NODE_OPTIONS=--disable-wasm-trap-handler
     - npm ci
     - STRAPI_URL=https://cms.pixelwave.it npm run build
     - /bin/cp -R dist/. $DEPLOYPATH
