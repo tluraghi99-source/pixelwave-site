@@ -727,7 +727,7 @@ header.nav .nav__mobile .nav__link {
      upward from there only, so it never dips under the margin. */
   right: calc(clamp(1rem, 1.2vw, 1.25rem) - 1px);
   bottom: calc(clamp(1rem, 1.2vw, 1.25rem) - 2px);
-  color: var(--pw-black);
+  color: var(--pw-orange);
 }
 .hero__scroll-arrow-icon { display: block; line-height: 0; }
 .hero__bigmark {
