@@ -644,18 +644,18 @@ header.nav .nav__mobile .nav__link {
   .nav__mobile-sublink:hover { color: var(--pw-black); }
 }
 
-/* Menu button's own dark shell — always black/bordered regardless of the
+/* Menu button's own shell — always pink/bordered regardless of the
    header's light/dark theme, with a hover-triggered pixel-grid glow (reused
    PixelTrail, tinted lime) sampled from a reference recording. Square
    corners deliberately kept (no border-radius) to match the site's
    brutalist, all-zero-radius convention. */
 .nav__menu-btn {
   position: relative; overflow: hidden;
-  background: var(--pw-black);
+  background: #FF2E93;
   border: 1px solid rgba(255,255,255,0.1);
   transition: border-color var(--dur-base) var(--ease-wave);
 }
-.nav__menu-btn:hover { border-color: rgba(255,255,255,0.2); }
+.nav__menu-btn:hover { border-color: rgba(255,255,255,0.35); }
 .nav__menu-btn-grid { z-index: 0; }
 .nav__menu-btn-pixel {
   background: #c9dc28;
