@@ -8,6 +8,9 @@ deployment:
     - export DEPLOYPATH=/home/pixelwave/public_html/
     - export PATH=/opt/cpanel/ea-nodejs22/bin:$PATH
     - export NODE_OPTIONS=--disable-wasm-trap-handler
+    - export MALLOC_ARENA_MAX=2
+    - export RAYON_NUM_THREADS=2
+    - export UV_THREADPOOL_SIZE=2
     - npm ci
     - STRAPI_URL=https://cms.pixelwave.it npm run build
     - /bin/cp -R dist/. $DEPLOYPATH
