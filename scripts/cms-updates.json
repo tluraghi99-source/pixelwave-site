@@ -1,0 +1,86 @@
+{
+  "_note": "Clients for Cascina Guzzafame (slug Condivivere) and Niccolò E. Zaffarano are left out on purpose until confirmed. Marracash e Guè Santeria is not in the CMS yet.",
+  "projects": [
+    {
+      "slug": "1000-miglia25",
+      "description": "Una settimana alla 1000 Miglia 2025 con Maserati, da Brescia a Roma e ritorno: fotografia, video con drone per il racconto finale e contenuti live per i social.",
+      "bodyDescription": "La 1000 Miglia è la storica corsa da Brescia a Roma e ritorno, circa 1.900 km attraverso l’Italia. Per l’edizione 2025 abbiamo seguito la gara per una settimana intera, con un’attenzione particolare a Maserati, presente con un’A6 GCS del 1953 e alcuni modelli attuali. Il lavoro ha incluso fotografia, video con drone per il racconto finale e contenuti live per i social durante tutta la corsa.",
+      "title": "1000 Miglia 2025"
+    },
+    {
+      "slug": "1000-miglia26",
+      "description": "Di nuovo alla 1000 Miglia, dal 9 al 13 giugno 2026, con l’A6 GCS del 1953 di Maserati e quattro modelli attuali: fotografia, video con drone e contenuti live per i social lungo il percorso.",
+      "bodyDescription": "Per l’edizione 2026 della 1000 Miglia, dal 9 al 13 giugno sul percorso Brescia–Roma–Brescia, abbiamo di nuovo seguito la corsa per una settimana, con un’attenzione particolare a Maserati. Il marchio ha partecipato con un’A6 GCS del 1953, affiancata da quattro modelli attuali. Abbiamo realizzato fotografia, video con drone per il racconto finale e contenuti live per i social durante la gara.",
+      "title": "1000 Miglia 2026"
+    },
+    {
+      "slug": "Ale-Franz",
+      "description": "Allestimento del set e direzione della fotografia per lo spot TV di Comieco per la Paper Week 2026, “Non t’incartare”, con Ale e Franz, più versioni brevi per i social.",
+      "bodyDescription": "Comieco è il consorzio nazionale per il recupero e il riciclo degli imballaggi in carta e cartone. Per la campagna Paper Week 2026, “Non t’incartare”, che ha Ale e Franz come voce pubblica, abbiamo allestito il set e diretto la fotografia dello spot televisivo. Lo spot è stato poi declinato in contenuti più brevi per i social."
+    },
+    {
+      "slug": "AlfaTour-2026",
+      "description": "Riprese live del concerto di Alfa al Forum di Assago, Milano: camere sul palco e dietro le quinte, e un operatore Ronin per la diretta dello show.",
+      "bodyDescription": "Nell’ambito del suo tour 2026, abbiamo seguito dal vivo il concerto di Alfa al Forum di Assago, a Milano, con camere sul palco e dietro le quinte. Un operatore Ronin si è occupato della diretta del concerto.",
+      "client": "Alfa"
+    },
+    {
+      "slug": "carroponte",
+      "description": "Riprese live del concerto di Tony Effe al Kozel Carroponte di Milano, che ha aperto il suo Summer Tour 2025, con gli ospiti Lazza, Bresh, Capo Plaza e Kid Yugi.",
+      "bodyDescription": "Tony Effe ha aperto il suo Summer Tour 2025 al Kozel Carroponte di Milano, affiancato sul palco da Lazza, Bresh, Capo Plaza e Kid Yugi. Abbiamo seguito il concerto dal vivo, con camere sul palco e dietro le quinte e un operatore Ronin per la diretta dello show.",
+      "title": "Kozel Carroponte",
+      "client": "Tony Effe"
+    },
+    {
+      "slug": "ntinnammari",
+      "description": "Foto, video e montaggio per Red Bull alla ’Ntinna a Mari di Cefalù, in Sicilia: la gara secolare sul palo unto sopra il mare, ogni 6 agosto.",
+      "bodyDescription": "La ’Ntinna a Mari è una gara secolare che si svolge ogni 6 agosto a Cefalù, in Sicilia, durante la festa del SS. Salvatore: i concorrenti camminano su un palo di abete lungo circa 16 metri, unto di sivo e disteso sul mare dal vecchio molo, per afferrare la bandiera posta all’estremità. Per Red Bull, partner dell’evento, siamo andati a Cefalù a realizzare foto e video e abbiamo montato i contenuti video per i social.",
+      "client": "Red Bull"
+    },
+    {
+      "slug": "ollyPalazettitour",
+      "description": "In viaggio con il tour nei palazzetti di Olly, tutto esaurito, in giro per l’Italia: riprese video dei live e materiale per il documentario del tour.",
+      "bodyDescription": "Il Tutta Vita Palazzetti Tour ha portato Olly nei palazzetti di tutta Italia, con circa venti date sold out tra la fine del 2025 e la primavera 2026. Abbiamo seguito il tour occupandoci della parte video dei live e delle riprese per il video documentario del tour.",
+      "title": "Olly Palazzetti tour",
+      "client": "Olly"
+    },
+    {
+      "slug": "Scudetto21",
+      "description": "Documentazione foto e video dei festeggiamenti in Piazza Duomo il 3 maggio 2026, dopo il 21° scudetto dell’Inter, montata in un racconto con versioni per i social.",
+      "bodyDescription": "Il 3 maggio 2026 l’Inter ha conquistato il 21° scudetto, battendo il Parma 2-0 a San Siro con tre giornate di anticipo. Abbiamo documentato i festeggiamenti in Piazza Duomo, a Milano, con fotografia e video, e montato l’intero racconto. Il materiale è stato poi declinato in versioni per i social."
+    },
+    {
+      "slug": "Condivivere",
+      "description": "Reportage foto e video della serata a Cascina Guzzafame per Fondazione CondiVivere, onlus che sostiene la vita adulta di persone con disabilità cognitive.",
+      "bodyDescription": "Fondazione CondiVivere è una onlus nata nel 2010 per iniziativa di un gruppo di genitori, che lavora sulla vita adulta e sull’autonomia delle persone con disabilità cognitive. Abbiamo seguito la sua serata a Cascina Guzzafame, a Gaggiano, vicino a Milano, con un reportage foto e video. Il materiale è stato montato e declinato in versioni per i social."
+    },
+    {
+      "slug": "niccolozaffarano",
+      "description": "Supporto foto e video per una serata organizzata da Niccolò E. Zaffarano, sartoria contemporanea milanese: due fotografi e due videomaker.",
+      "bodyDescription": "Niccolò E. Zaffarano è una sartoria contemporanea milanese. La serata è stata organizzata dalla sartoria stessa e noi l’abbiamo supportata con un team dedicato di quattro operatori: due fotografi e due videomaker. Il lavoro ha incluso reportage foto e video, montaggio e versioni per i social."
+    }
+  ],
+  "tagLabels": {
+    "Campain": "Campagna",
+    "concert": "Concerto",
+    "Milan": "Milano",
+    "tony effe": "Tony Effe",
+    "RedBull": "Red Bull",
+    "Sicily": "Sicilia",
+    "Football": "Calcio",
+    "porsche": "Porsche",
+    "tutta vita sempre": "Tutta Vita Sempre"
+  },
+  "teamRoles": {
+    "Thomas Luraghi": "Direttore creativo e di brand",
+    "Christian Luinetti": "Videomaker | Video editor",
+    "Giulia Virgara": "Studio manager",
+    "Riccardo Alessio": "Fotografo | DOP",
+    "Niccolò Franzosi": "Videomaker | Pilota di droni",
+    "Luca Mantovani": "Direttore brand e comunicazione",
+    "Matteo Montelatici": "Co-founder | Videomaker | Fotografo",
+    "Claudio Belli": "Video editor | Motion artist",
+    "Stefano Longo": "Videomaker | Fotografo",
+    "Andrea Conti": "Founder | Regista | Operatore Vmix | DOP"
+  }
+}
