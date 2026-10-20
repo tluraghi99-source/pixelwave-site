@@ -72,8 +72,22 @@ async function run(label, documentId, route, data) {
   }
 }
 
+// Draft status first (what an edit actually changes); a restricted token may
+// not be allowed to read drafts, so fall back to the published copy.
+async function list(route, extra = "") {
+  const q = `pagination%5BpageSize%5D=100${extra}`
+  if (token) {
+    try {
+      return await api(`/api/${route}?status=draft&${q}`)
+    } catch {
+      /* fall through to published */
+    }
+  }
+  return api(`/api/${route}?status=published&${q}`)
+}
+
 // Projects
-const projRes = await api(`/api/projects?status=${token ? "draft" : "published"}&pagination%5BpageSize%5D=100&populate%5Btags%5D=true`)
+const projRes = await list("projects", "&populate%5Btags%5D=true")
 for (const u of updates.projects) {
   const p = projRes.data.find((x) => x.slug === u.slug) ?? projRes.data.find((x) => norm(x.slug) === norm(u.slug))
   if (!p) {
@@ -91,7 +105,7 @@ for (const u of updates.projects) {
 }
 
 // Team roles
-const teamRes = await api(`/api/team-members?status=${token ? "draft" : "published"}&pagination%5BpageSize%5D=100`)
+const teamRes = await list("team-members")
 for (const [name, role] of Object.entries(updates.teamRoles)) {
   const m = teamRes.data.find((x) => norm(x.name) === norm(name))
   if (!m) {
