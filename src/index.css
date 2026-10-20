@@ -1876,6 +1876,9 @@ html.nav-open .cursor-dot { background: var(--pw-black); }
 .cursor-hint {
   position: fixed; top: 0; left: 0; pointer-events: none; z-index: var(--z-toast);
 }
+/* Anchored to the cursor dot (see CursorHint's idleReappear): the y it receives
+   is the pointer's own, so centre the label on it instead of hanging below. */
+.cursor-hint--anchored { translate: 0 -50%; }
 .cursor-hint__inner {
   display: inline-block;
   font-family: var(--font-text); font-size: 1.05rem; font-weight: 500;

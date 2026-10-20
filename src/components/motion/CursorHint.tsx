@@ -12,6 +12,12 @@ const DEFAULT_AUTO_HIDE_MS = 3500
 const IDLE_REAPPEAR_MS = 900
 const IDLE_MAX_SCROLL = 0.2
 
+/** `idleReappear` mode anchors the hint to the custom cursor dot: the same
+ *  spring (CustomCursor.tsx) so it trails exactly as the dot does, and a fixed
+ *  18px to the right of the dot's centre, vertically centred on it. */
+const DOT_SPRING = { stiffness: 300, damping: 40, mass: 0.5 }
+const ANCHORED_OFFSET_X = 18
+
 interface CursorHintProps {
   text: string
   /** "glow" breathes an orange text-shadow (Contact's "Let's chat" nudge);
@@ -53,13 +59,17 @@ export function CursorHint({
   idleReappear = false,
 }: CursorHintProps) {
   const [enabled, setEnabled] = useState(false)
-  const [internalVisible, setInternalVisible] = useState(true)
+  // Anchored mode starts hidden: until the first mouse move there is no
+  // pointer position to anchor to, and a hint floating mid-screen reads as
+  // misplaced.
+  const [internalVisible, setInternalVisible] = useState(!idleReappear)
   const isControlled = controlledVisible !== undefined
   const visible = isControlled ? controlledVisible : internalVisible
   const x = useMotionValue(-200)
   const y = useMotionValue(-200)
-  const springX = useSpring(x, { stiffness: 500, damping: 40, mass: 0.5 })
-  const springY = useSpring(y, { stiffness: 500, damping: 40, mass: 0.5 })
+  const springConfig = idleReappear ? DOT_SPRING : { stiffness: 500, damping: 40, mass: 0.5 }
+  const springX = useSpring(x, springConfig)
+  const springY = useSpring(y, springConfig)
 
   useEffect(() => {
     const mq = window.matchMedia("(pointer: fine)")
@@ -72,9 +82,12 @@ export function CursorHint({
   useEffect(() => {
     if (!enabled) return
     // Real cursor position isn't known until the first mousemove — starts
-    // centered so it's visible immediately on arrival either way.
-    x.set(window.innerWidth / 2 + 18)
-    y.set(window.innerHeight / 2 - 72)
+    // centered so it's visible immediately on arrival either way (anchored
+    // mode waits for the first move instead).
+    if (!idleReappear) {
+      x.set(window.innerWidth / 2 + 18)
+      y.set(window.innerHeight / 2 - 72)
+    }
 
     let idleTimer: ReturnType<typeof setTimeout> | undefined
     const nearTop = () => window.scrollY <= window.innerHeight * IDLE_MAX_SCROLL
@@ -84,8 +97,8 @@ export function CursorHint({
     }
 
     function handleMove(e: MouseEvent) {
-      x.set(e.clientX + 18)
-      y.set(e.clientY - 12)
+      x.set(e.clientX + (idleReappear ? ANCHORED_OFFSET_X : 18))
+      y.set(idleReappear ? e.clientY : e.clientY - 12)
       if (idleReappear && !isControlled) {
         setInternalVisible(false)
         armIdle()
@@ -124,6 +137,25 @@ export function CursorHint({
   }, [enabled, x, y, autoHideMs, dismissOnScroll, isControlled, idleReappear])
 
   if (!enabled) return null
+
+  // Anchored mode keeps the label mounted and only fades its opacity. Mounting
+  // and unmounting it would freeze the springs that move it (they stop when
+  // their element is removed), so it would reappear wherever it last was
+  // instead of next to the dot.
+  if (idleReappear) {
+    return (
+      <motion.span
+        className="cursor-hint cursor-hint--anchored"
+        style={{ x: springX, y: springY }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: visible ? 1 : 0 }}
+        transition={{ duration: 0.4 }}
+        aria-hidden="true"
+      >
+        <span className={`cursor-hint__inner cursor-hint__inner--${variant}`}>{text}</span>
+      </motion.span>
+    )
+  }
 
   return (
     <AnimatePresence>
