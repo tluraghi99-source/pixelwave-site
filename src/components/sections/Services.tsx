@@ -17,22 +17,28 @@ function hasRealThumb(p: Project): boolean {
   return !!p.cover || (p.heroMediaType === "image" && !!p.heroMedia)
 }
 
-/** One random project image per service, drawn from the projects assigned
+/** One random project image per service, drawn only from the projects assigned
  *  that service's Work Category (service names match the category names).
- *  Reshuffled once per page load; prefers images not already used by an
- *  earlier service, and falls back to any project with an image, then to the
- *  old stock placeholder while Strapi is empty/loading. */
-function pickServiceImages(projects: Project[]): string[] {
+ *  A service whose category has no project with an image gets null — its row
+ *  just shows the text, never a random or stock picture. Reshuffled once per
+ *  page load; the scarcest categories choose first so a project that's the
+ *  only match for one service isn't taken by a service with more options. */
+function pickServiceImages(projects: Project[]): (string | null)[] {
   const withThumb = projects.filter(hasRealThumb)
+  const pools = SERVICES.map((service) =>
+    shuffle(withThumb.filter((p) => p.workCategories.some((c) => c.toLowerCase() === service.name.toLowerCase())))
+  )
   const used = new Set<string>()
-  return SERVICES.map((service) => {
-    const matching = shuffle(withThumb.filter((p) => p.workCategories.some((c) => c.toLowerCase() === service.name.toLowerCase())))
-    const pool = matching.length > 0 ? matching : shuffle(withThumb)
-    const pick = pool.find((p) => !used.has(p.id)) ?? pool[0]
-    if (!pick) return `https://picsum.photos/seed/pixelwave-svc-${service.num}/800/600?grayscale`
-    used.add(pick.id)
-    return projectThumbUrl(pick, "")
-  })
+  const images: (string | null)[] = SERVICES.map(() => null)
+  SERVICES.map((_, i) => i)
+    .filter((i) => pools[i].length > 0)
+    .sort((a, b) => pools[a].length - pools[b].length)
+    .forEach((i) => {
+      const pick = pools[i].find((p) => !used.has(p.id)) ?? pools[i][0]
+      used.add(pick.id)
+      images[i] = projectThumbUrl(pick, "")
+    })
+  return images
 }
 
 function isHoverCapable() {
@@ -45,7 +51,7 @@ function ServiceRow({
   onMouseEnter,
   onClick,
 }: {
-  service: (typeof SERVICES)[number] & { image: string }
+  service: (typeof SERVICES)[number] & { image: string | null }
   isOpen: boolean
   onMouseEnter: () => void
   onClick: () => void
@@ -151,9 +157,11 @@ function ServiceRow({
                 See {service.name} projects <ArrowUpRight size={16} aria-hidden="true" />
               </Link>
             </div>
-            <div className="svc-row__image">
-              <img src={service.image} alt={service.name} loading="lazy" />
-            </div>
+            {service.image && (
+              <div className="svc-row__image">
+                <img src={service.image} alt={service.name} loading="lazy" />
+              </div>
+            )}
           </div>
         </div>
       </div>

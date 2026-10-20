@@ -112,11 +112,15 @@ export function WorkPage() {
   const workCategories = useWorkCategories()
 
   // The fixed Video/Photo/Branding/Web Design/Social/Events taxonomy (see
-  // useWorkCategories), in its own editorial order — every category always
-  // shows here, independent of whether any project currently has it
-  // assigned yet. Separate from each project's own display `tags`, which
-  // never drove this filter's button list.
-  const FILTER_CATEGORIES = useMemo(() => workCategories.map((c) => c.name), [workCategories])
+  // useWorkCategories), in its own editorial order — but only the categories
+  // that at least one project currently has assigned. A category with nothing
+  // in it stays hidden and appears on its own once the CMS assigns it to a
+  // project. Separate from each project's own display `tags`, which never
+  // drove this filter's button list.
+  const FILTER_CATEGORIES = useMemo(() => {
+    const used = new Set(projects.flatMap((p) => p.workCategories))
+    return workCategories.map((c) => c.name).filter((name) => used.has(name))
+  }, [workCategories, projects])
 
   // Alphabetical (unlike FILTER_CATEGORIES' editorial order) — categories are
   // a small curated set where order doesn't matter; clients are the
@@ -146,6 +150,13 @@ export function WorkPage() {
   )
   const [activeClient, setActiveClient] = useState<string | null>(null)
 
+  // A ?category= link to a category with no projects yet (or an unknown one)
+  // is ignored rather than leaving an empty grid with no button to undo it.
+  const selectedCategories = useMemo(
+    () => new Set([...activeCategories].filter((c) => FILTER_CATEGORIES.includes(c))),
+    [activeCategories, FILTER_CATEGORIES]
+  )
+
   function toggleCategory(category: string) {
     setActiveCategories((prev) => {
       const next = new Set(prev)
@@ -166,12 +177,12 @@ export function WorkPage() {
   // actually drives the grid below.
   const visibleProjects = useMemo(() => {
     if (mode === "category") {
-      if (activeCategories.size === 0) return projects
-      return projects.filter((p) => p.workCategories.some((c) => activeCategories.has(c)))
+      if (selectedCategories.size === 0) return projects
+      return projects.filter((p) => p.workCategories.some((c) => selectedCategories.has(c)))
     }
     if (!activeClient) return projects
     return projects.filter((p) => p.client === activeClient)
-  }, [projects, mode, activeCategories, activeClient])
+  }, [projects, mode, selectedCategories, activeClient])
 
   return (
     <>
@@ -226,8 +237,8 @@ export function WorkPage() {
                       <button
                         key={category}
                         type="button"
-                        className={`work-page__filter ${activeCategories.has(category) ? "is-active" : ""}`}
-                        aria-pressed={activeCategories.has(category)}
+                        className={`work-page__filter ${selectedCategories.has(category) ? "is-active" : ""}`}
+                        aria-pressed={selectedCategories.has(category)}
                         onClick={() => toggleCategory(category)}
                       >
                         {category}
@@ -261,7 +272,7 @@ export function WorkPage() {
             {visibleProjects.length > 0 && (
               <RevealGroup
                 key={
-                  mode === "category" ? `cat:${[...activeCategories].sort().join(",")}` : `cli:${activeClient ?? ""}`
+                  mode === "category" ? `cat:${[...selectedCategories].sort().join(",")}` : `cli:${activeClient ?? ""}`
                 }
                 className="work-grid"
                 stagger={0.06}
