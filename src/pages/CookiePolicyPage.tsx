@@ -11,8 +11,8 @@ function TODO({ children }: { children: string }) {
 
 export function CookiePolicyPage() {
   usePageMeta(
-    "Cookie Policy — PixelWave",
-    "Which cookies PixelWave uses, what they are for, and how to change your choice."
+    "Informativa sui cookie — PixelWave",
+    "Quali cookie usa PixelWave, a cosa servono e come cambiare la tua scelta."
   )
 
   return (
@@ -20,88 +20,89 @@ export function CookiePolicyPage() {
       <main className="legal-page" data-theme="dark" data-screen-label="Cookie Policy">
         <CursorGlow className="cursor-glow" variant="dark" glow={false} />
         <div className="wrap legal-page__content">
-          <p className="legal-page__eyebrow">Legal</p>
-          <h1 className="legal-page__title">Cookie Policy</h1>
+          <p className="legal-page__eyebrow">Note legali</p>
+          <h1 className="legal-page__title">Informativa sui cookie</h1>
           <p className="legal-page__updated">
-            Last updated: <TODO>set this date when the page below is finalized</TODO>
+            Ultimo aggiornamento: <TODO>inserire la data quando la pagina sarà definitiva</TODO>
           </p>
 
           <p className="legal-page__notice">
-            <strong>This page is a first draft.</strong> The list of cookies below must match the tags
-            actually configured in Google Tag Manager — check it before publishing, and have it
-            reviewed together with the Privacy Policy.
+            <strong>Questa pagina è una bozza.</strong> L’elenco dei cookie qui sotto deve
+            corrispondere ai tag effettivamente configurati in Google Tag Manager: controllalo prima
+            di pubblicare e fallo rivedere insieme all’informativa sulla privacy.
           </p>
 
-          <h2>1. What cookies are</h2>
+          <h2>1. Cosa sono i cookie</h2>
           <p>
-            Cookies are small files a website stores in your browser. Some are needed for a site to
-            work; others measure how it is used or show advertising.
+            I cookie sono piccoli file che un sito salva nel tuo browser. Alcuni servono al
+            funzionamento del sito; altri misurano come viene usato o mostrano pubblicità.
           </p>
 
-          <h2>2. What we use</h2>
+          <h2>2. Cosa usiamo</h2>
           <p>
-            <strong>Necessary.</strong> The site sets no cookies of its own. It remembers, for the
-            length of your visit only, that you have already seen the opening animation (in your
-            browser's session storage), and it stores your cookie choice below in your browser. Neither
-            tracks you, and neither needs consent.
+            <strong>Necessari.</strong> Il sito non imposta cookie propri. Ricorda, solo per la durata
+            della tua visita, che hai già visto l’animazione iniziale (nella session storage del tuo
+            browser) e salva nel tuo browser la scelta che fai sui cookie qui sotto. Nessuno dei due
+            ti traccia e nessuno richiede il consenso.
           </p>
           <p>
-            <strong>Statistics and marketing.</strong> These are used <em>only if you accept them</em>.
-            Until then, nothing is requested from Google or Meta. They are loaded through Google Tag
-            Manager:
+            <strong>Statistiche e marketing.</strong> Vengono usati{" "}
+            <em>solo se li accetti</em>. Finché non lo fai, a Google o a Meta non viene richiesto
+            nulla. Si caricano tramite Google Tag Manager:
           </p>
           <ul>
             <li>
-              <strong>Google Analytics</strong> (statistics) — <code>_ga</code> and <code>_ga_*</code>{" "}
-              (up to 2 years), <code>_gid</code> (24 hours). Used to count visits and see which pages
-              are viewed.
+              <strong>Google Analytics</strong> (statistiche) — <code>_ga</code> e <code>_ga_*</code>{" "}
+              (fino a 2 anni), <code>_gid</code> (24 ore). Servono a contare le visite e a vedere
+              quali pagine vengono viste.
             </li>
             <li>
-              <strong>Google Ads</strong> (marketing) — <code>_gcl_*</code> (up to 90 days). Used to
-              measure the results of advertising.
+              <strong>Google Ads</strong> (marketing) — <code>_gcl_*</code> (fino a 90 giorni).
+              Servono a misurare i risultati della pubblicità.
             </li>
             <li>
-              <strong>Meta pixel</strong> (marketing) — <code>_fbp</code> (up to 90 days). Used to
-              measure advertising on Facebook and Instagram.
+              <strong>Pixel di Meta</strong> (marketing) — <code>_fbp</code> (fino a 90 giorni).
+              Serve a misurare la pubblicità su Facebook e Instagram.
             </li>
           </ul>
           <p>
             <TODO>
-              Keep only the tools actually set up in the Tag Manager container, and confirm the
-              durations above against each provider's current documentation.
+              Tenere solo gli strumenti realmente configurati nel contenitore di Tag Manager e
+              verificare le durate indicate sopra sulla documentazione attuale di ciascun fornitore.
             </TODO>
           </p>
 
-          <h2>3. Your choice</h2>
+          <h2>3. La tua scelta</h2>
           <p>
-            When you first visit, a banner lets you accept all, reject all, or choose by category.
-            Rejecting is as easy as accepting, and the site works the same either way. We ask again
-            after about six months.
+            Alla prima visita un banner ti permette di accettare tutto, rifiutare tutto o scegliere
+            per categoria. Rifiutare è facile quanto accettare e il sito funziona allo stesso modo in
+            entrambi i casi. Te lo chiediamo di nuovo dopo circa sei mesi.
           </p>
           {consentEnabled && (
             <p>
               <button type="button" className="legal-page__link-button" onClick={openCookiePreferences}>
-                Change your cookie preferences
+                Cambia le tue preferenze sui cookie
               </button>
             </p>
           )}
           <p>
-            You can also delete cookies from your browser's settings at any time. If you withdraw consent
-            after accepting, the page reloads and the cookies above are removed.
+            Puoi anche eliminare i cookie dalle impostazioni del browser in qualsiasi momento. Se
+            revochi il consenso dopo averlo dato, la pagina si ricarica e i cookie elencati sopra
+            vengono rimossi.
           </p>
 
-          <h2>4. Who receives the data</h2>
+          <h2>4. Chi riceve i dati</h2>
           <p>
-            When you accept, the data collected is processed by Google (Analytics and Ads) and, for the
-            pixel, Meta, which may transfer it outside the European Union.{" "}
+            Se accetti, i dati raccolti vengono trattati da Google (Analytics e Ads) e, per il pixel,
+            da Meta, che potrebbero trasferirli fuori dall’Unione europea.{" "}
             <TODO>
-              Confirm the data-processing terms accepted with Google and Meta and the transfer
-              safeguards they rely on.
+              Confermare i termini di trattamento dei dati accettati con Google e Meta e le garanzie
+              sui trasferimenti su cui si basano.
             </TODO>
           </p>
           <p>
-            For how we handle the data you send us through our forms, see the{" "}
-            <Link to="/privacy">Privacy Policy</Link>.
+            Per come trattiamo i dati che ci invii tramite i moduli, leggi l'
+            <Link to="/privacy">informativa sulla privacy</Link>.
           </p>
         </div>
       </main>

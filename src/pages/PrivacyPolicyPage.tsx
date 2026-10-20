@@ -7,23 +7,23 @@ import { ROUTES } from "@/lib/routes"
 /** Wraps a placeholder value that needs a real business decision before
  *  this page goes live — a legal name, an address, a retention period,
  *  none of which this codebase has any way to know on its own. Rendered
- *  with a visible marker (index.css) so it can't accidentally ship
+ *  with a visible marker (index.css) so it can’t accidentally ship
  *  unnoticed, on top of being called out again in prose here. */
 function TODO({ children }: { children: string }) {
   return <mark className="legal-page__todo">{children}</mark>
 }
 
-/** GDPR-driven — see the Contact and Careers forms' new consent checkbox,
+/** GDPR-driven — see the Contact and Careers forms' consent checkbox,
  *  which links here. This is a first draft built from what the codebase
  *  actually does (the real form fields, the real processors it calls), not
  *  a generic template — but it still needs a real person (ideally a lawyer)
  *  to fill in the placeholders and sign off before publishing, the same way
  *  no other legal document on a real business gets shipped from a first
- *  draft alone. */
+ *  draft alone. Written in Italian. */
 export function PrivacyPolicyPage() {
   usePageMeta(
-    "Privacy Policy — PixelWave",
-    "How PixelWave collects, uses, and protects the personal data submitted through this site."
+    "Informativa sulla privacy — PixelWave",
+    "Come PixelWave raccoglie, usa e protegge i dati personali inviati tramite questo sito."
   )
 
   return (
@@ -31,127 +31,131 @@ export function PrivacyPolicyPage() {
       <main className="legal-page" data-theme="dark" data-screen-label="Privacy Policy">
         <CursorGlow className="cursor-glow" variant="dark" glow={false} />
         <div className="wrap legal-page__content">
-          <p className="legal-page__eyebrow">Legal</p>
-          <h1 className="legal-page__title">Privacy Policy</h1>
+          <p className="legal-page__eyebrow">Note legali</p>
+          <h1 className="legal-page__title">Informativa sulla privacy</h1>
           <p className="legal-page__updated">
-            Last updated: <TODO>set this date when the draft below is finalized</TODO>
+            Ultimo aggiornamento: <TODO>inserire la data quando la bozza sarà definitiva</TODO>
           </p>
 
           <p className="legal-page__notice">
-            <strong>This page is a first draft, not a published policy.</strong> Every highlighted
-            note below is a placeholder that needs a real answer — several need a lawyer's
-            sign-off — before this should be treated as accurate or linked to as final.
+            <strong>Questa pagina è una bozza, non un’informativa pubblicata.</strong> Ogni nota
+            evidenziata qui sotto è un segnaposto che richiede una risposta reale — alcune richiedono
+            la verifica di un legale — prima che il testo venga considerato corretto o presentato
+            come definitivo.
           </p>
 
-          <h2>1. Who we are</h2>
+          <h2>1. Chi siamo</h2>
           <p>
-            PixelWave is a creative studio based in{" "}
+            PixelWave è uno studio creativo con sede a{" "}
             <a href="https://maps.app.goo.gl/xNz7W3z1U6EcBg6f7" target="_blank" rel="noopener noreferrer">
-              Milano, Italia
+              Milano
             </a>
-            . For the purposes of the GDPR, PixelWave is the data controller for the personal
-            data described below.
+            . Ai sensi del GDPR, PixelWave è il titolare del trattamento dei dati personali descritti
+            qui sotto.
           </p>
           <p>
             <TODO>
-              Registered legal entity name, registered address, and VAT/tax ID — needed here for
-              the controller to be properly identified.
+              Ragione sociale, sede legale e partita IVA o codice fiscale: servono per identificare
+              correttamente il titolare del trattamento.
             </TODO>
           </p>
 
-          <h2>2. What data we collect</h2>
-          <p>We only collect what each form on this site actually asks for:</p>
+          <h2>2. Quali dati raccogliamo</h2>
+          <p>Raccogliamo solo ciò che ciascun modulo di questo sito richiede:</p>
           <ul>
             <li>
-              <strong>Contact form</strong> (/contact) — your name, email address, phone
-              number (optional), the project
-              type(s) you select, and the timeline you select.
+              <strong>Modulo contatti</strong> (/contatti) — il tuo nome, l’indirizzo email, il
+              numero di telefono (facoltativo), i tipi di progetto e i tempi che selezioni.
             </li>
             <li>
-              <strong>Careers form</strong> (/careers) — your name, surname, email address, phone
-              number, the role you're applying for, and the CV file you upload. The CV is sent to
-              us by email and is not kept on our servers once that email has been sent.
+              <strong>Modulo candidature</strong> (/lavora-con-noi) — il tuo nome, cognome, indirizzo
+              email, numero di telefono, il ruolo per cui ti candidi e il file del CV che carichi. Il
+              CV ci arriva per email e, una volta inviata l’email, non viene conservato sui nostri
+              server.
             </li>
           </ul>
           <p>
-            Statistics and advertising cookies (Google Analytics, Google Ads, Meta pixel) are used
-            only if you accept them in the cookie banner; until then nothing is requested from
-            those services. See the <Link to="/cookies">Cookie Policy</Link> for the details and to
-            change your choice.
+            I cookie di statistica e di pubblicità (Google Analytics, Google Ads, pixel di Meta)
+            vengono usati solo se li accetti nel banner dei cookie; finché non lo fai, a quei servizi
+            non viene richiesto nulla. Leggi l'<Link to="/cookies">informativa sui cookie</Link> per i
+            dettagli e per cambiare la tua scelta.
           </p>
 
-          <h2>3. Why we collect it, and on what basis</h2>
+          <h2>3. Perché li raccogliamo e su quale base</h2>
           <p>
-            We use this data solely to respond to your inquiry or evaluate your application —
-            nothing is used for marketing, and nothing is sold or shared with advertisers. The
-            legal basis is your consent, given via the checkbox on each form, and — for the
-            Careers form specifically — the steps necessary prior to entering into a contract
-            with you, should your application move forward.
+            Usiamo questi dati esclusivamente per rispondere alla tua richiesta o per valutare la tua
+            candidatura: nulla viene usato per il marketing e nulla viene venduto o condiviso con
+            inserzionisti. La base giuridica è il tuo consenso, espresso con la casella presente su
+            ogni modulo e, solo per il modulo candidature, l’esecuzione di misure precontrattuali
+            adottate su tua richiesta, se la tua candidatura va avanti.
           </p>
 
-          <h2>4. How long we keep it</h2>
+          <h2>4. Per quanto tempo li conserviamo</h2>
           <p>
-            CV files uploaded through the Careers form are deleted from our server as soon as
-            they have been emailed to us; they remain only in our mailbox.
+            I CV caricati tramite il modulo candidature vengono eliminati dal nostro server non
+            appena ci sono stati inviati per email; restano solo nella nostra casella di posta.
           </p>
           <p>
             <TODO>
-              Retention period — e.g. "12 months after our last contact with you, unless a
-              working relationship begins" — needs a real decision.
+              Periodo di conservazione — per esempio "12 mesi dall’ultimo contatto con te, salvo
+              l’avvio di un rapporto di lavoro" — serve una decisione reale.
             </TODO>
           </p>
 
-          <h2>5. Who processes it</h2>
-          <p>Your data is handled by these services on our behalf:</p>
+          <h2>5. Chi tratta i dati</h2>
+          <p>I tuoi dati sono gestiti, per nostro conto, da questi servizi:</p>
           <ul>
             <li>
-              <strong>Strapi CMS</strong>, where form submissions are stored —{" "}
-              <TODO>hosting provider and server location (EU or not)</TODO>.
+              <strong>Strapi CMS</strong>, dove sono salvate le richieste inviate dai moduli —{" "}
+              <TODO>fornitore di hosting e ubicazione del server (UE o no)</TODO>.
             </li>
             <li>
-              <strong>Google Workspace / Gmail</strong>, used to send us an email notification
-              when a form is submitted.
+              <strong>Google Workspace / Gmail</strong>, usato per inviarci una notifica via email
+              quando viene compilato un modulo.
             </li>
             <li>
-              <strong>Google (Tag Manager, Analytics, Ads)</strong> and{" "}
-              <strong>Meta (pixel)</strong>, for statistics and advertising measurement — only if
-              you accept the corresponding cookies.
+              <strong>Google (Tag Manager, Analytics, Ads)</strong> e <strong>Meta (pixel)</strong>,
+              per le statistiche e la misurazione della pubblicità — solo se accetti i cookie
+              corrispondenti.
             </li>
           </ul>
           <p>
             <TODO>
-              Confirm whether data-processing agreements (DPAs) are in place with each of the
-              above, and note here if any transfers data outside the EU (Google and Meta may).
+              Confermare se esistono accordi sul trattamento dei dati (DPA) con ciascuno dei servizi
+              sopra e indicare qui se qualcuno trasferisce dati fuori dall’Unione europea (Google e
+              Meta potrebbero).
             </TODO>
           </p>
 
-          <h2>6. Your rights</h2>
-          <p>Under the GDPR, you have the right to:</p>
+          <h2>6. I tuoi diritti</h2>
+          <p>Ai sensi del GDPR hai il diritto di:</p>
           <ul>
-            <li>Access the personal data we hold about you</li>
-            <li>Correct it if it's inaccurate</li>
-            <li>Request its deletion</li>
-            <li>Restrict or object to how it's processed</li>
-            <li>Receive a copy in a portable format</li>
-            <li>Withdraw your consent at any time, with no effect on data already processed</li>
+            <li>Accedere ai dati personali che conserviamo su di te</li>
+            <li>Correggerli se sono inesatti</li>
+            <li>Chiederne la cancellazione</li>
+            <li>Limitarne il trattamento o opporti</li>
+            <li>Riceverne una copia in un formato portabile</li>
             <li>
-              Lodge a complaint with the Garante per la protezione dei dati personali (Italy's
-              supervisory authority), or your own country's equivalent
+              Revocare il consenso in qualsiasi momento, senza effetti sui trattamenti già effettuati
+            </li>
+            <li>
+              Presentare reclamo al Garante per la protezione dei dati personali (l’autorità di
+              controllo italiana) o all’autorità del tuo paese
             </li>
           </ul>
           <p>
-            To exercise any of these, contact us at{" "}
-            <TODO>real privacy-contact email address</TODO>.
+            Per esercitare questi diritti scrivici a{" "}
+            <TODO>indirizzo email reale per le richieste sulla privacy</TODO>.
           </p>
 
-          <h2>7. Changes to this policy</h2>
+          <h2>7. Modifiche a questa informativa</h2>
           <p>
-            If this policy changes in a way that affects how your data is handled, we'll update
-            the date at the top of this page.
+            Se questa informativa cambia in modo da incidere sul trattamento dei tuoi dati,
+            aggiorneremo la data in cima a questa pagina.
           </p>
 
           <p className="legal-page__back">
-            <Link to={ROUTES.contact}>← Back to Contact</Link>
+            <Link to={ROUTES.contact}>← Torna a Contatti</Link>
           </p>
         </div>
       </main>
