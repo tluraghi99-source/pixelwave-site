@@ -2,6 +2,7 @@ import { Link } from "react-router-dom"
 import { usePageMeta } from "@/hooks/usePageMeta"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { Footer } from "@/components/sections/Footer"
+import { ROUTES } from "@/lib/routes"
 
 /** Wraps a placeholder value that needs a real business decision before
  *  this page goes live — a legal name, an address, a retention period,
@@ -150,7 +151,7 @@ export function PrivacyPolicyPage() {
           </p>
 
           <p className="legal-page__back">
-            <Link to="/contact">← Back to Contact</Link>
+            <Link to={ROUTES.contact}>← Back to Contact</Link>
           </p>
         </div>
       </main>

@@ -1,11 +1,12 @@
 import { lazy, Suspense } from "react"
-import { Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes, useLocation, useParams } from "react-router-dom"
 import { ScrollProgress } from "@/components/ScrollProgress"
 import { ScrollToTop } from "@/components/ScrollToTop"
 import { CookieConsent } from "@/components/CookieConsent"
 import { CustomCursor } from "@/components/motion/CustomCursor"
 import { Header } from "@/components/sections/Header"
 import { HomePage } from "@/pages/HomePage"
+import { ROUTES, projectPath } from "@/lib/routes"
 
 // Route-level code splitting: each of these ships as its own chunk, fetched
 // on first visit, instead of all five pages' code (and everything they
@@ -30,6 +31,18 @@ const PrivacyPolicyPage = lazy(() =>
   import("@/pages/PrivacyPolicyPage").then((m) => ({ default: m.PrivacyPolicyPage }))
 )
 
+/** Old English addresses (shared or indexed before the Italian ones) land on
+ *  the new page, keeping any ?query. */
+function Redirect({ to }: { to: string }) {
+  const { search } = useLocation()
+  return <Navigate to={`${to}${search}`} replace />
+}
+function RedirectProject() {
+  const { slug = "" } = useParams()
+  const { search } = useLocation()
+  return <Navigate to={`${projectPath(slug)}${search}`} replace />
+}
+
 function App() {
   return (
     <>
@@ -45,13 +58,18 @@ function App() {
       <Suspense fallback={null}>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/work" element={<WorkPage />} />
-          <Route path="/work/:slug" element={<ProjectPage />} />
-          <Route path="/studio" element={<StudioPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/careers" element={<CareersPage />} />
-          <Route path="/privacy" element={<PrivacyPolicyPage />} />
-          <Route path="/cookies" element={<CookiePolicyPage />} />
+          <Route path={ROUTES.work} element={<WorkPage />} />
+          <Route path={`${ROUTES.work}/:slug`} element={<ProjectPage />} />
+          <Route path={ROUTES.studio} element={<StudioPage />} />
+          <Route path={ROUTES.contact} element={<ContactPage />} />
+          <Route path={ROUTES.careers} element={<CareersPage />} />
+          <Route path={ROUTES.privacy} element={<PrivacyPolicyPage />} />
+          <Route path={ROUTES.cookies} element={<CookiePolicyPage />} />
+          {/* Old English addresses */}
+          <Route path="/work" element={<Redirect to={ROUTES.work} />} />
+          <Route path="/work/:slug" element={<RedirectProject />} />
+          <Route path="/contact" element={<Redirect to={ROUTES.contact} />} />
+          <Route path="/careers" element={<Redirect to={ROUTES.careers} />} />
           {/* Catch-all — any URL that doesn't match one of the routes above
               (a typo, an old bookmark, a dead external link) used to render
               nothing at all: no route matched, so React Router mounted

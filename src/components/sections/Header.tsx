@@ -7,17 +7,18 @@ import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
 import { BrandLogo } from "@/components/pw/Logo"
 import { PixelTrail } from "@/components/ui/pixel-trail"
 import { EASE_WAVE, HERO_CROSSFADE_RATIO, HERO_NAV_HIDE_AFTER, HERO_REVEAL_END, HERO_REVEAL_START } from "@/lib/motion"
+import { ROUTES } from "@/lib/routes"
 
 // Desktop-only full menu panel — columns mirror the top-level nav, filled
 // out with a level of real sub-navigation (mirrors a reference layout).
 const MENU_COLUMNS = [
   {
     label: "Work",
-    href: "/work",
+    href: ROUTES.work,
     // Land directly on a filter mode — WorkPage.tsx reads ?mode= once on mount.
     links: [
-      { label: "Category", href: "/work?mode=category" },
-      { label: "Client", href: "/work?mode=client" },
+      { label: "Category", href: `${ROUTES.work}?vista=categoria` },
+      { label: "Client", href: `${ROUTES.work}?vista=cliente` },
     ],
   },
   {
@@ -27,14 +28,14 @@ const MENU_COLUMNS = [
   },
   {
     label: "Studio",
-    href: "/studio",
+    href: ROUTES.studio,
     links: [] as { label: string; href: string }[],
   },
   {
     label: "Let's chat",
-    href: "/contact",
+    href: ROUTES.contact,
     links: [
-      { label: "Join us", href: "/careers" },
+      { label: "Join us", href: ROUTES.careers },
       { label: "Instagram", href: "https://www.instagram.com/pixelwave_studio/" },
       { label: "YouTube", href: "https://www.youtube.com/@PixelWaveStudio" },
       { label: "LinkedIn", href: "https://www.linkedin.com/company/pixelwavestudio/" },

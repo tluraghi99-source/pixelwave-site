@@ -11,6 +11,7 @@ import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Button } from "@/components/pw/Button"
 import { CtaBand } from "@/components/sections/CtaBand"
 import { CursorHint } from "@/components/motion/CursorHint"
+import { ROUTES } from "@/lib/routes"
 
 // The video's reveal is a fixed overlay, not part of the pin's own document
 // flow (see reel__reveal-overlay below) — it rides the same global
@@ -225,7 +226,7 @@ function WorkReelPinned({ ctaHeadline, projects }: { ctaHeadline: string; projec
               <p className="reel__cta-headline">{ctaHeadline}</p>
               <Button
                 variant="secondary"
-                href="/contact"
+                href={ROUTES.contact}
                 iconRight={<ArrowUpRight size={16} />}
                 className="reel__cta-btn"
               >

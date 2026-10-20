@@ -3,6 +3,7 @@ import { Button } from "@/components/pw/Button"
 import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Reveal } from "@/components/motion/Reveal"
 import { CursorGlow } from "@/components/motion/CursorGlow"
+import { ROUTES } from "@/lib/routes"
 
 interface CtaBandProps {
   /** No `number` — this is an interstitial nudge, not a numbered content
@@ -22,7 +23,7 @@ export function CtaBand({
   label = "Let's talk",
   headline,
   buttonLabel = "Start a project",
-  href = "/contact",
+  href = ROUTES.contact,
 }: CtaBandProps) {
   return (
     <section className="sec sec--dark cta-band" data-theme="dark" data-screen-label="CTA">

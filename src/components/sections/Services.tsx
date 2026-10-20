@@ -10,6 +10,7 @@ import { SERVICES } from "@/data/services"
 import { useProjects } from "@/hooks/useProjects"
 import { shuffle } from "@/lib/array"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
+import { ROUTES } from "@/lib/routes"
 
 /** Only projects with a real still image (cover, or an image hero) — the
  *  shared thumb chain would otherwise hand back a stock placeholder. */
@@ -72,7 +73,7 @@ function ServiceRow({
 
   // Service names are the same strings as the Work Categories, so this lands
   // on /work with that category already selected (see WorkPage's ?category=).
-  const workHref = `/work?category=${encodeURIComponent(service.name)}`
+  const workHref = `${ROUTES.work}?categoria=${encodeURIComponent(service.name)}`
 
   return (
     <div

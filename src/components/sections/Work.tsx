@@ -10,6 +10,7 @@ import { Reveal } from "@/components/motion/Reveal"
 import { shuffle } from "@/lib/array"
 import { CircularGallery, type CircularGalleryHandle } from "@/components/ui/circular-gallery"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
+import { projectPath } from "@/lib/routes"
 
 /** Shared chain (see strapi.ts's projectThumbUrl) — this gallery only ever
  *  shows static images, so a video/youtube heroMediaType (or no cover and
@@ -120,7 +121,7 @@ function WorkTrack({ projects }: { projects: Project[] }) {
             ))}
             title={w.title}
             description={w.desc}
-            href={`/work/${w.slug}`}
+            href={projectPath(w.slug)}
           >
             <span className="work__view">
               View project <ArrowUpRight size={15} />
@@ -152,7 +153,7 @@ export function WorkGallery({
         image: galleryImageUrl(w),
         text: w.title,
         tags: w.tags.map((t) => ({ variant: t.highlighted ? ("orange" as const) : ("outline" as const), label: t.label })),
-        href: `/work/${w.slug}`,
+        href: projectPath(w.slug),
       })),
     [projects]
   )

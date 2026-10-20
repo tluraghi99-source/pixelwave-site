@@ -1,6 +1,6 @@
 // Generates dist/sitemap.xml as a "postbuild" step (see package.json — npm
 // runs this automatically right after `npm run build` finishes). Lists
-// every fixed route plus every published project's /work/<slug>, fetched
+// every fixed route plus every published project's /lavori/<slug>, fetched
 // fresh from Strapi each build so the sitemap never drifts from real
 // content as projects are added, renamed, or removed.
 //
@@ -16,7 +16,7 @@ import { writeFile } from "node:fs/promises"
 const SITE_URL = process.env.SITE_URL ?? "https://pixelwave.it"
 const STRAPI_URL = process.env.STRAPI_URL ?? "http://localhost:1337"
 
-const STATIC_ROUTES = ["/", "/work", "/studio", "/contact"]
+const STATIC_ROUTES = ["/", "/lavori", "/studio", "/contatti"]
 
 /** Mirrors src/lib/strapi.ts's own fetchProjects: resolves to `[]` on any
  *  network/parse failure rather than throwing, so an unreachable Strapi at
@@ -39,7 +39,7 @@ function urlEntry(path) {
 
 async function run() {
   const slugs = await fetchProjectSlugs()
-  const routes = [...STATIC_ROUTES, ...slugs.map((slug) => `/work/${slug}`)]
+  const routes = [...STATIC_ROUTES, ...slugs.map((slug) => `/lavori/${slug}`)]
   const body = routes.map(urlEntry).join("\n")
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`
 

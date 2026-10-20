@@ -14,6 +14,7 @@ import { useWorkCategories } from "@/hooks/useWorkCategories"
 import { usePageMeta } from "@/hooks/usePageMeta"
 import { shuffle } from "@/lib/array"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
+import { projectPath } from "@/lib/routes"
 
 /** Shared chain (see strapi.ts's projectThumbUrl) — a small grid card is
  *  never a sensible place to autoplay a video or a YouTube embed,
@@ -131,18 +132,18 @@ export function WorkPage() {
   )
 
   // Lets the nav menu's "Category"/"Client" links land directly on a mode
-  // (e.g. /work?mode=client) — read once on mount, not kept in sync with
+  // (e.g. /lavori?vista=cliente) — read once on mount, not kept in sync with
   // further clicks on the toggle below (out of scope for now).
   const [searchParams] = useSearchParams()
   const [mode, setMode] = useState<"category" | "client">(
-    searchParams.get("mode") === "client" ? "client" : "category"
+    ["cliente", "client"].includes(searchParams.get("vista") ?? searchParams.get("mode") ?? "") ? "client" : "category"
   )
-  // /work?category=Video (or several, comma-separated) opens with those
+  // /lavori?categoria=Video (or several, comma-separated) opens with those
   // categories already selected — the homepage's Services links use it.
   const [activeCategories, setActiveCategories] = useState<Set<string>>(
     () =>
       new Set(
-        (searchParams.get("category") ?? "")
+        (searchParams.get("categoria") ?? searchParams.get("category") ?? "")
           .split(",")
           .map((c) => c.trim())
           .filter(Boolean)
@@ -289,7 +290,7 @@ export function WorkPage() {
                         </Tag>
                       ))}
                       title={p.title}
-                      href={`/work/${p.slug}`}
+                      href={projectPath(p.slug)}
                     >
                       <span className="work__view">
                         View project <ArrowUpRight size={15} />

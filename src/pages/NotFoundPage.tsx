@@ -6,6 +6,7 @@ import { Reveal } from "@/components/motion/Reveal"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { Footer } from "@/components/sections/Footer"
 import mascot from "@/assets/mascot.svg"
+import { ROUTES } from "@/lib/routes"
 
 /** No route matched. A surf/wave pun fits the brand's own voice better than
  *  a generic "page not found" — the homepage's own CTA already asks "Got a
@@ -40,7 +41,7 @@ export function NotFoundPage() {
             <Button href="/" iconRight={<ArrowUpRight size={16} />}>
               Back to homepage
             </Button>
-            <Button href="/work" variant="secondary">
+            <Button href={ROUTES.work} variant="secondary">
               See our work
             </Button>
           </Reveal>

@@ -9,6 +9,7 @@ import { useProjectsStatus } from "@/hooks/useProjects"
 import { usePageMeta } from "@/hooks/usePageMeta"
 import { useVideoFrames } from "@/hooks/useVideoFrames"
 import { mediaUrl, projectThumbUrl, type Project } from "@/lib/strapi"
+import { ROUTES, projectPath } from "@/lib/routes"
 
 type MediaItem =
   | { type: "image"; src: string }
@@ -349,7 +350,7 @@ export function ProjectPage() {
         <main className="project-page" data-theme="dark">
           <div className="wrap project-page__not-found">
             <p className="lead">Project not found.</p>
-            <Link to="/work">Back to all projects →</Link>
+            <Link to={ROUTES.work}>Back to all projects →</Link>
           </div>
         </main>
         <Footer />
@@ -364,7 +365,7 @@ export function ProjectPage() {
           <CursorGlow className="cursor-glow" variant="dark" glow />
           <div className="wrap project-overview" data-screen-label="Project Info">
             <Reveal>
-              <Link to="/work" className="project-back">
+              <Link to={ROUTES.work} className="project-back">
                 ← All projects
               </Link>
             </Reveal>
@@ -407,7 +408,7 @@ export function ProjectPage() {
           )}
 
           <Reveal>
-            <Link to={`/work/${nextProject.slug}`} className="project-next wrap" data-screen-label="Next Project">
+            <Link to={projectPath(nextProject.slug)} className="project-next wrap" data-screen-label="Next Project">
               <div>
                 <span className="project-next__label">Next project</span>
                 <span className="project-next__title">

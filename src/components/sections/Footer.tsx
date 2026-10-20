@@ -8,6 +8,7 @@ import { CursorGlow } from "@/components/motion/CursorGlow"
 import { ClientLogos } from "@/components/sections/ClientLogos"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
 import { consentEnabled, openCookiePreferences } from "@/lib/consent"
+import { ROUTES } from "@/lib/routes"
 
 const SOCIALS = [
   { label: "Instagram", href: "https://www.instagram.com/pixelwave_studio/" },
@@ -75,7 +76,7 @@ export function Footer() {
         </RevealGroup>
 
         <Reveal className="foot__cta-wrap" delay={0.1}>
-          <InteractiveHoverButton text="Let's chat" href="/contact" />
+          <InteractiveHoverButton text="Let's chat" href={ROUTES.contact} />
         </Reveal>
       </div>
 
@@ -100,8 +101,8 @@ export function Footer() {
       <div className="wrap foot__legal">
         <span>© {new Date().getFullYear()} PixelWave. All rights reserved.</span>
         <span className="foot__legal-links">
-          <Link to="/privacy">Privacy Policy</Link>
-          <Link to="/cookies">Cookie Policy</Link>
+          <Link to={ROUTES.privacy}>Privacy Policy</Link>
+          <Link to={ROUTES.cookies}>Cookie Policy</Link>
           {consentEnabled && (
             <button type="button" className="foot__legal-button" onClick={openCookiePreferences}>
               Cookie preferences
