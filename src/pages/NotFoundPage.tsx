@@ -15,7 +15,7 @@ import { ROUTES } from "@/lib/routes"
  *  since it adds nothing a screen reader needs beyond the text already
  *  saying the page is missing. */
 export function NotFoundPage() {
-  usePageMeta("Page not found — PixelWave", "This page wiped out. Let's get you back to shore.")
+  usePageMeta("Pagina non trovata — PixelWave", "Questa pagina è stata spazzata via. Ti riportiamo a riva.")
 
   return (
     <>
@@ -26,23 +26,23 @@ export function NotFoundPage() {
             <img src={mascot} alt="" className="not-found__mascot" />
           </Reveal>
           <Reveal delay={0.1}>
-            <SectionLabel number="404">Page not found</SectionLabel>
+            <SectionLabel number="404">Pagina non trovata</SectionLabel>
           </Reveal>
           <Reveal delay={0.15}>
-            <p className="lead">Wiped out.</p>
+            <p className="lead">Spazzata via.</p>
           </Reveal>
           <Reveal delay={0.2}>
             <p className="secbody">
-              This page doesn't exist, moved, or got left on the cutting room floor. Lucky for
-              you, someone's still out here filming.
+              Questa pagina non esiste, è stata spostata o è finita tra gli scarti del montaggio.
+              Per fortuna c’è ancora qualcuno qui fuori a girare.
             </p>
           </Reveal>
           <Reveal delay={0.25} className="not-found__actions">
             <Button href="/" iconRight={<ArrowUpRight size={16} />}>
-              Back to homepage
+              Torna alla home
             </Button>
             <Button href={ROUTES.work} variant="secondary">
-              See our work
+              Guarda i nostri lavori
             </Button>
           </Reveal>
         </div>

@@ -230,7 +230,7 @@ function WorkReelPinned({ ctaHeadline, projects }: { ctaHeadline: string; projec
                 iconRight={<ArrowUpRight size={16} />}
                 className="reel__cta-btn"
               >
-                Start a project
+                Inizia un progetto
               </Button>
             </motion.div>
           </motion.div>

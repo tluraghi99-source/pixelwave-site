@@ -6,6 +6,12 @@ import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motio
  *  visitor never actually scrolls). */
 const DEFAULT_AUTO_HIDE_MS = 3500
 
+/** `idleReappear` mode: how long the mouse must rest before the hint comes
+ *  back, and how far down the page it still does (as a fraction of the
+ *  viewport height) — past that the visitor is clearly already scrolling. */
+const IDLE_REAPPEAR_MS = 900
+const IDLE_MAX_SCROLL = 0.2
+
 interface CursorHintProps {
   text: string
   /** "glow" breathes an orange text-shadow (Contact's "Let's chat" nudge);
@@ -26,6 +32,11 @@ interface CursorHintProps {
    *  it mounts, so dismissOnScroll's first-scroll-event rule would hide it
    *  almost immediately). Omit for the default self-managed behavior. */
   visible?: boolean
+  /** Instead of a one-time nudge: shown on arrival, hidden while the mouse
+   *  moves, and back every time the mouse comes to rest (and again after
+   *  scrolling back to the top). Stays away once the page has scrolled past
+   *  the first fifth of the viewport. Replaces autoHideMs/dismissOnScroll. */
+  idleReappear?: boolean
 }
 
 /** Small text label that trails the cursor on arrival, fine-pointer (desktop)
@@ -39,6 +50,7 @@ export function CursorHint({
   autoHideMs = DEFAULT_AUTO_HIDE_MS,
   dismissOnScroll = false,
   visible: controlledVisible,
+  idleReappear = false,
 }: CursorHintProps) {
   const [enabled, setEnabled] = useState(false)
   const [internalVisible, setInternalVisible] = useState(true)
@@ -64,14 +76,39 @@ export function CursorHint({
     x.set(window.innerWidth / 2 + 18)
     y.set(window.innerHeight / 2 - 72)
 
+    let idleTimer: ReturnType<typeof setTimeout> | undefined
+    const nearTop = () => window.scrollY <= window.innerHeight * IDLE_MAX_SCROLL
+    const armIdle = () => {
+      clearTimeout(idleTimer)
+      idleTimer = setTimeout(() => setInternalVisible(nearTop()), IDLE_REAPPEAR_MS)
+    }
+
     function handleMove(e: MouseEvent) {
       x.set(e.clientX + 18)
       y.set(e.clientY - 12)
+      if (idleReappear && !isControlled) {
+        setInternalVisible(false)
+        armIdle()
+      }
     }
     window.addEventListener("mousemove", handleMove)
 
     if (isControlled) {
       return () => window.removeEventListener("mousemove", handleMove)
+    }
+
+    if (idleReappear) {
+      function handleIdleScroll() {
+        setInternalVisible(false)
+        if (nearTop()) armIdle()
+        else clearTimeout(idleTimer)
+      }
+      window.addEventListener("scroll", handleIdleScroll, { passive: true })
+      return () => {
+        window.removeEventListener("mousemove", handleMove)
+        window.removeEventListener("scroll", handleIdleScroll)
+        clearTimeout(idleTimer)
+      }
     }
 
     function handleScroll() {
@@ -84,7 +121,7 @@ export function CursorHint({
       if (dismissOnScroll) window.removeEventListener("scroll", handleScroll)
       clearTimeout(timer)
     }
-  }, [enabled, x, y, autoHideMs, dismissOnScroll, isControlled])
+  }, [enabled, x, y, autoHideMs, dismissOnScroll, isControlled, idleReappear])
 
   if (!enabled) return null
 

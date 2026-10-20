@@ -7,7 +7,7 @@ import { Footer } from "@/components/sections/Footer"
 export function StudioPage() {
   usePageMeta(
     "Studio — PixelWave",
-    "Meet the PixelWave team and take a look inside the studio where every project comes together."
+    "Conosci il team di PixelWave e guarda dentro lo studio dove ogni progetto prende forma."
   )
   return (
     <>

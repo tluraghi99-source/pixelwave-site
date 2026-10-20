@@ -17,18 +17,18 @@ const CATEGORIES: Array<{
 }> = [
   {
     key: "necessary",
-    title: "Necessary",
-    description: "Needed for the site to work. They don't track you and can't be turned off.",
+    title: "Necessari",
+    description: "Servono al funzionamento del sito. Non ti tracciano e non si possono disattivare.",
   },
   {
     key: "statistics",
-    title: "Statistics",
-    description: "Google Analytics, to understand how the site is used (pages visited, rough location).",
+    title: "Statistiche",
+    description: "Google Analytics, per capire come viene usato il sito (pagine visitate, posizione approssimativa).",
   },
   {
     key: "marketing",
     title: "Marketing",
-    description: "Google Ads and the Meta pixel, to measure and show relevant advertising.",
+    description: "Google Ads e pixel di Meta, per misurare e mostrare pubblicità pertinente.",
   },
 ]
 
@@ -79,14 +79,14 @@ export function CookieConsent() {
       aria-labelledby="cookie-banner-title"
     >
       <p id="cookie-banner-title" className="cookie-banner__title">
-        Cookies
+        Cookie
       </p>
 
       {!customizing ? (
         <p className="cookie-banner__text">
-          We use cookies for statistics and advertising only if you agree. You can accept all, reject
-          all, or choose, and change your mind any time from the footer.{" "}
-          <Link to="/cookies">Cookie Policy</Link>
+          Usiamo i cookie per statistiche e pubblicità solo se sei d’accordo. Puoi accettare tutto,
+          rifiutare tutto o scegliere, e cambiare idea quando vuoi dal footer.{" "}
+          <Link to="/cookies">Informativa sui cookie</Link>
         </p>
       ) : (
         <ul className="cookie-banner__list">
@@ -125,14 +125,14 @@ export function CookieConsent() {
           className="pw-btn pw-btn--secondary pw-btn--sm"
           onClick={() => choose({ statistics: true, marketing: true })}
         >
-          Accept all
+          Accetta tutti
         </button>
         <button type="button" className="pw-btn pw-btn--secondary pw-btn--sm" onClick={() => choose(NONE)}>
-          Reject all
+          Rifiuta tutti
         </button>
         {customizing ? (
           <button type="button" className="pw-btn pw-btn--secondary pw-btn--sm" onClick={() => choose(draft)}>
-            Save choices
+            Salva le scelte
           </button>
         ) : (
           <button
@@ -143,7 +143,7 @@ export function CookieConsent() {
               setCustomizing(true)
             }}
           >
-            Customize
+            Personalizza
           </button>
         )}
       </div>

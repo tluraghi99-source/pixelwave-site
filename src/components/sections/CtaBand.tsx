@@ -22,7 +22,7 @@ interface CtaBandProps {
 export function CtaBand({
   label = "Let's talk",
   headline,
-  buttonLabel = "Start a project",
+  buttonLabel = "Inizia un progetto",
   href = ROUTES.contact,
 }: CtaBandProps) {
   return (

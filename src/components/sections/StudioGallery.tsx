@@ -20,10 +20,10 @@ function StudioGalleryHeading() {
   return (
     <>
       <Reveal>
-        <SectionLabel number="02">Inside the studio</SectionLabel>
+        <SectionLabel number="02">Dentro lo studio</SectionLabel>
       </Reveal>
       <Reveal delay={0.1}>
-        <p className="lead">Where it happens.</p>
+        <p className="lead">Dove succede.</p>
       </Reveal>
     </>
   )

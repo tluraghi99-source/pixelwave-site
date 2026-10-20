@@ -10,7 +10,7 @@ import { Footer } from "@/components/sections/Footer"
 export function HomePage() {
   usePageMeta(
     "PixelWave — Your Vision, Our Wave",
-    "PixelWave is a creative studio for video, photo, branding, web design, social and events — from concept to final delivery."
+    "PixelWave è uno studio creativo per video, foto, branding, web design, social ed eventi: dall’idea alla consegna finale."
   )
   const [introDone, setIntroDone] = useState(false)
 
@@ -21,7 +21,7 @@ export function HomePage() {
       <Hero introDone={introDone} />
       <div className="page-content">
         <main>
-          <WorkReel ctaHeadline="Got a wave in mind?" />
+          <WorkReel ctaHeadline="Hai una wave in mente?" />
           <TickerStrip />
           <Services />
         </main>

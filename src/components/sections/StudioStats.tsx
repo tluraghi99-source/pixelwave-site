@@ -92,12 +92,12 @@ export function StudioStats() {
       <div className="studio-stats__hero" aria-hidden="true" />
       <div className="wrap">
         <Reveal>
-          <SectionLabel number="01">The studio</SectionLabel>
+          <SectionLabel number="01">Lo studio</SectionLabel>
         </Reveal>
         <div className="studio-stats__row">
-          <StatBlock value={teamMembers.length} label="People" delay={0.1} />
-          <StatBlock value={2} label="Floors" accent delay={0.35} />
-          <StatBlock value={100} label="Projects" suffix="+" delay={0.6} />
+          <StatBlock value={teamMembers.length} label="Persone" delay={0.1} />
+          <StatBlock value={2} label="Piani" accent delay={0.35} />
+          <StatBlock value={100} label="Progetti" suffix="+" delay={0.6} />
           <motion.p
             className="studio-stats__tail"
             initial={{ opacity: 0 }}
@@ -105,9 +105,9 @@ export function StudioStats() {
             viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: 0.6, delay: 0.9, ease: EASE_WAVE }}
           >
-            A space where creativity has no boundaries.
+            Uno spazio dove la creatività non ha confini.
             <br />
-            And every idea has room to grow.
+            E ogni idea ha spazio per crescere.
           </motion.p>
         </div>
       </div>

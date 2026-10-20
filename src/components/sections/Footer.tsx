@@ -99,13 +99,13 @@ export function Footer() {
       )}
 
       <div className="wrap foot__legal">
-        <span>© {new Date().getFullYear()} PixelWave. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} PixelWave. Tutti i diritti riservati.</span>
         <span className="foot__legal-links">
-          <Link to={ROUTES.privacy}>Privacy Policy</Link>
-          <Link to={ROUTES.cookies}>Cookie Policy</Link>
+          <Link to={ROUTES.privacy}>Informativa sulla privacy</Link>
+          <Link to={ROUTES.cookies}>Informativa sui cookie</Link>
           {consentEnabled && (
             <button type="button" className="foot__legal-button" onClick={openCookiePreferences}>
-              Cookie preferences
+              Preferenze cookie
             </button>
           )}
         </span>

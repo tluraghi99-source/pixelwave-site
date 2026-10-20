@@ -30,7 +30,7 @@ export function Hero({ introDone }: HeroProps) {
 
   const measure = useCallback(() => {
     const source = wrapRef.current
-    const target = document.querySelector('a[aria-label="PixelWave home"]')
+    const target = document.querySelector('a[aria-label="PixelWave, vai alla home"]')
     if (!source || !target) return
     const sourceRect = source.getBoundingClientRect()
     const targetRect = target.getBoundingClientRect()
@@ -85,7 +85,7 @@ export function Hero({ introDone }: HeroProps) {
   return (
     <section className="hero" data-screen-label="Hero">
       <CursorGlow className="cursor-glow" variant="light" glow ambient />
-      {introDone && <CursorHint text="Scroll" variant="bounce" autoHideMs={6000} dismissOnScroll />}
+      {introDone && <CursorHint text="Scroll" variant="bounce" idleReappear />}
 
       <motion.div
         ref={wrapRef}

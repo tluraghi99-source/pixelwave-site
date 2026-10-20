@@ -86,7 +86,7 @@ function withMedia(p: Project): ProjectWithMedia {
 function ProjectMeta({ year }: { year?: number }) {
   return (
     <div className="project-meta">
-      <span className="project-meta__label">Overview</span>
+      <span className="project-meta__label">Panoramica</span>
       {year ? <span className="project-meta__label">{year}</span> : null}
     </div>
   )
@@ -125,7 +125,7 @@ function ProjectMedia({ media, muted = true }: { media: MediaItem; muted?: boole
         ref={iframeRef}
         className="project-video-media"
         src={`https://www.youtube.com/embed/${media.videoId}?autoplay=1&mute=1&loop=1&playlist=${media.videoId}&controls=0&playsinline=1&enablejsapi=1`}
-        title="Project video"
+        title="Video del progetto"
         allow="autoplay"
       />
     )
@@ -174,7 +174,7 @@ function ProjectVideoPinned({ media }: { media: MediaItem }) {
               type="button"
               className="project-video-pin__mute"
               aria-pressed={!muted}
-              aria-label={muted ? "Unmute" : "Mute"}
+              aria-label={muted ? "Attiva audio" : "Disattiva audio"}
               title={muted ? "Unmute" : "Mute"}
               onClick={() => setMuted((m) => !m)}
             >
@@ -182,7 +182,7 @@ function ProjectVideoPinned({ media }: { media: MediaItem }) {
             </button>
           )}
           <button type="button" className="project-video-pin__skip" onClick={handleSkip}>
-            Skip
+            Salta
           </button>
         </div>
       </div>
@@ -211,7 +211,7 @@ function ProjectVideoAmbient({ media }: { media: MediaItem }) {
             type="button"
             className="project-video-pin__mute"
             aria-pressed={!muted}
-            aria-label={muted ? "Unmute" : "Mute"}
+            aria-label={muted ? "Attiva audio" : "Disattiva audio"}
             title={muted ? "Unmute" : "Mute"}
             onClick={() => setMuted((m) => !m)}
           >
@@ -349,8 +349,8 @@ export function ProjectPage() {
       <>
         <main className="project-page" data-theme="dark">
           <div className="wrap project-page__not-found">
-            <p className="lead">Project not found.</p>
-            <Link to={ROUTES.work}>Back to all projects →</Link>
+            <p className="lead">Progetto non trovato.</p>
+            <Link to={ROUTES.work}>Torna a tutti i progetti →</Link>
           </div>
         </main>
         <Footer />
@@ -366,7 +366,7 @@ export function ProjectPage() {
           <div className="wrap project-overview" data-screen-label="Project Info">
             <Reveal>
               <Link to={ROUTES.work} className="project-back">
-                ← All projects
+                ← Tutti i progetti
               </Link>
             </Reveal>
             <Reveal delay={0.05}>
@@ -410,7 +410,7 @@ export function ProjectPage() {
           <Reveal>
             <Link to={projectPath(nextProject.slug)} className="project-next wrap" data-screen-label="Next Project">
               <div>
-                <span className="project-next__label">Next project</span>
+                <span className="project-next__label">Prossimo progetto</span>
                 <span className="project-next__title">
                   {nextProject.title} <ArrowUpRight size={28} />
                 </span>

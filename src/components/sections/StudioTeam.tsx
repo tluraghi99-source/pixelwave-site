@@ -89,7 +89,7 @@ export function StudioTeam() {
             {!expanded && gridItems.length > 2 && (
               <div className="team-grid__show-all-wrap">
                 <Button type="button" variant="secondary" size="md" onClick={() => setExpanded(true)}>
-                  Show all
+                  Mostra tutti
                 </Button>
               </div>
             )}

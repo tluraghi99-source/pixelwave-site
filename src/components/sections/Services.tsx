@@ -11,6 +11,7 @@ import { useProjects } from "@/hooks/useProjects"
 import { shuffle } from "@/lib/array"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
 import { ROUTES } from "@/lib/routes"
+import { categoryKey } from "@/lib/categories"
 
 /** Only projects with a real still image (cover, or an image hero) — the
  *  shared thumb chain would otherwise hand back a stock placeholder. */
@@ -27,7 +28,7 @@ function hasRealThumb(p: Project): boolean {
 function pickServiceImages(projects: Project[]): (string | null)[] {
   const withThumb = projects.filter(hasRealThumb)
   const pools = SERVICES.map((service) =>
-    shuffle(withThumb.filter((p) => p.workCategories.some((c) => c.toLowerCase() === service.name.toLowerCase())))
+    shuffle(withThumb.filter((p) => p.workCategories.some((c) => categoryKey(c) === categoryKey(service.name))))
   )
   const used = new Set<string>()
   const images: (string | null)[] = SERVICES.map(() => null)
@@ -155,7 +156,7 @@ function ServiceRow({
                 ))}
               </div>
               <Link to={workHref} className="svc-row__link">
-                See {service.name} projects <ArrowUpRight size={16} aria-hidden="true" />
+                Vedi i progetti {service.name} <ArrowUpRight size={16} aria-hidden="true" />
               </Link>
             </div>
             {service.image && (
@@ -183,7 +184,7 @@ export function Services() {
       <CursorGlow className="cursor-glow" variant="dark" glow={false} />
       <div className="wrap">
         <Reveal>
-          <SectionLabel number="02">Services</SectionLabel>
+          <SectionLabel number="02">Servizi</SectionLabel>
         </Reveal>
         <div
           className="svc-list mt-12"

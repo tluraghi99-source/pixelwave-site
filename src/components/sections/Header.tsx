@@ -13,16 +13,16 @@ import { ROUTES } from "@/lib/routes"
 // out with a level of real sub-navigation (mirrors a reference layout).
 const MENU_COLUMNS = [
   {
-    label: "Work",
+    label: "Lavori",
     href: ROUTES.work,
     // Land directly on a filter mode — WorkPage.tsx reads ?mode= once on mount.
     links: [
-      { label: "Category", href: `${ROUTES.work}?vista=categoria` },
-      { label: "Client", href: `${ROUTES.work}?vista=cliente` },
+      { label: "Categoria", href: `${ROUTES.work}?vista=categoria` },
+      { label: "Cliente", href: `${ROUTES.work}?vista=cliente` },
     ],
   },
   {
-    label: "Services",
+    label: "Servizi",
     href: "#services",
     links: [] as { label: string; href: string }[],
   },
@@ -35,7 +35,7 @@ const MENU_COLUMNS = [
     label: "Let's chat",
     href: ROUTES.contact,
     links: [
-      { label: "Join us", href: ROUTES.careers },
+      { label: "Lavora con noi", href: ROUTES.careers },
       { label: "Instagram", href: "https://www.instagram.com/pixelwave_studio/" },
       { label: "YouTube", href: "https://www.youtube.com/@PixelWaveStudio" },
       { label: "LinkedIn", href: "https://www.linkedin.com/company/pixelwavestudio/" },
@@ -276,7 +276,7 @@ export function Header() {
           // mobileBarOrange's own comment above), instead of popping back in
           // while the bar is still mid-retract.
           className={`nav__logo${hideLogo ? " nav__logo--hidden" : ""}`}
-          aria-label="PixelWave home"
+          aria-label="PixelWave, vai alla home"
           aria-hidden={hideLogo}
           tabIndex={hideLogo ? -1 : undefined}
           // Native hash-anchor scrolling landed short of the true top when
@@ -321,9 +321,9 @@ export function Header() {
             pixelClassName="nav__menu-btn-pixel"
           />
           <InteractiveHoverButton
-            text={open ? "Close" : "Menu"}
+            text={open ? "Chiudi" : "Menu"}
             icon={open ? <X size={16} /> : <Menu size={16} />}
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? "Chiudi il menu" : "Apri il menu"}
             className="relative z-10 border-none bg-transparent text-foreground"
             onClick={() => setOpen((v) => !v)}
           />

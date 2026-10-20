@@ -39,7 +39,7 @@ export function ClientLogos() {
 
   return (
     <div className="client-logos">
-      <h2 className="sr-only">Clients</h2>
+      <h2 className="sr-only">Clienti</h2>
       <Marquee speed={110} className="client-logos__row">
         {clients.map((client) => (
           <ClientMark client={client} key={client.id} />

@@ -15,6 +15,7 @@ import { usePageMeta } from "@/hooks/usePageMeta"
 import { shuffle } from "@/lib/array"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
 import { projectPath } from "@/lib/routes"
+import { categoryKey, categoryLabel } from "@/lib/categories"
 
 /** Shared chain (see strapi.ts's projectThumbUrl) — a small grid card is
  *  never a sensible place to autoplay a video or a YouTube embed,
@@ -103,8 +104,8 @@ function FilterRow({ children }: { children: ReactNode }) {
 
 export function WorkPage() {
   usePageMeta(
-    "All Projects — PixelWave",
-    "Browse every PixelWave project — video, photo, branding, web design, social and events work, filterable by category or client."
+    "Tutti i progetti — PixelWave",
+    "Sfoglia tutti i progetti di PixelWave — video, foto, branding, web design, social ed eventi — filtrabili per categoria o cliente."
   )
   const fetchedProjects = useProjects()
   // Reshuffled once per fetch (like the Studio team grid), not on every
@@ -119,8 +120,8 @@ export function WorkPage() {
   // project. Separate from each project's own display `tags`, which never
   // drove this filter's button list.
   const FILTER_CATEGORIES = useMemo(() => {
-    const used = new Set(projects.flatMap((p) => p.workCategories))
-    return workCategories.map((c) => c.name).filter((name) => used.has(name))
+    const used = new Set(projects.flatMap((p) => p.workCategories.map(categoryKey)))
+    return workCategories.map((c) => c.name).filter((name) => used.has(categoryKey(name)))
   }, [workCategories, projects])
 
   // Alphabetical (unlike FILTER_CATEGORIES' editorial order) — categories are
@@ -147,6 +148,7 @@ export function WorkPage() {
           .split(",")
           .map((c) => c.trim())
           .filter(Boolean)
+          .map(categoryKey)
       )
   )
   const [activeClient, setActiveClient] = useState<string | null>(null)
@@ -154,15 +156,16 @@ export function WorkPage() {
   // A ?category= link to a category with no projects yet (or an unknown one)
   // is ignored rather than leaving an empty grid with no button to undo it.
   const selectedCategories = useMemo(
-    () => new Set([...activeCategories].filter((c) => FILTER_CATEGORIES.includes(c))),
+    () => new Set([...activeCategories].filter((k) => FILTER_CATEGORIES.some((name) => categoryKey(name) === k))),
     [activeCategories, FILTER_CATEGORIES]
   )
 
   function toggleCategory(category: string) {
     setActiveCategories((prev) => {
       const next = new Set(prev)
-      if (next.has(category)) next.delete(category)
-      else next.add(category)
+      const key = categoryKey(category)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
       return next
     })
   }
@@ -179,7 +182,7 @@ export function WorkPage() {
   const visibleProjects = useMemo(() => {
     if (mode === "category") {
       if (selectedCategories.size === 0) return projects
-      return projects.filter((p) => p.workCategories.some((c) => selectedCategories.has(c)))
+      return projects.filter((p) => p.workCategories.some((c) => selectedCategories.has(categoryKey(c))))
     }
     if (!activeClient) return projects
     return projects.filter((p) => p.client === activeClient)
@@ -194,7 +197,7 @@ export function WorkPage() {
           <div className="wrap">
             <div className="work-page__head">
               <Reveal delay={0.1}>
-                <p className="lead">All projects.</p>
+                <p className="lead">Tutti i progetti.</p>
               </Reveal>
               <Reveal delay={0.15} className="work-page__filter-block">
                 <div className="work-page__mode-toggle" role="tablist">
@@ -205,7 +208,7 @@ export function WorkPage() {
                     className={`work-page__mode-tab ${mode === "category" ? "is-active" : ""}`}
                     onClick={() => setMode("category")}
                   >
-                    Category
+                    Categoria
                     {mode === "category" && (
                       <motion.span
                         className="work-page__mode-tab-underline"
@@ -221,7 +224,7 @@ export function WorkPage() {
                     className={`work-page__mode-tab ${mode === "client" ? "is-active" : ""}`}
                     onClick={() => setMode("client")}
                   >
-                    Client
+                    Cliente
                     {mode === "client" && (
                       <motion.span
                         className="work-page__mode-tab-underline"
@@ -238,11 +241,11 @@ export function WorkPage() {
                       <button
                         key={category}
                         type="button"
-                        className={`work-page__filter ${selectedCategories.has(category) ? "is-active" : ""}`}
-                        aria-pressed={selectedCategories.has(category)}
+                        className={`work-page__filter ${selectedCategories.has(categoryKey(category)) ? "is-active" : ""}`}
+                        aria-pressed={selectedCategories.has(categoryKey(category))}
                         onClick={() => toggleCategory(category)}
                       >
-                        {category}
+                        {categoryLabel(category)}
                       </button>
                     ))}
                   </FilterRow>
@@ -293,7 +296,7 @@ export function WorkPage() {
                       href={projectPath(p.slug)}
                     >
                       <span className="work__view">
-                        View project <ArrowUpRight size={15} />
+                        Vedi il progetto <ArrowUpRight size={15} />
                       </span>
                     </Card>
                   </RevealItem>

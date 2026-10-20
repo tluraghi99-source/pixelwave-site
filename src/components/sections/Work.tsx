@@ -124,7 +124,7 @@ function WorkTrack({ projects }: { projects: Project[] }) {
             href={projectPath(w.slug)}
           >
             <span className="work__view">
-              View project <ArrowUpRight size={15} />
+              Vedi il progetto <ArrowUpRight size={15} />
             </span>
           </Card>
         </div>
@@ -181,10 +181,10 @@ export function WorkHeading(): ReactNode {
     <div className="work__head">
       <div>
         <Reveal>
-          <SectionLabel number="01">Selected Work</SectionLabel>
+          <SectionLabel number="01">Lavori selezionati</SectionLabel>
         </Reveal>
         <Reveal delay={0.1}>
-          <p className="lead">Recent waves.</p>
+          <p className="lead">Le nostre waves.</p>
         </Reveal>
       </div>
     </div>

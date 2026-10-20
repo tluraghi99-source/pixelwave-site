@@ -15,10 +15,10 @@ import { submitCareersApplication } from "@/lib/strapi"
 // see CareersPage.tsx/ContactPage.tsx's shared .contact-page* classes for
 // the layout itself, kept identical on purpose.
 const STEPS = [
-  { key: "detail", label: "Detail" },
-  { key: "role", label: "Role" },
+  { key: "detail", label: "Dati" },
+  { key: "role", label: "Ruolo" },
   { key: "cv", label: "CV" },
-  { key: "review", label: "Review" },
+  { key: "review", label: "Riepilogo" },
 ] as const
 
 const MAX_CV_SIZE_MB = 10
@@ -41,13 +41,13 @@ function CvUpload({ file, onChange }: { file: File | null; onChange: (file: File
         type="file"
         accept=".pdf,.doc,.docx"
         className="contact-page__cv-input"
-        aria-label="CV file"
+        aria-label="File del CV"
         onChange={(e) => onChange(e.target.files?.[0] ?? null)}
       />
       <button type="button" className="contact-page__cv-dropzone" onClick={() => inputRef.current?.click()}>
         <Upload size={16} aria-hidden="true" />
         <span className="contact-page__cv-dropzone-text">
-          {file ? file.name : "Choose a file — PDF or Word"}
+          {file ? file.name : "Scegli un file: PDF o Word"}
         </span>
       </button>
       {file && (
@@ -55,7 +55,7 @@ function CvUpload({ file, onChange }: { file: File | null; onChange: (file: File
           {formatFileSize(file.size)}
           {" · "}
           <button type="button" className="contact-page__cv-clear" onClick={() => onChange(null)}>
-            Remove
+            Rimuovi
           </button>
         </span>
       )}
@@ -65,8 +65,8 @@ function CvUpload({ file, onChange }: { file: File | null; onChange: (file: File
 
 export function CareersPage() {
   usePageMeta(
-    "Join Us — PixelWave",
-    "Apply to join the PixelWave team. Tell us about yourself and attach your CV."
+    "Lavora con noi — PixelWave",
+    "Candidati per entrare nel team di PixelWave. Raccontaci chi sei e allega il tuo CV."
   )
   const [stepIndex, setStepIndex] = useState(0)
   const [name, setName] = useState("")
@@ -113,7 +113,7 @@ export function CareersPage() {
 
   function handleCvChange(file: File | null) {
     if (file && file.size > MAX_CV_SIZE_MB * 1024 * 1024) {
-      setCvError(`That file is over ${MAX_CV_SIZE_MB}MB — try a smaller one.`)
+      setCvError(`Il file supera i ${MAX_CV_SIZE_MB}MB: provane uno più piccolo.`)
       setCv(null)
       return
     }
@@ -125,27 +125,27 @@ export function CareersPage() {
   // the same state the real, accessible controls below already expose —
   // there's nothing here a screen reader needs that the labeled Input/file
   // controls don't already say, which is why the mirror stays aria-hidden.
-  const firstName = name.trim() || "there"
+  const firstName = name.trim()
   const hasName = name.trim() !== ""
   const reactive = sent
-    ? { text: `Thanks, ${firstName}!`, isPlaceholder: false }
+    ? { text: `Grazie${firstName ? `, ${firstName}` : ""}!`, isPlaceholder: false }
     : step.key === "detail"
-      ? { text: hasName ? name : "Your name", isPlaceholder: !hasName }
+      ? { text: hasName ? name : "Il tuo nome", isPlaceholder: !hasName }
       : step.key === "role"
-        ? { text: role.trim() || "Your role", isPlaceholder: role.trim() === "" }
+        ? { text: role.trim() || "Il tuo ruolo", isPlaceholder: role.trim() === "" }
         : step.key === "cv"
-          ? { text: cv ? cv.name : "Upload your CV", isPlaceholder: !cv }
-          : { text: "Look good?", isPlaceholder: false }
+          ? { text: cv ? cv.name : "Carica il tuo CV", isPlaceholder: !cv }
+          : { text: "Tutto ok?", isPlaceholder: false }
 
   const eyebrowText = sent
-    ? "Sent"
+    ? "Inviato"
     : step.key === "detail"
-      ? "Tell us who you are"
+      ? "Dicci chi sei"
       : step.key === "role"
-        ? "What do you do"
+        ? "Cosa fai"
         : step.key === "cv"
-          ? "Attach your CV"
-          : "Review your details"
+          ? "Allega il tuo CV"
+          : "Controlla i tuoi dati"
 
   return (
     <main>
@@ -156,7 +156,7 @@ export function CareersPage() {
         <div
           className="contact-page__progress"
           role="img"
-          aria-label={sent ? "Sent" : `Step ${stepIndex + 1} of ${STEPS.length}`}
+          aria-label={sent ? "Inviato" : `Passo ${stepIndex + 1} di ${STEPS.length}`}
         >
           {STEPS.map((s, i) => (
             <span
@@ -191,7 +191,7 @@ export function CareersPage() {
                 transition={{ duration: 0.4, ease: EASE_WAVE }}
               >
                 <Check className="contact-page__sent-icon" size={20} aria-hidden="true" />
-                <p className="contact-page__sent-msg">We'll be in touch shortly.</p>
+                <p className="contact-page__sent-msg">Ti scriviamo a breve.</p>
               </motion.div>
             ) : (
               <motion.div
@@ -205,35 +205,35 @@ export function CareersPage() {
                 {stepIndex > 0 && (
                   <button type="button" className="contact-page__back" onClick={handleBack}>
                     <ArrowLeft size={14} aria-hidden="true" />
-                    Back
+                    Indietro
                   </button>
                 )}
 
                 {step.key === "detail" && (
                   <div className="contact-page__fields">
                     <Input
-                      label="Name"
-                      placeholder="First name"
+                      label="Nome"
+                      placeholder="Il tuo nome"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                     />
                     <Input
-                      label="Surname"
-                      placeholder="Last name"
+                      label="Cognome"
+                      placeholder="Il tuo cognome"
                       value={surname}
                       onChange={(e) => setSurname(e.target.value)}
                     />
                     <Input
                       label="Email"
                       type="email"
-                      placeholder="Mail address"
+                      placeholder="Indirizzo email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
                     <Input
-                      label="Phone"
+                      label="Telefono"
                       type="tel"
-                      placeholder="Phone number"
+                      placeholder="Numero di telefono"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                     />
@@ -243,8 +243,8 @@ export function CareersPage() {
                 {step.key === "role" && (
                   <div className="contact-page__fields">
                     <Input
-                      label="Role"
-                      placeholder="e.g. Video Editor, Designer, Developer…"
+                      label="Ruolo"
+                      placeholder="es. video editor, designer, developer…"
                       value={role}
                       onChange={(e) => setRole(e.target.value)}
                     />
@@ -261,21 +261,21 @@ export function CareersPage() {
                 {step.key === "review" && (
                   <div className="contact-page__recap">
                     <button type="button" className="contact-page__recap-row" onClick={() => setStepIndex(0)}>
-                      <span className="contact-page__recap-label">Name &amp; contact</span>
+                      <span className="contact-page__recap-label">Nome e contatti</span>
                       <span className="contact-page__recap-value">
                         {name} {surname} · {email} · {phone}
                       </span>
-                      <span className="contact-page__recap-edit">Edit</span>
+                      <span className="contact-page__recap-edit">Modifica</span>
                     </button>
                     <button type="button" className="contact-page__recap-row" onClick={() => setStepIndex(1)}>
-                      <span className="contact-page__recap-label">Role</span>
+                      <span className="contact-page__recap-label">Ruolo</span>
                       <span className="contact-page__recap-value">{role}</span>
-                      <span className="contact-page__recap-edit">Edit</span>
+                      <span className="contact-page__recap-edit">Modifica</span>
                     </button>
                     <button type="button" className="contact-page__recap-row" onClick={() => setStepIndex(2)}>
                       <span className="contact-page__recap-label">CV</span>
                       <span className="contact-page__recap-value">{cv?.name}</span>
-                      <span className="contact-page__recap-edit">Edit</span>
+                      <span className="contact-page__recap-edit">Modifica</span>
                     </button>
                     {/* Required, unchecked by default — GDPR consent for the
                        personal data and CV submitted above. Gates the final
@@ -292,23 +292,23 @@ export function CareersPage() {
                         <Check size={12} strokeWidth={3} />
                       </span>
                       <span>
-                        I've read and accept the{" "}
+                        Ho letto e accetto{" "}
                         <Link to="/privacy" target="_blank" rel="noopener noreferrer">
-                          Privacy Policy
+                          l’informativa sulla privacy
                         </Link>
                         .
                       </span>
                     </label>
                     {sendError && (
                       <p className="contact-page__send-error">
-                        Something went wrong sending that — please try again.
+                        Qualcosa è andato storto nell’invio. Riprova.
                       </p>
                     )}
                   </div>
                 )}
 
                 <InteractiveHoverButton
-                  text={sending ? "Sending…" : isLastStep ? "Send it our way" : "Next"}
+                  text={sending ? "Invio in corso…" : isLastStep ? "Inviaci la tua candidatura" : "Avanti"}
                   icon={<ArrowRight size={16} />}
                   onClick={handleNext}
                   className={`contact-page__next ${canAdvance && !sending ? "" : "contact-page__next--disabled"}`}

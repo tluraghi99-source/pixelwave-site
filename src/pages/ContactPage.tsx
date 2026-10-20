@@ -13,16 +13,16 @@ import { SERVICES } from "@/data/services"
 import { submitContact } from "@/lib/strapi"
 
 const STEPS = [
-  { key: "detail", label: "Detail" },
-  { key: "type", label: "Project type" },
-  { key: "when", label: "When" },
-  { key: "review", label: "Review" },
+  { key: "detail", label: "Dati" },
+  { key: "type", label: "Tipo di progetto" },
+  { key: "when", label: "Quando" },
+  { key: "review", label: "Riepilogo" },
 ] as const
 
 // Same list as the homepage Services section, so the form never offers
 // something the site doesn't list (or misses something it does).
 const PROJECT_TYPES = SERVICES.map((service) => service.name)
-const TIMELINES = ["ASAP", "1–3 months", "3–6 months", "Not sure yet"]
+const TIMELINES = ["Appena possibile", "1–3 mesi", "3–6 mesi", "Non lo so ancora"]
 
 /** Joins selected types with " + ", breaking to a new line after every third
  *  one so a long selection doesn't run into a single unwieldy line. */
@@ -36,8 +36,8 @@ function formatProjectTypes(types: string[]): string {
 
 export function ContactPage() {
   usePageMeta(
-    "Contact — PixelWave",
-    "Start a project with PixelWave. Tell us what you need and we'll get back to you."
+    "Contatti — PixelWave",
+    "Inizia un progetto con PixelWave. Raccontaci di cosa hai bisogno e ti risponderemo."
   )
   const [stepIndex, setStepIndex] = useState(0)
   const [name, setName] = useState("")
@@ -87,27 +87,27 @@ export function ContactPage() {
   // state the real, accessible controls below already expose — there's
   // nothing here a screen reader needs that the labeled Input/Tag controls
   // don't already say, which is why the mirror stays aria-hidden.
-  const firstName = name.trim().split(" ")[0] || "there"
+  const firstName = name.trim().split(" ")[0]
   const hasName = name.trim() !== ""
   const reactive = sent
-    ? { text: `Thanks, ${firstName}!`, isPlaceholder: false }
+    ? { text: `Grazie${firstName ? `, ${firstName}` : ""}!`, isPlaceholder: false }
     : step.key === "detail"
-      ? { text: hasName ? name : "Your name", isPlaceholder: !hasName }
+      ? { text: hasName ? name : "Il tuo nome", isPlaceholder: !hasName }
       : step.key === "type"
-        ? { text: projectTypes.length > 0 ? formatProjectTypes(projectTypes) : "Pick a project type", isPlaceholder: projectTypes.length === 0 }
+        ? { text: projectTypes.length > 0 ? formatProjectTypes(projectTypes) : "Scegli un tipo di progetto", isPlaceholder: projectTypes.length === 0 }
         : step.key === "when"
-          ? { text: timeline ?? "Pick a timeline", isPlaceholder: timeline === null }
-          : { text: "Look good?", isPlaceholder: false }
+          ? { text: timeline ?? "Scegli i tempi", isPlaceholder: timeline === null }
+          : { text: "Tutto ok?", isPlaceholder: false }
 
   const eyebrowText = sent
-    ? "Sent"
+    ? "Inviato"
     : step.key === "detail"
-      ? "Tell us who you are"
+      ? "Dicci chi sei"
       : step.key === "type"
-        ? "What are we building"
+        ? "Cosa costruiamo"
         : step.key === "when"
-          ? "When are you starting"
-          : "Review your details"
+          ? "Quando si parte"
+          : "Controlla i tuoi dati"
 
   return (
     <main>
@@ -118,7 +118,7 @@ export function ContactPage() {
         <div
           className="contact-page__progress"
           role="img"
-          aria-label={sent ? "Sent" : `Step ${stepIndex + 1} of ${STEPS.length}`}
+          aria-label={sent ? "Inviato" : `Passo ${stepIndex + 1} di ${STEPS.length}`}
         >
           {STEPS.map((s, i) => (
             <span
@@ -170,7 +170,7 @@ export function ContactPage() {
                 transition={{ duration: 0.4, ease: EASE_WAVE }}
               >
                 <Check className="contact-page__sent-icon" size={20} aria-hidden="true" />
-                <p className="contact-page__sent-msg">We'll be in touch shortly.</p>
+                <p className="contact-page__sent-msg">Ti scriviamo a breve.</p>
               </motion.div>
             ) : (
               <motion.div
@@ -184,29 +184,29 @@ export function ContactPage() {
                 {stepIndex > 0 && (
                   <button type="button" className="contact-page__back" onClick={handleBack}>
                     <ArrowLeft size={14} aria-hidden="true" />
-                    Back
+                    Indietro
                   </button>
                 )}
 
                 {step.key === "detail" && (
                   <div className="contact-page__fields">
                     <Input
-                      label="Name"
-                      placeholder="Your name"
+                      label="Nome"
+                      placeholder="Il tuo nome"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                     />
                     <Input
                       label="Email"
                       type="email"
-                      placeholder="Mail address"
+                      placeholder="Indirizzo email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
                     <Input
-                      label="Phone (optional)"
+                      label="Telefono (facoltativo)"
                       type="tel"
-                      placeholder="Phone number (optional)"
+                      placeholder="Telefono (facoltativo)"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                     />
@@ -246,22 +246,22 @@ export function ContactPage() {
                 {step.key === "review" && (
                   <div className="contact-page__recap">
                     <button type="button" className="contact-page__recap-row" onClick={() => setStepIndex(0)}>
-                      <span className="contact-page__recap-label">Name &amp; contact</span>
+                      <span className="contact-page__recap-label">Nome e contatti</span>
                       <span className="contact-page__recap-value">
                         {name} · {email}
                         {phone.trim() !== "" && ` · ${phone.trim()}`}
                       </span>
-                      <span className="contact-page__recap-edit">Edit</span>
+                      <span className="contact-page__recap-edit">Modifica</span>
                     </button>
                     <button type="button" className="contact-page__recap-row" onClick={() => setStepIndex(1)}>
-                      <span className="contact-page__recap-label">Project type</span>
+                      <span className="contact-page__recap-label">Tipo di progetto</span>
                       <span className="contact-page__recap-value">{projectTypes.join(", ")}</span>
-                      <span className="contact-page__recap-edit">Edit</span>
+                      <span className="contact-page__recap-edit">Modifica</span>
                     </button>
                     <button type="button" className="contact-page__recap-row" onClick={() => setStepIndex(2)}>
-                      <span className="contact-page__recap-label">Timeline</span>
+                      <span className="contact-page__recap-label">Tempi</span>
                       <span className="contact-page__recap-value">{timeline}</span>
-                      <span className="contact-page__recap-edit">Edit</span>
+                      <span className="contact-page__recap-edit">Modifica</span>
                     </button>
                     {/* Required, unchecked by default — GDPR consent for the
                        name/email/project details submitted above. Gates the
@@ -278,23 +278,23 @@ export function ContactPage() {
                         <Check size={12} strokeWidth={3} />
                       </span>
                       <span>
-                        I've read and accept the{" "}
+                        Ho letto e accetto{" "}
                         <Link to="/privacy" target="_blank" rel="noopener noreferrer">
-                          Privacy Policy
+                          l’informativa sulla privacy
                         </Link>
                         .
                       </span>
                     </label>
                     {sendError && (
                       <p className="contact-page__send-error">
-                        Something went wrong sending that — please try again.
+                        Qualcosa è andato storto nell’invio. Riprova.
                       </p>
                     )}
                   </div>
                 )}
 
                 <InteractiveHoverButton
-                  text={sending ? "Sending…" : isLastStep ? "Send it our way" : "Next"}
+                  text={sending ? "Invio in corso…" : isLastStep ? "Inviaci la richiesta" : "Avanti"}
                   icon={<ArrowRight size={16} />}
                   onClick={handleNext}
                   className={`contact-page__next ${canAdvance && !sending ? "" : "contact-page__next--disabled"}`}
