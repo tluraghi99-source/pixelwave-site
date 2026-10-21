@@ -3,6 +3,7 @@ import { motion, useTransform } from "framer-motion"
 import { PixelResolveGrid } from "@/components/motion/PixelResolveGrid"
 import { BrandLogo } from "@/components/pw/Logo"
 import { useLoadProgress } from "@/components/hooks/use-load-progress"
+import { usePreloadHomeAssets } from "@/hooks/usePreloadHomeAssets"
 
 const SEEN_KEY = "pw-intro-seen"
 
@@ -25,6 +26,8 @@ export function Preloader({ onReveal }: PreloaderProps) {
   const [hidden, setHidden] = useState(false)
 
   function handleReveal() {
+    // Timing mark, readable from devtools: performance.getEntriesByName("pw:intro-reveal")
+    performance.mark("pw:intro-reveal")
     onReveal()
     try {
       sessionStorage.setItem(SEEN_KEY, "1")
@@ -34,7 +37,16 @@ export function Preloader({ onReveal }: PreloaderProps) {
     setHidden(true)
   }
 
-  const { progress, displayPercent } = useLoadProgress({ onReveal: handleReveal, enabled: !alreadySeen })
+  // The site only opens once the project cover images the home page shows
+  // and the scroll-scrub video are in the cache too (capped, so a slow
+  // connection can't hold it shut).
+  const assetsReady = usePreloadHomeAssets(!alreadySeen)
+  const { progress, displayPercent } = useLoadProgress({
+    onReveal: handleReveal,
+    enabled: !alreadySeen,
+    extraReady: assetsReady,
+    maxWaitMs: 10000,
+  })
 
   // The grid's own tiles provide full opaque coverage at the start (each one
   // still solid black), so the container itself only needs its own black

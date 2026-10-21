@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useMotionValue, useSpring } from "framer-motion"
 import type { MotionValue } from "framer-motion"
 
@@ -11,8 +11,12 @@ interface UseLoadProgressOptions {
   enabled?: boolean
   /** Preloader must stay visible at least this long, even if fonts resolve instantly (e.g. already cached). @default 900 */
   minDurationMs?: number
-  /** Force-complete if fonts.ready hasn't resolved by then — must never hang. @default 3500 */
+  /** Force-complete if fonts (and any `extraReady` condition) haven't resolved by then — must never hang. @default 3500 */
   maxWaitMs?: number
+  /** A second condition to wait for besides the webfonts — e.g. the images
+   *  the first screen needs. Flip it to true when ready; maxWaitMs still
+   *  caps the wait. @default true */
+  extraReady?: boolean
   /** Extra delay after the spring's own value (not just its target) reaches ~100, so the last tiles' own transition actually finishes before handoff. @default 400 */
   settleMs?: number
 }
@@ -35,6 +39,7 @@ export function useLoadProgress({
   enabled = true,
   minDurationMs = 900,
   maxWaitMs = 3500,
+  extraReady = true,
   settleMs = 400,
 }: UseLoadProgressOptions): UseLoadProgressResult {
   const rawTarget = useMotionValue(0)
@@ -43,6 +48,15 @@ export function useLoadProgress({
   )
   const spring = useSpring(rawTarget, reducedMotion ? { stiffness: 1000, damping: 100 } : { stiffness: 60, damping: 20 })
   const [displayPercent, setDisplayPercent] = useState(0)
+  // Fonts and the caller's own condition both have to hold before finishing;
+  // refs so the one long-lived effect below can see the latest values.
+  const fontsReadyRef = useRef(false)
+  const extraReadyRef = useRef(extraReady)
+  const tryFinishRef = useRef<() => void>(() => {})
+  extraReadyRef.current = extraReady
+  useEffect(() => {
+    if (extraReady) tryFinishRef.current()
+  }, [extraReady])
 
   useEffect(() => {
     const unsub = spring.on("change", (v) => setDisplayPercent(Math.round(Math.min(100, v))))
@@ -95,11 +109,18 @@ export function useLoadProgress({
 
     const maxWaitTimer = setTimeout(finish, maxWaitMs)
 
+    tryFinishRef.current = () => {
+      if (fontsReadyRef.current && extraReadyRef.current) finish()
+    }
     const fontSet = typeof document !== "undefined" ? document.fonts : undefined
     if (fontSet?.ready) {
-      fontSet.ready.then(finish)
+      fontSet.ready.then(() => {
+        fontsReadyRef.current = true
+        tryFinishRef.current()
+      })
     } else {
-      finish()
+      fontsReadyRef.current = true
+      tryFinishRef.current()
     }
 
     return () => {

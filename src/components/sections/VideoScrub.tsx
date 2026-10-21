@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useMotionValueEvent } from "framer-motion"
 import type { MotionValue } from "framer-motion"
+import { HERO_VIDEO_SRC } from "@/lib/motion"
 
 /** Scrubs /video/hero.mp4's playhead to match an externally-driven 0..1 progress value. */
 export function VideoScrubbed({ progress }: { progress: MotionValue<number> }) {
@@ -44,7 +45,7 @@ export function VideoScrubbed({ progress }: { progress: MotionValue<number> }) {
       <video
         ref={videoRef}
         className="video-scrub__video"
-        src="/video/hero.mp4"
+        src={HERO_VIDEO_SRC}
         muted
         playsInline
         preload="auto"

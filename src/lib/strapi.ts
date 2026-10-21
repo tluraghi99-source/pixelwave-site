@@ -38,6 +38,10 @@ export interface StrapiMedia {
   /** Resized copies, narrowest first. Empty for videos, SVGs and anything
    *  Strapi didn't resize — those just use `url`. */
   formats: MediaFormat[]
+  /** The original file's size, when Strapi reports it — lets mediaUrl use a
+   *  modest original instead of an upscaled smaller copy. */
+  width?: number
+  sizeKb?: number
 }
 
 export interface ProjectTag {
@@ -96,15 +100,33 @@ export function strapiMediaUrl(url: string): string {
   return url.startsWith("http") ? url : `${STRAPI_URL}${url}`
 }
 
-/** The lightest copy that still covers `targetWidth` CSS pixels (pick a bit
- *  above the rendered size to stay sharp on high-density screens): the
- *  narrowest resized format at least that wide, else the widest one there
- *  is, else the original (videos, SVGs, anything Strapi didn't resize).
- *  Serving originals straight from the CMS was the biggest performance
+/** An original at most this wide and this heavy is fine to serve as is. */
+const MAX_ORIGINAL_WIDTH = 2400
+const MAX_ORIGINAL_KB = 500
+
+/** The lightest copy that still covers `targetWidth` CSS pixels at this
+ *  screen's pixel density (capped at 2×): the narrowest resized format at
+ *  least that wide; failing that, a modest original (<= 2400px, <= 500KB)
+ *  when it is bigger than every resized copy; else the widest copy there is;
+ *  else the original (videos, SVGs, anything Strapi didn't resize).
+ *  Serving big originals straight from the CMS was the biggest performance
  *  cost on the Work, Studio and project pages — several MB per photo. */
 export function mediaUrl(media: StrapiMedia, targetWidth: number): string {
-  const format = media.formats.find((f) => f.width >= targetWidth) ?? media.formats[media.formats.length - 1]
-  return format ? format.url : media.url
+  const density = typeof window === "undefined" ? 1 : Math.min(window.devicePixelRatio || 1, 2)
+  const needed = targetWidth * density
+  const widest = media.formats[media.formats.length - 1]
+  const format = media.formats.find((f) => f.width >= needed)
+  if (format) return format.url
+  if (
+    widest &&
+    media.width !== undefined &&
+    media.width > widest.width &&
+    media.width <= MAX_ORIGINAL_WIDTH &&
+    (media.sizeKb ?? Infinity) <= MAX_ORIGINAL_KB
+  ) {
+    return media.url
+  }
+  return widest ? widest.url : media.url
 }
 
 /** Card/grid/carousel thumbnails render well under this many CSS pixels. */
@@ -117,6 +139,8 @@ interface StrapiTagRaw {
 interface StrapiMediaRaw {
   url: string
   mime: string
+  width?: number | null
+  size?: number | null
   formats?: Record<string, { url: string; width: number }> | null
 }
 
@@ -124,7 +148,13 @@ function mapMedia(raw: StrapiMediaRaw): StrapiMedia {
   const formats = Object.values(raw.formats ?? {})
     .map((f) => ({ url: strapiMediaUrl(f.url), width: f.width }))
     .sort((a, b) => a.width - b.width)
-  return { url: strapiMediaUrl(raw.url), mime: raw.mime, formats }
+  return {
+    url: strapiMediaUrl(raw.url),
+    mime: raw.mime,
+    formats,
+    width: raw.width ?? undefined,
+    sizeKb: raw.size ?? undefined,
+  }
 }
 interface StrapiProjectRaw {
   documentId: string

@@ -31,3 +31,7 @@ export function wrap(min: number, max: number, v: number) {
   const range = max - min
   return ((((v - min) % range) + range) % range) + min
 }
+
+/** The scroll-scrubbed reel video (VideoScrub.tsx), also warmed into the
+ *  browser cache by the intro so it is ready the moment the site opens. */
+export const HERO_VIDEO_SRC = "/video/hero.mp4"
