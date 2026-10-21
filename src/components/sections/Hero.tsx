@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion"
+import { Link } from "react-router-dom"
+import { ArrowUpRight } from "lucide-react"
 import logoWordmark from "@/assets/logo-wordmark.svg"
 import { EASE_WAVE, HERO_CROSSFADE_RATIO, HERO_REVEAL_END, HERO_REVEAL_START } from "@/lib/motion"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { CursorHint } from "@/components/motion/CursorHint"
+import { ROUTES } from "@/lib/routes"
 
 interface HeroProps {
   introDone: boolean
@@ -82,6 +85,11 @@ export function Hero({ introDone }: HeroProps) {
   const reducedMotion = useReducedMotion()
   const arrowOpacity = useTransform(scrollY, [0, vh * 0.1], [1, 0])
 
+  // The CTA box under the menu button leaves a little later than the arrow,
+  // and stops catching clicks once it is mostly gone.
+  const ctaOpacity = useTransform(scrollY, [0, vh * 0.15], [1, 0])
+  const ctaPointer = useTransform(scrollY, (y) => (y > vh * 0.12 ? "none" : "auto"))
+
   return (
     <section className="hero" data-screen-label="Hero">
       <CursorGlow className="cursor-glow" variant="light" glow ambient />
@@ -115,6 +123,24 @@ export function Hero({ introDone }: HeroProps) {
           style={{ scale: bigScale, opacity: bigOpacity, x: bigX, y: bigY }}
         />
       </motion.div>
+
+      {introDone && (
+        <motion.div className="hero__cta-wrap" style={{ opacity: ctaOpacity, pointerEvents: ctaPointer }}>
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: EASE_WAVE, delay: 0.3 }}
+          >
+            <Link to={ROUTES.contact} className="hero__cta">
+              <span className="hero__cta-label">Hai una wave in mente?</span>
+              <span className="hero__cta-main">
+                Let’s chat
+                <ArrowUpRight size={20} aria-hidden="true" />
+              </span>
+            </Link>
+          </motion.div>
+        </motion.div>
+      )}
 
       {introDone && (
         <motion.div className="hero__scroll-arrow" style={{ opacity: arrowOpacity }} aria-hidden="true">

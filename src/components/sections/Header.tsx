@@ -2,7 +2,6 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion"
 import { Link, useLocation } from "react-router-dom"
 import { Menu, X } from "lucide-react"
-import { useScreenSize } from "@/components/hooks/use-screen-size"
 import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
 import { BrandLogo } from "@/components/pw/Logo"
 import { PixelTrail } from "@/components/ui/pixel-trail"
@@ -63,17 +62,6 @@ export function Header() {
   // clears regardless of whether the panel's own exit ever reports done.
   const [mobileBarOrange, setMobileBarOrange] = useState(false)
   const mobileBarTimeoutRef = useRef<number>(undefined)
-  const themeColorDefaultRef = useRef<string | null>(null)
-  // mobileBarOrange flips true whenever `open` does, on every viewport —
-  // its own CSS effect (the orange bar) only actually shows under 768px,
-  // gated by a media query there instead of here. The logo-hiding effect
-  // below needs the same "narrow enough for the full-screen mobile panel"
-  // check explicitly, since aria-hidden/tabIndex have no CSS-media-query
-  // equivalent — without this the logo would go aria-hidden and keyboard-
-  // unreachable on desktop too, despite staying visibly on screen there
-  // (the desktop nav is a small dropdown, not a takeover panel covering it).
-  const screenSize = useScreenSize()
-  const hideLogo = mobileBarOrange && screenSize.lessThan("md")
   const lastY = useRef(0)
   const headerRef = useRef<HTMLElement>(null)
   const scrollLockedRef = useRef(false)
@@ -130,37 +118,12 @@ export function Header() {
         // works around (see above) can also leave the page's scroll lock on;
         // releaseScrollLock() is a no-op if onExitComplete already handled it.
         releaseScrollLock()
-        // Confirmed live on a real iPhone: iOS Safari only repaints the
-        // status-bar/Dynamic-Island tint over the safe area on an actual
-        // scroll event — the theme-color change above and the header's own
-        // background change do NOT trigger it, so that strip stayed orange
-        // indefinitely without this. A 1px nudge and back forces the repaint
-        // with no visible movement.
-        const y = window.scrollY
-        window.scrollTo(0, y + 1)
-        window.scrollTo(0, y)
       }, MOBILE_NAV_EXIT_S * 1000)
     }
     return () => {
       if (mobileBarTimeoutRef.current) window.clearTimeout(mobileBarTimeoutRef.current)
     }
   }, [open])
-
-  // A screen recording on a real iPhone showed the header's own background
-  // reverting correctly (confirmed via the DOM/CSS above), but iOS Safari's
-  // status-bar/Dynamic Island tint itself stayed orange indefinitely after
-  // that — it only seems to re-sample the page's content color on certain
-  // triggers (e.g. a scroll), not on an ordinary class/background change.
-  // Updating the theme-color meta tag directly gives it an explicit,
-  // immediate signal instead of relying on that sampling.
-  useEffect(() => {
-    const meta = document.querySelector('meta[name="theme-color"]')
-    if (!meta) return
-    if (themeColorDefaultRef.current === null) {
-      themeColorDefaultRef.current = meta.getAttribute("content") ?? "#000000"
-    }
-    meta.setAttribute("content", mobileBarOrange ? "#FF5B00" : themeColorDefaultRef.current)
-  }, [mobileBarOrange])
 
   // Both menus are fixed overlays now (desktop's dropdown panel, mobile's
   // full-screen takeover), so page scroll is locked behind either one.
@@ -269,16 +232,8 @@ export function Header() {
       <div className="wrap nav__inner">
         <a
           href={isHome ? "#top" : "/"}
-          // Hidden while the full-screen mobile menu is open — tied to
-          // mobileBarOrange (via hideLogo) rather than the raw `open` boolean
-          // so it stays hidden through the panel's own close animation too,
-          // matching how long the bar itself stays solid orange (see
-          // mobileBarOrange's own comment above), instead of popping back in
-          // while the bar is still mid-retract.
-          className={`nav__logo${hideLogo ? " nav__logo--hidden" : ""}`}
+          className="nav__logo"
           aria-label="PixelWave, vai alla home"
-          aria-hidden={hideLogo}
-          tabIndex={hideLogo ? -1 : undefined}
           // Native hash-anchor scrolling landed short of the true top when
           // clicked from partway down the page — WorkReel's pinned section
           // (.reel__inner, position: sticky over an 850vh-tall .reel) sits
