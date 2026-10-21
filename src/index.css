@@ -720,7 +720,9 @@ header.nav .nav__mobile .nav__link {
 }
 .hero__cta {
   display: flex; flex-direction: column; justify-content: space-between;
-  width: clamp(12rem, 12vw, 14rem); aspect-ratio: 2.1 / 1;
+  /* Three times the menu button's width (84px = 5.25rem at rest), same height
+     as before (5.6rem). */
+  width: 15.75rem; height: 5.6rem;
   padding: 0.85rem 1rem;
   background: var(--pw-black); color: var(--pw-white); text-decoration: none;
   transition: background var(--dur-base) var(--ease-wave), color var(--dur-base) var(--ease-wave);

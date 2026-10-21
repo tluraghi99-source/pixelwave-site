@@ -197,7 +197,7 @@ export function WorkPage() {
           <div className="wrap">
             <div className="work-page__head">
               <Reveal delay={0.1}>
-                <p className="lead">Tutti i progetti.</p>
+                <p className="lead">Progetti.</p>
               </Reveal>
               <Reveal delay={0.15} className="work-page__filter-block">
                 <div className="work-page__mode-toggle" role="tablist">
