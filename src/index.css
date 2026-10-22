@@ -541,7 +541,9 @@ header.nav {
   background: transparent; border: none;
   padding-right: var(--scroll-comp);
 }
-.nav__inner { display: flex; align-items: center; justify-content: space-between; height: 76px; }
+/* Above the mobile menu panel (z-index 1), which now also covers the bar's
+   own area, so the logo and the menu/close button stay visible and clickable. */
+.nav__inner { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; height: 76px; }
 /* Faded out (not display: none, which would collapse the flex layout and
    shove the menu button over) while the full-screen mobile menu is open —
    Header.tsx's hideLogo already only adds this class under 768px, so no
@@ -567,27 +569,40 @@ header.nav {
 header.nav[data-theme="light"] .nav__link {
   color: rgba(0,0,0,0.85); text-shadow: 0 1px 10px rgba(255,255,255,0.6);
 }
-/* Mobile menu — an orange rectangle opening under the menu button: it starts
-   at the bottom of the 76px top bar and runs to the bottom of the screen,
-   inset from the left, right and bottom edges by the same margin as the
-   menu button's own right edge (and the desktop dropdown panel). The top bar
-   itself stays as it is, so the logo and the close button remain reachable.
+/* Mobile menu — an orange takeover reaching the full viewport height
+   (76px top bar + this panel together), not a small dropdown, hugging the
+   top bar so the logo/close button stay reachable above it.
    display starts at none and only flips to flex under the max-width query
    below — Tailwind's md:hidden utility has the same specificity as a plain
    class selector, so leaving display unconditional here would tie with it
    and could win the cascade on desktop too (same trap .nav__panel's own
    comment already warns about).
-   The bottom edge adds env(safe-area-inset-bottom) so the rectangle clears
-   the iOS home indicator instead of sitting under it. */
+   bottom: 0 (not height: calc(100svh - 76px), tried first) — on iOS
+   Safari, an explicit svh-based height stopped short of the true screen
+   edge whenever the browser's own floating bottom toolbar was showing,
+   leaving a strip of the page's plain white background (and a matching
+   white toolbar tint) below the panel instead of the orange bleeding
+   under it like the rest of the site does. Anchoring with bottom: 0
+   instead lets the fixed element's box reach the actual bottom of the
+   screen the way the browser chrome itself does, so the color extends
+   underneath it. */
+/* One single orange piece from the very top of the screen: the top bar itself
+   stays transparent (it used to turn orange next to this panel, and on a real
+   phone that separate bar could stay orange after the menu closed). The 76px
+   bar height is added to the top padding so the links sit where they did. */
 .nav__mobile {
-  --nav-mobile-inset: clamp(1rem, 1.2vw, 1.25rem);
-  position: fixed; top: 76px;
-  left: var(--nav-mobile-inset); right: var(--nav-mobile-inset);
-  bottom: calc(var(--nav-mobile-inset) + env(safe-area-inset-bottom, 0px));
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;
   background: var(--pw-orange);
   flex-direction: column; justify-content: center;
   gap: clamp(2rem, 8vw, 3rem);
   padding: clamp(1.5rem, 5vw, 2.5rem);
+  padding-top: calc(76px + clamp(1.5rem, 5vw, 2.5rem));
+  /* Now that the panel's box extends under the home-indicator safe area
+     (see bottom: 0 above), pad past it explicitly — otherwise the last
+     link (e.g. "LinkedIn") can end up sitting behind the gesture bar on
+     a tall link list. max() keeps the original padding on devices/browsers
+     without a safe area at all. */
+  padding-bottom: max(clamp(1.5rem, 5vw, 2.5rem), env(safe-area-inset-bottom));
   overflow-y: auto;
   display: none;
 }
