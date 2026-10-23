@@ -4,15 +4,6 @@ import { CursorGlow } from "@/components/motion/CursorGlow"
 import { Footer } from "@/components/sections/Footer"
 import { ROUTES } from "@/lib/routes"
 
-/** Wraps a placeholder value that needs a real business decision before
- *  this page goes live — a legal name, an address, a retention period,
- *  none of which this codebase has any way to know on its own. Rendered
- *  with a visible marker (index.css) so it can’t accidentally ship
- *  unnoticed, on top of being called out again in prose here. */
-function TODO({ children }: { children: string }) {
-  return <mark className="legal-page__todo">{children}</mark>
-}
-
 /** GDPR-driven — see the Contact and Careers forms' consent checkbox,
  *  which links here. This is a first draft built from what the codebase
  *  actually does (the real form fields, the real processors it calls), not
@@ -34,14 +25,7 @@ export function PrivacyPolicyPage() {
           <p className="legal-page__eyebrow">Note legali</p>
           <h1 className="legal-page__title">Informativa sulla privacy</h1>
           <p className="legal-page__updated">
-            Ultimo aggiornamento: <TODO>inserire la data quando la bozza sarà definitiva</TODO>
-          </p>
-
-          <p className="legal-page__notice">
-            <strong>Questa pagina è una bozza, non un’informativa pubblicata.</strong> Ogni nota
-            evidenziata qui sotto è un segnaposto che richiede una risposta reale — alcune richiedono
-            la verifica di un legale — prima che il testo venga considerato corretto o presentato
-            come definitivo.
+            Ultimo aggiornamento: 23 ottobre 2026
           </p>
 
           <h2>1. Chi siamo</h2>
@@ -54,10 +38,9 @@ export function PrivacyPolicyPage() {
             qui sotto.
           </p>
           <p>
-            <TODO>
-              Ragione sociale, sede legale e partita IVA o codice fiscale: servono per identificare
-              correttamente il titolare del trattamento.
-            </TODO>
+            Titolare del trattamento: <strong>PIXEL WAVE S.r.l.</strong>, sede legale in Via Pietro
+            Tamburini 6, sede operativa in Via G. Mussi 15, 20154 Milano, partita IVA 12315400965,
+            PEC <a href="mailto:pixelwave@legalmail.it">pixelwave@legalmail.it</a>.
           </p>
 
           <h2>2. Quali dati raccogliamo</h2>
@@ -77,7 +60,7 @@ export function PrivacyPolicyPage() {
           <p>
             I cookie di statistica e di pubblicità (Google Analytics, Google Ads, pixel di Meta)
             vengono usati solo se li accetti nel banner dei cookie; finché non lo fai, a quei servizi
-            non viene richiesto nulla. Leggi l'<Link to="/cookies">informativa sui cookie</Link> per i
+            non viene richiesto nulla. Leggi l'<Link to={ROUTES.cookies}>informativa sui cookie</Link> per i
             dettagli e per cambiare la tua scelta.
           </p>
 
@@ -96,18 +79,17 @@ export function PrivacyPolicyPage() {
             appena ci sono stati inviati per email; restano solo nella nostra casella di posta.
           </p>
           <p>
-            <TODO>
-              Periodo di conservazione — per esempio "12 mesi dall’ultimo contatto con te, salvo
-              l’avvio di un rapporto di lavoro" — serve una decisione reale.
-            </TODO>
+            Gli altri dati inviati tramite i moduli (contatti e candidature) li conserviamo per 12
+            mesi dall’ultimo contatto con te, salvo l’avvio di un rapporto di lavoro o di
+            collaborazione; trascorso questo periodo vengono eliminati.
           </p>
 
           <h2>5. Chi tratta i dati</h2>
           <p>I tuoi dati sono gestiti, per nostro conto, da questi servizi:</p>
           <ul>
             <li>
-              <strong>Strapi CMS</strong>, dove sono salvate le richieste inviate dai moduli —{" "}
-              <TODO>fornitore di hosting e ubicazione del server (UE o no)</TODO>.
+              <strong>Strapi CMS</strong>, dove sono salvate le richieste inviate dai moduli,
+              ospitato su server di Server Plan S.r.l. in Italia.
             </li>
             <li>
               <strong>Google Workspace / Gmail</strong>, usato per inviarci una notifica via email
@@ -119,13 +101,6 @@ export function PrivacyPolicyPage() {
               corrispondenti.
             </li>
           </ul>
-          <p>
-            <TODO>
-              Confermare se esistono accordi sul trattamento dei dati (DPA) con ciascuno dei servizi
-              sopra e indicare qui se qualcuno trasferisce dati fuori dall’Unione europea (Google e
-              Meta potrebbero).
-            </TODO>
-          </p>
 
           <h2>6. I tuoi diritti</h2>
           <p>Ai sensi del GDPR hai il diritto di:</p>
@@ -145,7 +120,7 @@ export function PrivacyPolicyPage() {
           </ul>
           <p>
             Per esercitare questi diritti scrivici a{" "}
-            <TODO>indirizzo email reale per le richieste sulla privacy</TODO>.
+            <a href="mailto:info@pixelwave.it">info@pixelwave.it</a>.
           </p>
 
           <h2>7. Modifiche a questa informativa</h2>
