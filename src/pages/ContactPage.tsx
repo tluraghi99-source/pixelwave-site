@@ -142,17 +142,13 @@ export function ContactPage() {
           </div>
           {/* First step only, every width (mobile reflows above the reactive
              text instead of hiding — see index.css) — quick-access info for
-             anyone who'd rather not fill out the form. Real mailto:/tel: links,
-             so tap-to-call/email works. The phone number is a temporary one
-             until the studio's own line is confirmed — change both the href
-             and the label together. */}
+             anyone who'd rather not fill out the form. Real mailto: link. The
+             phone number is removed until the studio's own line is confirmed
+             — when it is, add a tel: link back here (href and label together). */}
           {!sent && step.key === "detail" && (
             <div className="contact-page__quick-contact">
               <a className="contact-page__quick-contact-link" href="mailto:info@pixelwave.it">
                 info@pixelwave.it
-              </a>
-              <a className="contact-page__quick-contact-link" href="tel:+393391789739">
-                +39 339 178 9739
               </a>
             </div>
           )}
