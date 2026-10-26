@@ -16,7 +16,7 @@ import { writeFile } from "node:fs/promises"
 const SITE_URL = process.env.SITE_URL ?? "https://pixelwave.it"
 const STRAPI_URL = process.env.STRAPI_URL ?? "http://localhost:1337"
 
-const STATIC_ROUTES = ["/", "/lavori", "/studio", "/contatti"]
+const STATIC_ROUTES = ["/", "/lavori", "/studio", "/contatti", "/lavora-con-noi"]
 
 /** Mirrors src/lib/strapi.ts's own fetchProjects: resolves to `[]` on any
  *  network/parse failure rather than throwing, so an unreachable Strapi at

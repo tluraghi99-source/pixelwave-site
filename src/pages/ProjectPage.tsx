@@ -7,6 +7,7 @@ import { CursorGlow } from "@/components/motion/CursorGlow"
 import { Footer } from "@/components/sections/Footer"
 import { useProjectsStatus } from "@/hooks/useProjects"
 import { usePageMeta } from "@/hooks/usePageMeta"
+import { useNoIndex } from "@/hooks/useNoIndex"
 import { useVideoFrames } from "@/hooks/useVideoFrames"
 import { mediaUrl, projectThumbUrl, type Project } from "@/lib/strapi"
 import { ROUTES, projectPath } from "@/lib/routes"
@@ -307,6 +308,7 @@ export function ProjectPage() {
   // never changes across renders — falls back to the site-wide title/desc
   // while `projects` is still loading or the slug genuinely doesn't match.
   usePageMeta(project ? `${project.title} — PixelWave` : "PixelWave — Your Vision, Our Wave", project?.desc)
+  useNoIndex(loaded && !project)
 
   // No uploaded gallery + a self-hosted video hero: fill the carousel with
   // stills grabbed from that video. Extraction takes a while (it has to

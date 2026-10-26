@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react"
 import { usePageMeta } from "@/hooks/usePageMeta"
+import { useNoIndex } from "@/hooks/useNoIndex"
 import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Button } from "@/components/pw/Button"
 import { Reveal } from "@/components/motion/Reveal"
@@ -16,6 +17,7 @@ import { ROUTES } from "@/lib/routes"
  *  saying the page is missing. */
 export function NotFoundPage() {
   usePageMeta("Pagina non trovata — PixelWave", "Questa pagina è stata spazzata via. Ti riportiamo a riva.")
+  useNoIndex()
 
   return (
     <>
