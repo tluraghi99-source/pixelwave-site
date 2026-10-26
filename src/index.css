@@ -723,17 +723,17 @@ header.nav .nav__mobile .nav__link {
   color: var(--pw-orange);
 }
 .hero__scroll-arrow-icon { display: block; line-height: 0; }
-/* CTA box in the hero's top-right corner, right under the menu button. Its
+/* CTA box in the top-right corner (home hero, Progetti pages), right under the menu button. Its
    top-right corner is exactly the top-right corner of the open menu panel
    (.nav__panel: top 76px — the header bar's height — and the same right
    inset), so it sits flush behind the panel when that opens, with no edge
    peeking out. It starts at the bottom of the header bar so the transparent
    header never sits over it and swallows clicks. */
-.hero__cta-wrap {
+.corner-cta-wrap {
   position: absolute; z-index: 3;
   top: 76px; right: calc(clamp(1rem, 1.2vw, 1.25rem) + var(--scroll-comp, 0px));
 }
-.hero__cta {
+.corner-cta {
   display: flex; flex-direction: column; justify-content: space-between;
   /* Three times the menu button's width (84px = 5.25rem at rest), same height
      as before (5.6rem). */
@@ -742,16 +742,19 @@ header.nav .nav__mobile .nav__link {
   background: var(--pw-black); color: var(--pw-white); text-decoration: none;
   transition: background var(--dur-base) var(--ease-wave), color var(--dur-base) var(--ease-wave);
 }
-.hero__cta-label { font-size: clamp(0.82rem, 1vw, 0.95rem); line-height: 1.3; color: rgba(255, 255, 255, 0.86); transition: color var(--dur-base) var(--ease-wave); }
-.hero__cta-main {
+.corner-cta__label { font-size: clamp(0.82rem, 1vw, 0.95rem); line-height: 1.3; color: rgba(255, 255, 255, 0.86); transition: color var(--dur-base) var(--ease-wave); }
+.corner-cta__main {
   display: flex; align-items: flex-end; justify-content: space-between;
   font-family: var(--font-display); font-weight: 600;
   font-size: clamp(1.15rem, 1.5vw, 1.6rem); letter-spacing: -0.02em; line-height: 1;
 }
 @media (hover: hover) {
-  .hero__cta:hover { background: var(--pw-orange); color: var(--pw-black); }
-  .hero__cta:hover .hero__cta-label { color: rgba(0, 0, 0, 0.8); }
+  .corner-cta:hover { background: var(--pw-orange); color: var(--pw-black); }
+  .corner-cta:hover .corner-cta__label { color: rgba(0, 0, 0, 0.8); }
 }
+/* On the black project page the black box would vanish: invert it. */
+.project-page .corner-cta { background: var(--pw-white); color: var(--pw-black); }
+.project-page .corner-cta .corner-cta__label { color: rgba(0, 0, 0, 0.7); }
 .hero__bigmark {
   position: absolute; z-index: 2;
   /* Matches .wrap's own left margin so this bleeds in from the same edge
@@ -1182,7 +1185,7 @@ header.nav .nav__mobile .nav__link {
 /* min-height: while the project is still loading the page is an empty shell —
    a full screen of it keeps the footer below the fold so it doesn't jump
    when the content arrives. */
-.project-page { padding-top: 50svh; min-height: 100svh; background: var(--pw-black); color: var(--pw-white); }
+.project-page { position: relative; padding-top: 50svh; min-height: 100svh; background: var(--pw-black); color: var(--pw-white); }
 .project-page__hero-glow { position: relative; isolation: isolate; }
 /* .project-page's own padding-top (above) is what creates the 50svh gap
    before this element's box even starts — sized to just this element's

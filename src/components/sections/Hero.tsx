@@ -125,15 +125,15 @@ export function Hero({ introDone }: HeroProps) {
       </motion.div>
 
       {introDone && (
-        <motion.div className="hero__cta-wrap" style={{ opacity: ctaOpacity, pointerEvents: ctaPointer }}>
+        <motion.div className="corner-cta-wrap" style={{ opacity: ctaOpacity, pointerEvents: ctaPointer }}>
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: EASE_WAVE, delay: 0.3 }}
           >
-            <Link to={ROUTES.contact} className="hero__cta">
-              <span className="hero__cta-label">Hai una wave in mente?</span>
-              <span className="hero__cta-main">
+            <Link to={ROUTES.contact} className="corner-cta">
+              <span className="corner-cta__label">Hai una wave in mente?</span>
+              <span className="corner-cta__main">
                 Let’s chat
                 <ArrowUpRight size={20} aria-hidden="true" />
               </span>

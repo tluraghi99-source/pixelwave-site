@@ -9,6 +9,8 @@ function locationOf(el: Element): string {
   if (el.closest(".reel")) return "carosello"
   if (el.closest("footer")) return "footer"
   if (el.closest(".contact-page")) return "pagina_contatti"
+  if (el.closest(".work-page")) return "pagina_progetti"
+  if (el.closest(".project-page")) return "pagina_progetto"
   return "altro"
 }
 

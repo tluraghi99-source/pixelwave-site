@@ -7,6 +7,7 @@ import { Card } from "@/components/pw/Card"
 import { Tag } from "@/components/pw/Tag"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { Footer } from "@/components/sections/Footer"
+import { CornerCta } from "@/components/sections/CornerCta"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { EASE_WAVE } from "@/lib/motion"
 import { useProjects } from "@/hooks/useProjects"
@@ -197,6 +198,7 @@ export function WorkPage() {
         <section className="sec work-page" data-screen-label="All Work">
           <div className="work-hero" data-screen-label="Work Hero" />
           <CursorGlow className="cursor-glow" variant="light" glow />
+          <CornerCta />
           <div className="wrap">
             <div className="work-page__head">
               <Reveal delay={0.1}>
