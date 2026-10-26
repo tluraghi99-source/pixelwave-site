@@ -11,6 +11,7 @@ import { EASE_WAVE } from "@/lib/motion"
 import { usePageMeta } from "@/hooks/usePageMeta"
 import { SERVICES } from "@/data/services"
 import { submitContact } from "@/lib/strapi"
+import { trackEvent } from "@/lib/consent"
 
 const STEPS = [
   { key: "detail", label: "Dati" },
@@ -68,10 +69,21 @@ export function ContactPage() {
       setSendError(false)
       const ok = await submitContact({ name, email, phone: phone.trim(), projectTypes, timeline })
       setSending(false)
-      if (ok) setSent(true)
-      else setSendError(true)
+      if (ok) {
+        setSent(true)
+        // The conversion: no personal data, only what kind of project and when.
+        trackEvent("generate_lead", {
+          form_name: "contatti",
+          project_types: projectTypes.join(", ").slice(0, 100),
+          timeline: timeline ?? "",
+        })
+      } else {
+        setSendError(true)
+        trackEvent("form_error", { form_name: "contatti" })
+      }
       return
     }
+    trackEvent("form_step", { form_name: "contatti", step_name: step.key })
     setStepIndex((i) => i + 1)
   }
 

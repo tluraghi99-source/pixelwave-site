@@ -62,6 +62,19 @@ function gtag(...args: unknown[]): void {
   window.dataLayer.push(arguments)
 }
 
+/** Pushes a named event to the dataLayer for Tag Manager (a Custom Event
+ *  trigger forwards the known ones to GA4) — but only once Tag Manager has
+ *  actually loaded, which only happens after the visitor accepted statistics
+ *  or marketing; and only if statistics are allowed. So nothing is ever queued
+ *  or sent for a visitor who hasn't agreed. Never pass personal data (names,
+ *  emails, phone numbers) in `params`. */
+export function trackEvent(name: string, params: Record<string, string | number | boolean> = {}): void {
+  if (!gtmLoaded) return
+  if (!readConsent()?.statistics) return
+  window.dataLayer = window.dataLayer || []
+  window.dataLayer.push({ event: name, ...params })
+}
+
 function consentState(choices: ConsentChoices) {
   const grant = (on: boolean) => (on ? "granted" : "denied")
   return {

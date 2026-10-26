@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react"
+import { lazy, Suspense, useEffect } from "react"
 import { Navigate, Route, Routes, useLocation, useParams } from "react-router-dom"
 import { ScrollProgress } from "@/components/ScrollProgress"
 import { ScrollToTop } from "@/components/ScrollToTop"
@@ -7,6 +7,7 @@ import { CustomCursor } from "@/components/motion/CustomCursor"
 import { Header } from "@/components/sections/Header"
 import { HomePage } from "@/pages/HomePage"
 import { ROUTES, projectPath } from "@/lib/routes"
+import { initClickTracking } from "@/lib/analytics"
 
 // Route-level code splitting: each of these ships as its own chunk, fetched
 // on first visit, instead of all five pages' code (and everything they
@@ -44,6 +45,9 @@ function RedirectProject() {
 }
 
 function App() {
+  // Contact-CTA, phone and email click events (sent only after consent).
+  useEffect(() => initClickTracking(), [])
+
   return (
     <>
       <ScrollToTop />

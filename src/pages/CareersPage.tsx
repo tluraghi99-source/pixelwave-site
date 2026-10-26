@@ -9,6 +9,7 @@ import { CursorHint } from "@/components/motion/CursorHint"
 import { EASE_WAVE } from "@/lib/motion"
 import { usePageMeta } from "@/hooks/usePageMeta"
 import { submitCareersApplication } from "@/lib/strapi"
+import { trackEvent } from "@/lib/consent"
 
 // Same wizard shape as ContactPage (detail -> ... -> review -> sent), just a
 // different field set for a job application instead of a project inquiry —
@@ -100,10 +101,16 @@ export function CareersPage() {
       setSendError(false)
       const ok = await submitCareersApplication({ name, surname, email, phone, role, cv })
       setSending(false)
-      if (ok) setSent(true)
-      else setSendError(true)
+      if (ok) {
+        setSent(true)
+        trackEvent("submit_application", { form_name: "candidature" })
+      } else {
+        setSendError(true)
+        trackEvent("form_error", { form_name: "candidature" })
+      }
       return
     }
+    trackEvent("form_step", { form_name: "candidature", step_name: step.key })
     setStepIndex((i) => i + 1)
   }
 
