@@ -5,6 +5,8 @@ import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Reveal } from "@/components/motion/Reveal"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { CircularGallery, type CircularGalleryHandle } from "@/components/ui/circular-gallery"
+import { ErrorBoundary } from "@/components/ErrorBoundary"
+import { hasWebGL } from "@/lib/webgl"
 
 // Real studio photos (public/images/studio), used as-is for now — some are
 // multi-shot collages rather than single clean frames, fine as a stand-in
@@ -185,5 +187,13 @@ function StudioGalleryAmbient() {
 export function StudioGallery() {
   const screenSize = useScreenSize()
   const isDesktop = screenSize.greaterThanOrEqual("lg")
-  return isDesktop ? <StudioGalleryDesktop /> : <StudioGalleryAmbient />
+  // The desktop carousel is WebGL: without it (or if it fails to start) use
+  // the plain scrolling one from mobile.
+  return isDesktop && hasWebGL() ? (
+    <ErrorBoundary fallback={<StudioGalleryAmbient />}>
+      <StudioGalleryDesktop />
+    </ErrorBoundary>
+  ) : (
+    <StudioGalleryAmbient />
+  )
 }

@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation, useParams } from "react-router-do
 import { ScrollProgress } from "@/components/ScrollProgress"
 import { ScrollToTop } from "@/components/ScrollToTop"
 import { CookieConsent } from "@/components/CookieConsent"
+import { ErrorBoundary } from "@/components/ErrorBoundary"
 import { CustomCursor } from "@/components/motion/CustomCursor"
 import { Header } from "@/components/sections/Header"
 import { HomePage } from "@/pages/HomePage"
@@ -44,7 +45,27 @@ function RedirectProject() {
   return <Navigate to={`${projectPath(slug)}${search}`} replace />
 }
 
+/** Shown instead of a page that crashed, so the visitor never faces a blank
+ *  screen: plain links (a full page load, not the router) to a fresh start. */
+function PageErrorFallback() {
+  return (
+    <main className="not-found" data-theme="dark">
+      <div className="wrap not-found__content">
+        <p className="lead">Qualcosa è andato storto.</p>
+        <p className="secbody">
+          Questa pagina non si è caricata come dovrebbe. Riprova, oppure{" "}
+          <a href={ROUTES.contact}>scrivici direttamente</a>: ti rispondiamo noi.
+        </p>
+        <p className="secbody">
+          <a href="/">Torna alla home</a>
+        </p>
+      </div>
+    </main>
+  )
+}
+
 function App() {
+  const { pathname } = useLocation()
   // Contact-CTA, phone and email click events (sent only after consent).
   useEffect(() => initClickTracking(), [])
 
@@ -59,28 +80,30 @@ function App() {
           wasn't part of the design — same visual result as a slow load
           today, just possible on first visit to each route instead of
           only on the very first page load. */}
-      <Suspense fallback={null}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path={ROUTES.work} element={<WorkPage />} />
-          <Route path={`${ROUTES.work}/:slug`} element={<ProjectPage />} />
-          <Route path={ROUTES.studio} element={<StudioPage />} />
-          <Route path={ROUTES.contact} element={<ContactPage />} />
-          <Route path={ROUTES.careers} element={<CareersPage />} />
-          <Route path={ROUTES.privacy} element={<PrivacyPolicyPage />} />
-          <Route path={ROUTES.cookies} element={<CookiePolicyPage />} />
-          {/* Old English addresses */}
-          <Route path="/work" element={<Redirect to={ROUTES.work} />} />
-          <Route path="/work/:slug" element={<RedirectProject />} />
-          <Route path="/contact" element={<Redirect to={ROUTES.contact} />} />
-          <Route path="/careers" element={<Redirect to={ROUTES.careers} />} />
-          {/* Catch-all — any URL that doesn't match one of the routes above
-              (a typo, an old bookmark, a dead external link) used to render
-              nothing at all: no route matched, so React Router mounted
-              nothing. */}
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </Suspense>
+      <ErrorBoundary fallback={<PageErrorFallback />} resetKey={pathname}>
+        <Suspense fallback={null}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path={ROUTES.work} element={<WorkPage />} />
+            <Route path={`${ROUTES.work}/:slug`} element={<ProjectPage />} />
+            <Route path={ROUTES.studio} element={<StudioPage />} />
+            <Route path={ROUTES.contact} element={<ContactPage />} />
+            <Route path={ROUTES.careers} element={<CareersPage />} />
+            <Route path={ROUTES.privacy} element={<PrivacyPolicyPage />} />
+            <Route path={ROUTES.cookies} element={<CookiePolicyPage />} />
+            {/* Old English addresses */}
+            <Route path="/work" element={<Redirect to={ROUTES.work} />} />
+            <Route path="/work/:slug" element={<RedirectProject />} />
+            <Route path="/contact" element={<Redirect to={ROUTES.contact} />} />
+            <Route path="/careers" element={<Redirect to={ROUTES.careers} />} />
+            {/* Catch-all — any URL that doesn't match one of the routes above
+                (a typo, an old bookmark, a dead external link) used to render
+                nothing at all: no route matched, so React Router mounted
+                nothing. */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
       <CookieConsent />
     </>
   )

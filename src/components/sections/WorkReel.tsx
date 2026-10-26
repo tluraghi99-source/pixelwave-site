@@ -7,6 +7,8 @@ import { useProjects } from "@/hooks/useProjects"
 import type { Project } from "@/lib/strapi"
 import { VideoScrubbed, VideoScrubAmbient } from "@/components/sections/VideoScrub"
 import { WorkHeading, WorkGallery, WorkAmbient } from "@/components/sections/Work"
+import { ErrorBoundary } from "@/components/ErrorBoundary"
+import { hasWebGL } from "@/lib/webgl"
 import { SectionLabel } from "@/components/pw/SectionLabel"
 import { Button } from "@/components/pw/Button"
 import { CtaBand } from "@/components/sections/CtaBand"
@@ -273,9 +275,15 @@ export function WorkReel({ ctaHeadline }: { ctaHeadline: string }) {
   const reducedMotion =
     typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
-  return isDesktop && !reducedMotion ? (
-    <WorkReelPinned ctaHeadline={ctaHeadline} projects={projects} />
+  const ambient = <WorkReelAmbient ctaHeadline={ctaHeadline} projects={projects} />
+
+  // The pinned version's carousel is WebGL: without it (or if it fails to
+  // start) fall back to the same plain flow as mobile.
+  return isDesktop && !reducedMotion && hasWebGL() ? (
+    <ErrorBoundary fallback={ambient}>
+      <WorkReelPinned ctaHeadline={ctaHeadline} projects={projects} />
+    </ErrorBoundary>
   ) : (
-    <WorkReelAmbient ctaHeadline={ctaHeadline} projects={projects} />
+    ambient
   )
 }
