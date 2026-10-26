@@ -8,6 +8,7 @@ import { Footer } from "@/components/sections/Footer"
 import { useProjectsStatus } from "@/hooks/useProjects"
 import { usePageMeta } from "@/hooks/usePageMeta"
 import { useNoIndex } from "@/hooks/useNoIndex"
+import { useJsonLd } from "@/hooks/useJsonLd"
 import { useVideoFrames } from "@/hooks/useVideoFrames"
 import { mediaUrl, projectThumbUrl, type Project } from "@/lib/strapi"
 import { ROUTES, projectPath } from "@/lib/routes"
@@ -309,6 +310,41 @@ export function ProjectPage() {
   // while `projects` is still loading or the slug genuinely doesn't match.
   usePageMeta(project ? `${project.title} — PixelWave` : "PixelWave — Your Vision, Our Wave", project?.desc)
   useNoIndex(loaded && !project)
+
+  // Structured data for Google: the project as a creative work by the studio,
+  // plus its place in the site (Home > Progetti > this project).
+  const siteUrl = window.location.origin
+  // Always an absolute address, whether the CMS returns a relative or a full one.
+  const projectImageSrc = project ? projectThumbUrl(project, "", 1200) : ""
+  const projectImage = projectImageSrc ? new URL(projectImageSrc, siteUrl).href : ""
+  useJsonLd(
+    project
+      ? {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "CreativeWork",
+              name: project.title,
+              description: project.desc,
+              url: `${siteUrl}${projectPath(project.slug)}`,
+              inLanguage: "it-IT",
+              dateCreated: String(project.year),
+              ...(projectImage ? { image: projectImage } : {}),
+              ...(project.tags.length > 0 ? { keywords: project.tags.map((t) => t.label).join(", ") } : {}),
+              creator: { "@id": `${siteUrl}/#organization` },
+            },
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: `${siteUrl}/` },
+                { "@type": "ListItem", position: 2, name: "Progetti", item: `${siteUrl}${ROUTES.work}` },
+                { "@type": "ListItem", position: 3, name: project.title },
+              ],
+            },
+          ],
+        }
+      : null
+  )
 
   // No uploaded gallery + a self-hosted video hero: fill the carousel with
   // stills grabbed from that video. Extraction takes a while (it has to

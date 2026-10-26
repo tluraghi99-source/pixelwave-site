@@ -46,6 +46,50 @@
     />
     <meta name="twitter:image" content="https://pixelwave.it/og-image.png" />
 
+    <!-- Structured data (schema.org JSON-LD): tells search engines who the
+         studio is. Kept to facts shown elsewhere on the site (legal details
+         are those of the privacy policy). Per-project data is added by
+         ProjectPage.tsx. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://pixelwave.it/#organization",
+            "name": "PixelWave",
+            "legalName": "PIXEL WAVE S.r.l.",
+            "url": "https://pixelwave.it/",
+            "logo": "https://pixelwave.it/apple-touch-icon.png",
+            "image": "https://pixelwave.it/og-image.png",
+            "description": "Studio creativo per video, foto, branding, web design, social ed eventi: dall’idea alla consegna finale.",
+            "email": "info@pixelwave.it",
+            "vatID": "IT12315400965",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Via G. Mussi 15",
+              "postalCode": "20154",
+              "addressLocality": "Milano",
+              "addressCountry": "IT"
+            },
+            "sameAs": [
+              "https://www.instagram.com/pixelwave_studio/",
+              "https://www.youtube.com/@PixelWaveStudio",
+              "https://www.linkedin.com/company/pixelwavestudio/"
+            ]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://pixelwave.it/#website",
+            "url": "https://pixelwave.it/",
+            "name": "PixelWave",
+            "inLanguage": "it-IT",
+            "publisher": { "@id": "https://pixelwave.it/#organization" }
+          }
+        ]
+      }
+    </script>
+
     <link rel="preload" as="font" type="font/woff2" href="/src/assets/fonts/hanken-grotesk.woff2" crossorigin />
     <link rel="preload" as="font" type="font/woff2" href="/src/assets/fonts/hanken-grotesk-italic.woff2" crossorigin />
   </head>
