@@ -12,7 +12,6 @@ import { EASE_WAVE } from "@/lib/motion"
 import { useProjects } from "@/hooks/useProjects"
 import { useWorkCategories } from "@/hooks/useWorkCategories"
 import { usePageMeta } from "@/hooks/usePageMeta"
-import { shuffle } from "@/lib/array"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
 import { projectPath } from "@/lib/routes"
 import { categoryKey, categoryLabel } from "@/lib/categories"
@@ -108,9 +107,13 @@ export function WorkPage() {
     "Sfoglia tutti i progetti di PixelWave — video, foto, branding, web design, social ed eventi — filtrabili per categoria o cliente."
   )
   const fetchedProjects = useProjects()
-  // Reshuffled once per fetch (like the Studio team grid), not on every
-  // render — a fixed-but-random order rather than the deleted `order` field.
-  const projects = useMemo(() => shuffle(fetchedProjects), [fetchedProjects])
+  // Newest year first, then older ones. Projects from the same year are
+  // ordered alphabetically by title so the order is predictable (the CMS has
+  // no finer date than the year).
+  const projects = useMemo(
+    () => [...fetchedProjects].sort((a, b) => b.year - a.year || a.title.localeCompare(b.title, "it")),
+    [fetchedProjects]
+  )
   const workCategories = useWorkCategories()
 
   // The fixed Video/Photo/Branding/Web Design/Social/Events taxonomy (see
