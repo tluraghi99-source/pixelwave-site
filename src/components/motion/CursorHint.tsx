@@ -15,7 +15,7 @@ const IDLE_MAX_SCROLL = 0.2
 /** `idleReappear` mode anchors the hint to the custom cursor dot: the same
  *  spring (CustomCursor.tsx) so it trails exactly as the dot does, and a fixed
  *  18px to the right of the dot's centre, vertically centred on it. */
-const DOT_SPRING = { stiffness: 300, damping: 40, mass: 0.5 }
+const DOT_SPRING = { stiffness: 600, damping: 40, mass: 0.5 }
 const ANCHORED_OFFSET_X = 18
 
 interface CursorHintProps {

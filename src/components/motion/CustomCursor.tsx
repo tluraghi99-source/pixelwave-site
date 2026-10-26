@@ -6,8 +6,8 @@ export function CustomCursor() {
   const [enabled, setEnabled] = useState(false)
   const x = useMotionValue(-100)
   const y = useMotionValue(-100)
-  const springX = useSpring(x, { stiffness: 300, damping: 40, mass: 0.5 })
-  const springY = useSpring(y, { stiffness: 300, damping: 40, mass: 0.5 })
+  const springX = useSpring(x, { stiffness: 600, damping: 40, mass: 0.5 })
+  const springY = useSpring(y, { stiffness: 600, damping: 40, mass: 0.5 })
 
   useEffect(() => {
     const mq = window.matchMedia("(pointer: fine)")
