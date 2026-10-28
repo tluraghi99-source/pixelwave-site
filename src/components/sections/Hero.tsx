@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react"
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, type PointerEvent } from "react"
+import { createPortal } from "react-dom"
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion"
 import { Link } from "react-router-dom"
 import { ArrowUpRight } from "lucide-react"
@@ -7,6 +8,17 @@ import { EASE_WAVE, HERO_CROSSFADE_RATIO, HERO_REVEAL_END, HERO_REVEAL_START } f
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { CursorHint } from "@/components/motion/CursorHint"
 import { ROUTES } from "@/lib/routes"
+
+// Easter egg: tap the square part of the big logo mark 10 times quickly and a
+// little runner game opens. Lazy, so it costs nothing until someone finds it.
+const MascotRunner = lazy(() => import("@/components/easter/MascotRunner"))
+const EGG_TAPS = 10
+const EGG_MAX_GAP_MS = 600
+// The square is the first 910 x 910 of the wordmark's 7075 x 1826 viewBox —
+// as fractions of the image's box, with a little slack for fingers.
+const EGG_MAX_X = 0.14
+const EGG_MAX_Y = 0.52
+const EGG_MIN_PX = 56
 
 interface HeroProps {
   introDone: boolean
@@ -25,6 +37,33 @@ export function Hero({ introDone }: HeroProps) {
   const vh = typeof window !== "undefined" ? window.innerHeight : 900
   const wrapRef = useRef<HTMLDivElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
+  const egg = useRef({ taps: 0, last: 0 })
+  const [gameOpen, setGameOpen] = useState(false)
+
+  // Hit-tested against the image's live bounding box rather than a separate
+  // overlay, so it stays exactly on the square while the mark scales and
+  // slides during the scroll.
+  function onMarkPointerDown(e: PointerEvent<HTMLImageElement>) {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const rx = (e.clientX - rect.left) / rect.width
+    const ry = (e.clientY - rect.top) / rect.height
+    const state = egg.current
+    // On a phone the whole logo is small, so the square can be under 40px —
+    // keep the tappable area at least a thumb wide.
+    const maxX = Math.max(EGG_MAX_X, EGG_MIN_PX / rect.width)
+    const maxY = Math.max(EGG_MAX_Y, EGG_MIN_PX / rect.height)
+    if (rx < 0 || rx > maxX || ry < 0 || ry > maxY) {
+      state.taps = 0
+      return
+    }
+    const now = performance.now()
+    state.taps = now - state.last <= EGG_MAX_GAP_MS ? state.taps + 1 : 1
+    state.last = now
+    if (state.taps >= EGG_TAPS) {
+      state.taps = 0
+      setGameOpen(true)
+    }
+  }
 
   // Where the big mark needs to land (relative to its own rest position) so it
   // visually docks exactly onto the header's logo — measured, not guessed, since
@@ -121,6 +160,8 @@ export function Hero({ introDone }: HeroProps) {
           width={7075}
           height={1826}
           style={{ scale: bigScale, opacity: bigOpacity, x: bigX, y: bigY }}
+          onPointerDown={onMarkPointerDown}
+          draggable={false}
         />
       </motion.div>
 
@@ -158,6 +199,17 @@ export function Hero({ introDone }: HeroProps) {
           </motion.span>
         </motion.div>
       )}
+
+      {/* Portaled out: the hero is its own stacking context pinned behind the
+          page (z-index 0), so an overlay rendered inside it would sit under
+          the header and every section. */}
+      {gameOpen &&
+        createPortal(
+          <Suspense fallback={null}>
+            <MascotRunner onClose={() => setGameOpen(false)} />
+          </Suspense>,
+          document.body
+        )}
     </section>
   )
 }
