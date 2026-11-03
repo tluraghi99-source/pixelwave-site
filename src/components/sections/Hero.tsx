@@ -41,7 +41,7 @@ export function Hero({ introDone }: HeroProps) {
   const [gameOpen, setGameOpen] = useState(false)
   const showreel = useShowreel()
   const [showreelOpen, setShowreelOpen] = useState(false)
-  // While the pointer is on the square its "Guarda" hint trails
+  // While the pointer is on the square its "Guarda showreel" hint trails
   // the cursor, so the "Scroll" hint steps out of the way.
   const [squareHover, setSquareHover] = useState(false)
   // The square turns orange under the pointer, where the orange dot and hint
@@ -151,7 +151,7 @@ export function Hero({ introDone }: HeroProps) {
       <CursorGlow className="cursor-glow" variant="light" glow ambient />
       {introDone && !squareHover && <CursorHint text="Scroll" variant="bounce" idleReappear />}
       {introDone && showreel && (
-        <CursorHint text="Guarda" visible={squareHover && !showreelOpen && !gameOpen} />
+        <CursorHint text="Guarda showreel" visible={squareHover && !showreelOpen && !gameOpen} />
       )}
 
       <motion.div
@@ -189,9 +189,9 @@ export function Hero({ introDone }: HeroProps) {
               placed exactly over where it sits in the full wordmark. With a
               published showreel it is a button: it shakes now and then, turns
               orange on hover (the orange is part of the shaking piece, so it
-              moves with it), a "Guarda" hint trails the cursor, and each
-              time it comes to rest a "Showreel" line drops into
-              its top bar until the next shake.
+              moves with it) and a "Guarda showreel" hint trails the cursor. On
+              phones and tablets, where there is no cursor, a "Show / reel" line
+              rises out of the square each time it comes to rest.
               Without one it is just the easter egg's tap target. */}
           {showreel ? (
             <button
@@ -205,7 +205,9 @@ export function Hero({ introDone }: HeroProps) {
             >
               <span className="hero__mark-square-art" />
               <span className="hero__mark-label" aria-hidden="true">
-                <span className="hero__mark-label-text">Showreel</span>
+                <span className="hero__mark-label-text">
+                  Show<br className="hero__mark-label-br" />reel
+                </span>
               </span>
             </button>
           ) : (
