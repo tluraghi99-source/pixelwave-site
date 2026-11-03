@@ -216,6 +216,51 @@ export async function fetchProjects(): Promise<Project[]> {
   }
 }
 
+/** Extracts an 11-character YouTube video id from any normal URL shape
+ *  editors are likely to paste: a watch URL (`?v=ID`, optionally with
+ *  other query params before/after), a shortened youtu.be/ID link, or an
+ *  existing /embed/ID link. Returns null on anything else, so callers can
+ *  fail soft rather than rendering a broken embed. */
+export function parseYoutubeId(url: string): string | null {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|watch\?(?:.*&)?v=))([A-Za-z0-9_-]{11})/)
+  return match ? match[1] : null
+}
+
+/** The studio's showreel, as set in the CMS's "Showreel" single type: an
+ *  uploaded video wins over a pasted YouTube link. */
+export type Showreel = { type: "video"; src: string } | { type: "youtube"; videoId: string }
+
+interface StrapiShowreelRaw {
+  video: StrapiMediaRaw | null
+  youtubeUrl: string | null
+}
+
+/** Local development only (`npm run dev`): a stand-in so the showreel button
+ *  can be seen and tuned while the CMS has no showreel yet. Dead code in the
+ *  production build — there, no published showreel means no button. */
+const DEV_PLACEHOLDER_SHOWREEL: Showreel | null = import.meta.env.DEV
+  ? { type: "video", src: "/video/hero.mp4" }
+  : null
+
+/** Fetches the published showreel. Resolves to `null` when there isn't one —
+ *  nothing published yet (Strapi answers 404 for an empty single type), a
+ *  link that isn't a valid YouTube URL, or any network/parse failure — and
+ *  the site then simply doesn't offer the showreel. */
+export async function fetchShowreel(): Promise<Showreel | null> {
+  try {
+    const res = await fetch(`${STRAPI_URL}/api/showreel?populate=video`)
+    if (!res.ok) return DEV_PLACEHOLDER_SHOWREEL
+    const json = await res.json()
+    const raw = json.data as StrapiShowreelRaw | null
+    if (!raw) return DEV_PLACEHOLDER_SHOWREEL
+    if (raw.video?.mime.startsWith("video/")) return { type: "video", src: strapiMediaUrl(raw.video.url) }
+    const videoId = raw.youtubeUrl ? parseYoutubeId(raw.youtubeUrl) : null
+    return videoId ? { type: "youtube", videoId } : DEV_PLACEHOLDER_SHOWREEL
+  } catch {
+    return DEV_PLACEHOLDER_SHOWREEL
+  }
+}
+
 export interface TeamMember {
   id: string
   order: number

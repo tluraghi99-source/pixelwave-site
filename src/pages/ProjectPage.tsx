@@ -10,7 +10,7 @@ import { usePageMeta } from "@/hooks/usePageMeta"
 import { useNoIndex } from "@/hooks/useNoIndex"
 import { useJsonLd } from "@/hooks/useJsonLd"
 import { useVideoFrames } from "@/hooks/useVideoFrames"
-import { mediaUrl, projectThumbUrl, type Project } from "@/lib/strapi"
+import { mediaUrl, parseYoutubeId, projectThumbUrl, type Project } from "@/lib/strapi"
 import { ROUTES, projectPath } from "@/lib/routes"
 
 type MediaItem =
@@ -26,17 +26,6 @@ interface ProjectWithMedia extends Project {
   hero: MediaItem
   gallery: MediaItem[]
   thumb: string
-}
-
-/** Extracts an 11-character YouTube video id from any normal URL shape
- *  editors are likely to paste: a watch URL (`?v=ID`, optionally with
- *  other query params before/after), a shortened youtu.be/ID link, or an
- *  existing /embed/ID link. Returns null on anything else, so callers can
- *  fail soft to the placeholder image rather than rendering a broken
- *  embed. */
-function parseYoutubeId(url: string): string | null {
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|watch\?(?:.*&)?v=))([A-Za-z0-9_-]{11})/)
-  return match ? match[1] : null
 }
 
 /** Builds the hero/gallery/thumb media fields for one project, falling back

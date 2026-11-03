@@ -1,24 +1,23 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState, type PointerEvent } from "react"
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion"
 import { Link } from "react-router-dom"
 import { ArrowUpRight } from "lucide-react"
-import logoWordmark from "@/assets/logo-wordmark.svg"
+import logoWordmarkRest from "@/assets/logo-wordmark-rest.svg"
+import logoMarkSquare from "@/assets/logo-mark-square.svg"
 import { EASE_WAVE, HERO_CROSSFADE_RATIO, HERO_REVEAL_END, HERO_REVEAL_START } from "@/lib/motion"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { CursorHint } from "@/components/motion/CursorHint"
+import { ShowreelModal } from "@/components/ShowreelModal"
+import { useShowreel } from "@/hooks/useShowreel"
 import { ROUTES } from "@/lib/routes"
 
-// Easter egg: tap the square part of the big logo mark 10 times quickly and a
+// The square part of the big logo mark is a button for the showreel (when the
+// CMS has one) and also hides an easter egg: tap it 10 times quickly and a
 // little runner game opens. Lazy, so it costs nothing until someone finds it.
 const MascotRunner = lazy(() => import("@/components/easter/MascotRunner"))
 const EGG_TAPS = 10
 const EGG_MAX_GAP_MS = 600
-// The square is the first 910 x 910 of the wordmark's 7075 x 1826 viewBox —
-// as fractions of the image's box, with a little slack for fingers.
-const EGG_MAX_X = 0.14
-const EGG_MAX_Y = 0.52
-const EGG_MIN_PX = 56
 
 interface HeroProps {
   introDone: boolean
@@ -37,33 +36,51 @@ export function Hero({ introDone }: HeroProps) {
   const vh = typeof window !== "undefined" ? window.innerHeight : 900
   const wrapRef = useRef<HTMLDivElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
-  const egg = useRef({ taps: 0, last: 0 })
+  const egg = useRef<{ taps: number; last: number; timer?: number }>({ taps: 0, last: 0 })
+  const squareRef = useRef<HTMLButtonElement>(null)
   const [gameOpen, setGameOpen] = useState(false)
+  const showreel = useShowreel()
+  const [showreelOpen, setShowreelOpen] = useState(false)
+  // While the pointer is on the square its "Guarda" hint trails
+  // the cursor, so the "Scroll" hint steps out of the way.
+  const [squareHover, setSquareHover] = useState(false)
+  // The square turns orange under the pointer, where the orange dot and hint
+  // would vanish: this class (see .mark-hover in index.css) turns them black.
+  useEffect(() => {
+    if (!squareHover) return
+    document.documentElement.classList.add("mark-hover")
+    return () => document.documentElement.classList.remove("mark-hover")
+  }, [squareHover])
 
-  // Hit-tested against the image's live bounding box rather than a separate
-  // overlay, so it stays exactly on the square while the mark scales and
-  // slides during the scroll.
-  function onMarkPointerDown(e: PointerEvent<HTMLImageElement>) {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const rx = (e.clientX - rect.left) / rect.width
-    const ry = (e.clientY - rect.top) / rect.height
+  // One click on the square opens the showreel, but only once no further tap
+  // follows within the egg's gap — so ten quick taps still reach the game
+  // instead of the first one opening the video. Hit-testing is the square's
+  // own box (it sits exactly over the mark's square), so it follows the mark
+  // while it scales and slides during the scroll.
+  function onSquareClick() {
     const state = egg.current
-    // On a phone the whole logo is small, so the square can be under 40px —
-    // keep the tappable area at least a thumb wide.
-    const maxX = Math.max(EGG_MAX_X, EGG_MIN_PX / rect.width)
-    const maxY = Math.max(EGG_MAX_Y, EGG_MIN_PX / rect.height)
-    if (rx < 0 || rx > maxX || ry < 0 || ry > maxY) {
-      state.taps = 0
-      return
-    }
+    window.clearTimeout(state.timer)
     const now = performance.now()
     state.taps = now - state.last <= EGG_MAX_GAP_MS ? state.taps + 1 : 1
     state.last = now
     if (state.taps >= EGG_TAPS) {
       state.taps = 0
       setGameOpen(true)
+      return
+    }
+    if (showreel) {
+      state.timer = window.setTimeout(() => {
+        state.taps = 0
+        setShowreelOpen(true)
+      }, EGG_MAX_GAP_MS)
     }
   }
+  useEffect(() => () => window.clearTimeout(egg.current.timer), [])
+
+  const closeShowreel = useCallback(() => {
+    setShowreelOpen(false)
+    squareRef.current?.focus()
+  }, [])
 
   // Where the big mark needs to land (relative to its own rest position) so it
   // visually docks exactly onto the header's logo — measured, not guessed, since
@@ -132,7 +149,10 @@ export function Hero({ introDone }: HeroProps) {
   return (
     <section className="hero" data-screen-label="Hero">
       <CursorGlow className="cursor-glow" variant="light" glow ambient />
-      {introDone && <CursorHint text="Scroll" variant="bounce" idleReappear />}
+      {introDone && !squareHover && <CursorHint text="Scroll" variant="bounce" idleReappear />}
+      {introDone && showreel && (
+        <CursorHint text="Guarda" visible={squareHover && !showreelOpen && !gameOpen} />
+      )}
 
       <motion.div
         ref={wrapRef}
@@ -142,27 +162,58 @@ export function Hero({ introDone }: HeroProps) {
         transition={{ duration: 0.9, ease: EASE_WAVE }}
         onAnimationComplete={measure}
       >
-        <motion.img
-          ref={imgRef}
-          src={logoWordmark}
-          alt="PixelWave"
-          className="hero__bigmark-img"
-          // Intrinsic size from the SVG's own viewBox (0 0 7075.3 1826.47,
-          // rounded) — logo-wordmark.svg carries no width/height of its own,
-          // so without these the <img> has no aspect ratio until the SVG
-          // actually loads, and CSS's width:75vw;height:auto only resolves
-          // a real height at that point too. The browser turns width/height
-          // attributes into a default aspect-ratio, reserving this element's
-          // box immediately instead of collapsing it to 0 height and then
-          // snapping open on load — that snap was this page's single
-          // largest layout shift (a Lighthouse CLS score of ~1, effectively
-          // all of it, traced to exactly this element).
-          width={7075}
-          height={1826}
+        <motion.div
+          className="hero__bigmark-inner"
           style={{ scale: bigScale, opacity: bigOpacity, x: bigX, y: bigY }}
-          onPointerDown={onMarkPointerDown}
-          draggable={false}
-        />
+        >
+          <img
+            ref={imgRef}
+            src={logoWordmarkRest}
+            alt="PixelWave"
+            className="hero__bigmark-img"
+            // Intrinsic size from the SVG's own viewBox (0 0 7075.3 1826.47,
+            // rounded) — the SVG carries no width/height of its own, so
+            // without these the <img> has no aspect ratio until the SVG
+            // actually loads, and CSS's width:100%;height:auto only resolves
+            // a real height at that point too. The browser turns width/height
+            // attributes into a default aspect-ratio, reserving this element's
+            // box immediately instead of collapsing it to 0 height and then
+            // snapping open on load — that snap was this page's single
+            // largest layout shift (a Lighthouse CLS score of ~1, effectively
+            // all of it, traced to exactly this element).
+            width={7075}
+            height={1826}
+            draggable={false}
+          />
+          {/* The logo's square, drawn separately so it can shake on its own;
+              placed exactly over where it sits in the full wordmark. With a
+              published showreel it is a button: it shakes now and then, turns
+              orange on hover (the orange is part of the shaking piece, so it
+              moves with it), a "Guarda" hint trails the cursor, and each
+              time it comes to rest a "Showreel" line drops into
+              its top bar until the next shake.
+              Without one it is just the easter egg's tap target. */}
+          {showreel ? (
+            <button
+              ref={squareRef}
+              type="button"
+              className={`hero__mark-square hero__mark-square--showreel${introDone ? " is-live" : ""}`}
+              onClick={onSquareClick}
+              onPointerEnter={() => setSquareHover(true)}
+              onPointerLeave={() => setSquareHover(false)}
+              aria-label="Guarda showreel"
+            >
+              <span className="hero__mark-square-art" />
+              <span className="hero__mark-label" aria-hidden="true">
+                <span className="hero__mark-label-text">Showreel</span>
+              </span>
+            </button>
+          ) : (
+            <div className="hero__mark-square" onClick={onSquareClick} aria-hidden="true">
+              <img src={logoMarkSquare} alt="" className="hero__mark-square-img" draggable={false} />
+            </div>
+          )}
+        </motion.div>
       </motion.div>
 
       {introDone && (
@@ -203,6 +254,9 @@ export function Hero({ introDone }: HeroProps) {
       {/* Portaled out: the hero is its own stacking context pinned behind the
           page (z-index 0), so an overlay rendered inside it would sit under
           the header and every section. */}
+      {showreel &&
+        showreelOpen &&
+        createPortal(<ShowreelModal showreel={showreel} onClose={closeShowreel} />, document.body)}
       {gameOpen &&
         createPortal(
           <Suspense fallback={null}>

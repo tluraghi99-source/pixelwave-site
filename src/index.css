@@ -762,10 +762,100 @@ header.nav .nav__mobile .nav__link {
      carries the same value so both insets match. */
   left: clamp(1rem, 1.2vw, 1.25rem); bottom: clamp(1rem, 1.2vw, 1.25rem);
 }
-.hero__bigmark-img {
-  display: block; width: 75vw; height: auto;
-  transform-origin: bottom left; will-change: transform;
+/* The mark is two pieces stacked in one box: the wordmark without its square
+   (.hero__bigmark-img) and the square on its own (.hero__mark-square), so the
+   square can shake alone. The box carries the scroll-linked scale/slide. */
+.hero__bigmark-inner { position: relative; width: 75vw; transform-origin: bottom left; will-change: transform; }
+.hero__bigmark-img { display: block; width: 100%; height: auto; }
+/* Exactly where the square sits in the full wordmark (910.26 of its 7075.3 x
+   1826.47 viewBox). */
+.hero__mark-square {
+  position: absolute; left: 0; top: 0; width: 12.865%; height: 49.836%;
+  padding: 0; border: 0; background: none; display: block; color: inherit;
 }
+/* A thumb-sized tap area even when the square is small (phones). */
+.hero__mark-square::after { content: ""; position: absolute; inset: -0.5rem; }
+.hero__mark-square-img { display: block; width: 100%; height: 100%; }
+.hero__mark-square--showreel { cursor: pointer; }
+.hero__mark-square--showreel:focus-visible { outline: 2px solid var(--pw-orange); outline-offset: 6px; }
+/* The square is drawn as a mask filled with a colour, so hovering just changes
+   that one colour (black to orange) — no second copy stacked on top, which
+   would leave a dark fringe of the original showing around the orange's edge.
+   Being one piece, the shake below moves it as a whole. */
+.hero__mark-square-art {
+  display: block; width: 100%; height: 100%; transform-origin: 50% 100%;
+  background-color: var(--pw-black);
+  -webkit-mask: url("./assets/logo-mark-square.svg") center / 100% 100% no-repeat;
+  mask: url("./assets/logo-mark-square.svg") center / 100% 100% no-repeat;
+  transition: background-color var(--dur-base) var(--ease-wave);
+}
+@media (hover: hover) {
+  .hero__mark-square--showreel:hover .hero__mark-square-art { background-color: var(--pw-orange); }
+}
+.hero__mark-square--showreel:focus-visible .hero__mark-square-art { background-color: var(--pw-orange); }
+/* A quick little shake, then still: ~0.55s of it in each 3.4s cycle. Starts
+   once the intro is over (.is-live). */
+@keyframes mark-shake {
+  0%, 16%, 100% { transform: none; }
+  2% { transform: translate(-3%, 0) rotate(-3deg); }
+  4% { transform: translate(3%, 0) rotate(3deg); }
+  6% { transform: translate(-2.5%, 0) rotate(-2.5deg); }
+  8% { transform: translate(2%, 0) rotate(2deg); }
+  10% { transform: translate(-1.2%, 0) rotate(-1.2deg); }
+  12% { transform: translate(0.8%, 0) rotate(0.8deg); }
+  14% { transform: none; }
+}
+.hero__mark-square--showreel.is-live .hero__mark-square-art { animation: mark-shake 3.4s ease-in-out 1.4s infinite; }
+/* "Showreel" inside the square's top bar (the L's upper half): drops in
+   from above once the square has settled after each shake, and lifts back out
+   before the next shake starts. Same delay and length as the shake, so the two
+   stay in step. */
+.hero__mark-label {
+  position: absolute; left: 0; top: 0; width: 100%; height: 50%; overflow: hidden;
+  container-type: inline-size; pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-wave);
+}
+.hero__mark-label-text {
+  display: block; transform: translateY(-120%); padding: 6cqw 0 0 6cqw;
+  text-align: left; white-space: nowrap; color: var(--pw-white); font-family: var(--font-display);
+  font-weight: 700; letter-spacing: -0.01em; line-height: 1.1; font-size: 8.7cqw;
+}
+.hero__mark-square--showreel.is-live .hero__mark-label-text { animation: mark-label 3.4s ease-in-out 1.4s infinite; }
+@keyframes mark-label {
+  0%, 16% { transform: translateY(-120%); }
+  24%, 86% { transform: none; }
+  94%, 100% { transform: translateY(-120%); }
+}
+/* The cursor already says it while hovering. */
+@media (hover: hover) {
+  .hero__mark-square--showreel:hover .hero__mark-label { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__mark-square--showreel.is-live .hero__mark-square-art { animation: none; }
+  .hero__mark-square--showreel.is-live .hero__mark-label-text { animation: none; }
+}
+/* Showreel (components/ShowreelModal.tsx): full-screen black overlay with the
+   video letterboxed, close (X) top right and mute bottom right (the mute button
+   and its container are the project videos' own classes). */
+.showreel {
+  position: fixed; inset: 0; z-index: var(--z-modal);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--pw-black); color: var(--pw-white);
+}
+.showreel__media { display: block; width: 100%; height: 100%; object-fit: contain; background: var(--pw-black); }
+.showreel__media--embed {
+  width: min(100vw, calc(100svh * 16 / 9)); height: min(100svh, calc(100vw * 9 / 16)); border: 0;
+}
+.showreel__close {
+  position: absolute; z-index: 2; top: clamp(1rem, 1.2vw, 1.25rem); right: clamp(1rem, 1.2vw, 1.25rem);
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; cursor: pointer;
+  background: rgba(0, 0, 0, 0.35); color: var(--pw-white); border: 1px solid rgba(255, 255, 255, 0.5);
+  transition: border-color var(--dur-base) var(--ease-wave), color var(--dur-base) var(--ease-wave);
+}
+.showreel__close:hover { border-color: var(--pw-orange); color: var(--pw-orange); }
+.showreel__close:focus-visible { outline: 2px solid var(--pw-orange); outline-offset: 2px; }
+.showreel__mute { border-radius: var(--radius-control); }
 
 /* video-scrub — <video> + tint that fill their nearest positioned ancestor;
    reused both by the mobile ambient section below and inside .reel__inner */
@@ -1897,6 +1987,9 @@ footer { position: relative; isolation: isolate; background: var(--surface-subtl
    entirely — flagged via a class on <html> since Header (which owns the
    open state) isn't an ancestor of CustomCursor's dot in the DOM. */
 html.nav-open .cursor-dot { background: var(--pw-black); }
+/* Over the hero's showreel square (orange on hover): dot and hint go black. */
+html.mark-hover .cursor-dot { background: var(--pw-black); }
+html.mark-hover .cursor-hint__inner { color: var(--pw-black); animation: none; text-shadow: none; }
 
 .cursor-hint {
   position: fixed; top: 0; left: 0; pointer-events: none; z-index: var(--z-toast);
