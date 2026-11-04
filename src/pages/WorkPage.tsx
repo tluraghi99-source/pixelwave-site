@@ -143,8 +143,10 @@ export function WorkPage() {
   const [mode, setMode] = useState<"category" | "client">(
     ["cliente", "client"].includes(searchParams.get("vista") ?? searchParams.get("mode") ?? "") ? "client" : "category"
   )
-  // /lavori?categoria=Video (or several, comma-separated) opens with those
-  // categories already selected — the homepage's Services links use it.
+  // One category at a time, like the client picker: choosing one replaces the
+  // previous choice, and clicking the active one clears it (all projects).
+  // /lavori?categoria=Video opens with that category already selected — the
+  // homepage's Services links use it (if several are given, the first wins).
   const [activeCategories, setActiveCategories] = useState<Set<string>>(
     () =>
       new Set(
@@ -152,6 +154,7 @@ export function WorkPage() {
           .split(",")
           .map((c) => c.trim())
           .filter(Boolean)
+          .slice(0, 1)
           .map(categoryKey)
       )
   )
@@ -164,14 +167,13 @@ export function WorkPage() {
     [activeCategories, FILTER_CATEGORIES]
   )
 
+  // The Foto filter on: the project pages opened from here show their
+  // photo carousel before the video (see ProjectPage.tsx).
+  const photosOnly = mode === "category" && selectedCategories.has("photo")
+
   function toggleCategory(category: string) {
-    setActiveCategories((prev) => {
-      const next = new Set(prev)
-      const key = categoryKey(category)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      return next
-    })
+    const key = categoryKey(category)
+    setActiveCategories((prev) => (prev.has(key) ? new Set() : new Set([key])))
   }
 
   // Single-select: picking a client is a lookup ("show me X's work"), not a
@@ -299,6 +301,7 @@ export function WorkPage() {
                       ))}
                       title={p.title}
                       href={projectPath(p.slug)}
+                      linkState={photosOnly ? { photosFirst: true } : undefined}
                     >
                       <span className="work__view">
                         Vedi il progetto <ArrowUpRight size={15} />

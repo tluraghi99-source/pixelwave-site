@@ -807,40 +807,8 @@ header.nav .nav__mobile .nav__link {
   14% { transform: none; }
 }
 .hero__mark-square--showreel.is-live .hero__mark-square-art { animation: mark-shake 3.4s ease-in-out 1.4s infinite; }
-/* Phones and tablets only (on desktop the cursor hint says it): "Show" / "reel"
-   stands upright above the square, reading bottom to top, and rises out of the
-   square's top edge once the square has settled after each shake, then sinks
-   back before the next shake. The clip box sits right on that edge, so the text
-   looks like it comes out of the square. Same delay and length as the shake, so
-   the two stay in step. It animates the individual `translate` property so the
-   slide stays vertical whatever the text is rotated by. */
-.hero__mark-label, .hero__mark-label-br { display: none; }
-@media (max-width: 1024px), (hover: none) {
-  .hero__mark-label {
-    display: block; position: absolute; left: 0; bottom: 100%; overflow: hidden; pointer-events: none;
-    padding-bottom: 0.55em; font-size: clamp(0.9rem, 4.8vw, 1.5rem);
-    transition: opacity var(--dur-base) var(--ease-wave);
-  }
-  .hero__mark-label-br { display: inline; }
-  .hero__mark-label-text {
-    display: block; writing-mode: vertical-rl; transform: rotate(180deg); translate: 0 calc(100% + 0.6em);
-    white-space: nowrap; color: var(--pw-black); font-family: var(--font-display);
-    font-weight: 700; letter-spacing: -0.01em; line-height: 0.75;
-  }
-  .hero__mark-square--showreel.is-live .hero__mark-label-text { animation: mark-label 3.4s ease-in-out 1.4s infinite; }
-}
-@keyframes mark-label {
-  0%, 16% { translate: 0 calc(100% + 0.6em); }
-  24%, 86% { translate: 0 0; }
-  94%, 100% { translate: 0 calc(100% + 0.6em); }
-}
-/* The cursor already says it while hovering. */
-@media (hover: hover) {
-  .hero__mark-square--showreel:hover .hero__mark-label { opacity: 0; }
-}
 @media (prefers-reduced-motion: reduce) {
   .hero__mark-square--showreel.is-live .hero__mark-square-art { animation: none; }
-  .hero__mark-square--showreel.is-live .hero__mark-label-text { animation: none; }
 }
 /* Showreel (components/ShowreelModal.tsx): full-screen black overlay with the
    video letterboxed, close (X) top right and mute bottom right (the mute button
@@ -2010,6 +1978,8 @@ footer { position: relative; isolation: isolate; background: var(--surface-subtl
 html.nav-open .cursor-dot { background: var(--pw-black); }
 /* Over the hero's showreel square (orange on hover): dot and hint go black. */
 html.mark-hover .cursor-dot { background: var(--pw-black); }
+/* On the showreel's black screen (even when opened from the orange menu): white. */
+html.showreel-open .cursor-dot { background: var(--pw-white); }
 html.mark-hover .cursor-hint__inner { color: var(--pw-black); animation: none; text-shadow: none; }
 
 .cursor-hint {

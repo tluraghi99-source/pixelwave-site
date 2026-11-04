@@ -7,6 +7,8 @@ interface CardProps extends Omit<HTMLAttributes<HTMLElement>, "title"> {
   description?: ReactNode
   meta?: ReactNode
   href?: string
+  /** Router state handed to the target page when `href` is an in-app link. */
+  linkState?: unknown
   interactive?: boolean
   /** Default order is tags, title (homepage carousel). Set this to put the
    *  title before the tags instead (used on the /work listing). */
@@ -20,6 +22,7 @@ export function Card({
   description,
   meta,
   href,
+  linkState,
   interactive = true,
   titleFirst = false,
   children,
@@ -67,7 +70,7 @@ export function Card({
   if (href) {
     if (href.startsWith("/") && !href.includes("#")) {
       return (
-        <Link className={cls} to={href} {...rest}>
+        <Link className={cls} to={href} state={linkState} {...rest}>
           {body}
         </Link>
       )

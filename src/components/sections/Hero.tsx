@@ -193,8 +193,7 @@ export function Hero({ introDone }: HeroProps) {
               published showreel it is a button: it shakes now and then, turns
               orange on hover (the orange is part of the shaking piece, so it
               moves with it) and a "Guarda showreel" hint trails the cursor. On
-              phones and tablets, where there is no cursor, a "Show / reel" line
-              rises out of the square each time it comes to rest.
+              phones and tablets the shaking alone says it is a button.
               Without one it is just the easter egg's tap target. */}
           {showreel ? (
             <button
@@ -207,11 +206,6 @@ export function Hero({ introDone }: HeroProps) {
               aria-label="Guarda showreel"
             >
               <span className="hero__mark-square-art" />
-              <span className="hero__mark-label" aria-hidden="true">
-                <span className="hero__mark-label-text">
-                  Show<br className="hero__mark-label-br" />reel
-                </span>
-              </span>
             </button>
           ) : (
             <div className="hero__mark-square" onClick={onSquareClick} aria-hidden="true">

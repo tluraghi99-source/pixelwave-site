@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useLocation, useParams } from "react-router-dom"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
 import { ArrowUpRight, Volume2, VolumeX } from "lucide-react"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
@@ -284,6 +284,11 @@ function GalleryRow({ items, reverse }: { items: MediaItem[]; reverse: boolean }
 export function ProjectPage() {
   const { slug } = useParams<{ slug: string }>()
   const { projects, loaded } = useProjectsStatus()
+  // The /lavori listing sets this when it was opened with only the Foto filter
+  // on (see WorkPage.tsx): the photo carousel then comes before the video.
+  // Router state, not a URL parameter, so a shared or typed link keeps the
+  // usual order.
+  const photosFirstRequested = (useLocation().state as { photosFirst?: boolean } | null)?.photosFirst === true
 
   const { project, nextProject } = useMemo(() => {
     const index = projects.findIndex((p) => p.slug === slug)
@@ -358,6 +363,29 @@ export function ProjectPage() {
               )
         : project.gallery
 
+  // Carousel before the video only when the visitor asked for it, there is a
+  // carousel to show (uploaded photos, or the stills taken from the video) and
+  // the hero is a video — otherwise there is nothing to swap.
+  const photosFirst =
+    photosFirstRequested &&
+    !!project &&
+    galleryItems.length > 0 &&
+    (project.hero.type === "video" || project.hero.type === "youtube")
+
+  const galleryBlock =
+    galleryItems.length > 0 ? (
+      <RevealGroup className="project-gallery" stagger={0.1} data-screen-label="Project Gallery">
+        <RevealItem>
+          <GalleryRow items={galleryItems.slice(0, Math.ceil(galleryItems.length / 2))} reverse={false} />
+        </RevealItem>
+        {galleryItems.length > 1 && (
+          <RevealItem>
+            <GalleryRow items={galleryItems.slice(Math.ceil(galleryItems.length / 2))} reverse={true} />
+          </RevealItem>
+        )}
+      </RevealGroup>
+    ) : null
+
   // Still fetching: an empty, full-height shell instead of "Project not
   // found" — otherwise that message (and the footer right under it) shows
   // for a moment and then jumps away when the real page mounts, the page's
@@ -408,10 +436,11 @@ export function ProjectPage() {
           </div>
         </div>
 
-        <ProjectVideo media={project.hero} />
+        {!photosFirst && <ProjectVideo media={project.hero} />}
 
         <div className="project-page__body-glow">
           <CursorGlow className="cursor-glow" variant="dark" glow={false} />
+          {photosFirst && galleryBlock}
           <div className="wrap project-overview" data-screen-label="Project Overview">
             <Reveal>
               <ProjectMeta />
@@ -421,18 +450,7 @@ export function ProjectPage() {
             </Reveal>
           </div>
 
-          {galleryItems.length > 0 && (
-            <RevealGroup className="project-gallery" stagger={0.1} data-screen-label="Project Gallery">
-              <RevealItem>
-                <GalleryRow items={galleryItems.slice(0, Math.ceil(galleryItems.length / 2))} reverse={false} />
-              </RevealItem>
-              {galleryItems.length > 1 && (
-                <RevealItem>
-                  <GalleryRow items={galleryItems.slice(Math.ceil(galleryItems.length / 2))} reverse={true} />
-                </RevealItem>
-              )}
-            </RevealGroup>
-          )}
+          {photosFirst ? <ProjectVideo media={project.hero} /> : galleryBlock}
 
           <Reveal>
             <Link to={projectPath(nextProject.slug)} className="project-next wrap" data-screen-label="Next Project">

@@ -64,6 +64,10 @@ export function Header() {
   const showreel = useShowreel()
   const [showreelOpen, setShowreelOpen] = useState(false)
   const [showreelOrigin, setShowreelOrigin] = useState<DOMRect | undefined>()
+  // The menu stays open under the showreel (closing the video lands back in
+  // it), so its Esc / click-outside handlers must leave the video's own alone.
+  const showreelOpenRef = useRef(false)
+  showreelOpenRef.current = showreelOpen
   const [hidden, setHidden] = useState(false)
   const [onDark, setOnDark] = useState(true)
   // Mirrors `open`, except on close it stays true for MOBILE_NAV_EXIT_S
@@ -137,8 +141,11 @@ export function Header() {
             type="button"
             className={`${className} nav__sublink-btn`}
             onClick={(e) => {
-              setShowreelOrigin(e.currentTarget.getBoundingClientRect())
-              setOpen(false)
+              // The button spans its whole column; the video should sink into
+              // the word itself, so measure the text, not the box.
+              const range = document.createRange()
+              range.selectNodeContents(e.currentTarget)
+              setShowreelOrigin(range.getBoundingClientRect())
               setShowreelOpen(true)
             }}
           >
@@ -227,7 +234,7 @@ export function Header() {
       scrollLockedRef.current = true
     }
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false)
+      if (e.key === "Escape" && !showreelOpenRef.current) setOpen(false)
     }
     // The panel doesn't cover the full viewport (it hugs its own content
     // height), so anywhere below/beside it is still "the page" as far as
@@ -235,6 +242,7 @@ export function Header() {
     // The trigger button that opened it lives inside headerRef too, so its
     // own click isn't seen as "outside" and doesn't fight the toggle.
     const onClickOutside = (e: MouseEvent) => {
+      if (showreelOpenRef.current) return
       if (headerRef.current && !headerRef.current.contains(e.target as Node)) setOpen(false)
     }
     window.addEventListener("keydown", onKey)

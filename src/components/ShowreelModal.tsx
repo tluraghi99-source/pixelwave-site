@@ -28,6 +28,7 @@ export function ShowreelModal({ showreel, onClose, origin, originShape = "box" }
   const [muted, setMuted] = useState(true)
   const [closing, setClosing] = useState(false)
   const reduceMotion = useReducedMotion()
+  const fadeOnClose = originShape === "box" && !!origin
   const requestClose = useCallback(() => setClosing(true), [])
   // The shape the clip-path starts from / returns to. Every shape is a 6-point
   // polygon in % of the viewport, so they interpolate with each other (and the
@@ -57,8 +58,12 @@ export function ShowreelModal({ showreel, onClose, origin, originShape = "box" }
     // The page underneath must not scroll while the showreel is up.
     const prev = document.documentElement.style.overflow
     document.documentElement.style.overflow = "hidden"
+    // The cursor dot is orange (black over the orange menu): white on this
+    // black screen — see `html.showreel-open` in index.css.
+    document.documentElement.classList.add("showreel-open")
     closeRef.current?.focus()
     return () => {
+      document.documentElement.classList.remove("showreel-open")
       window.removeEventListener("keydown", onKey)
       document.documentElement.style.overflow = prev
     }
@@ -80,9 +85,21 @@ export function ShowreelModal({ showreel, onClose, origin, originShape = "box" }
       role="dialog"
       aria-modal="true"
       aria-label="Showreel di PixelWave"
-      initial={{ clipPath: from }}
-      animate={{ clipPath: closing ? from : FULL_SCREEN }}
-      transition={{ duration: reduceMotion ? 0.01 : closing ? 0.55 : 0.85, ease: EASE_WAVE }}
+      initial={{ clipPath: from, opacity: 1 }}
+      animate={
+        closing
+          ? // From the logo it sinks back into its L; from a menu entry (a
+            // small word on a coloured panel) a shrinking block looks like a
+            // stray rectangle, so it just fades out, quickly.
+            fadeOnClose
+            ? { clipPath: FULL_SCREEN, opacity: 0 }
+            : { clipPath: from }
+          : { clipPath: FULL_SCREEN, opacity: 1 }
+      }
+      transition={{
+        duration: reduceMotion ? 0.01 : closing ? (fadeOnClose ? 0.25 : 0.55) : 0.85,
+        ease: closing && fadeOnClose ? "easeOut" : EASE_WAVE,
+      }}
       onAnimationComplete={() => {
         if (closing) onClose()
       }}
