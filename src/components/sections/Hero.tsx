@@ -41,6 +41,8 @@ export function Hero({ introDone }: HeroProps) {
   const [gameOpen, setGameOpen] = useState(false)
   const showreel = useShowreel()
   const [showreelOpen, setShowreelOpen] = useState(false)
+  // The square's box when the showreel was opened: it grows out of it.
+  const [showreelOrigin, setShowreelOrigin] = useState<DOMRect | undefined>()
   // While the pointer is on the square its "Guarda showreel" hint trails
   // the cursor, so the "Scroll" hint steps out of the way.
   const [squareHover, setSquareHover] = useState(false)
@@ -71,6 +73,7 @@ export function Hero({ introDone }: HeroProps) {
     if (showreel) {
       state.timer = window.setTimeout(() => {
         state.taps = 0
+        setShowreelOrigin(squareRef.current?.getBoundingClientRect())
         setShowreelOpen(true)
       }, EGG_MAX_GAP_MS)
     }
@@ -258,7 +261,7 @@ export function Hero({ introDone }: HeroProps) {
           the header and every section. */}
       {showreel &&
         showreelOpen &&
-        createPortal(<ShowreelModal showreel={showreel} onClose={closeShowreel} />, document.body)}
+        createPortal(<ShowreelModal showreel={showreel} origin={showreelOrigin} originShape="logo" onClose={closeShowreel} />, document.body)}
       {gameOpen &&
         createPortal(
           <Suspense fallback={null}>

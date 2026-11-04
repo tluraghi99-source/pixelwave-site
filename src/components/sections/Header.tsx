@@ -1,22 +1,33 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion"
+import { createPortal } from "react-dom"
 import { Link, useLocation } from "react-router-dom"
 import { Menu, X } from "lucide-react"
 import { useScreenSize } from "@/components/hooks/use-screen-size"
 import { InteractiveHoverButton } from "@/components/pw/InteractiveHoverButton"
 import { BrandLogo } from "@/components/pw/Logo"
+import { ShowreelModal } from "@/components/ShowreelModal"
 import { PixelTrail } from "@/components/ui/pixel-trail"
+import { useShowreel } from "@/hooks/useShowreel"
 import { EASE_WAVE, HERO_CROSSFADE_RATIO, HERO_NAV_HIDE_AFTER, HERO_REVEAL_END, HERO_REVEAL_START } from "@/lib/motion"
 import { ROUTES } from "@/lib/routes"
 
 // Desktop-only full menu panel — columns mirror the top-level nav, filled
 // out with a level of real sub-navigation (mirrors a reference layout).
-const MENU_COLUMNS = [
+// A link with `action: "showreel"` opens the showreel instead of navigating.
+interface MenuLink {
+  label: string
+  href: string
+  action?: "showreel"
+}
+const MENU_COLUMNS: { label: string; href: string; links: MenuLink[] }[] = [
   {
     label: "Lavori",
     href: ROUTES.work,
     // Land directly on a filter mode — WorkPage.tsx reads ?mode= once on mount.
     links: [
+      // Only offered while the CMS has a published showreel.
+      { label: "Showreel", href: "#", action: "showreel" },
       { label: "Categoria", href: `${ROUTES.work}?vista=categoria` },
       { label: "Cliente", href: `${ROUTES.work}?vista=cliente` },
     ],
@@ -24,12 +35,12 @@ const MENU_COLUMNS = [
   {
     label: "Servizi",
     href: "#services",
-    links: [] as { label: string; href: string }[],
+    links: [],
   },
   {
     label: "Studio",
     href: ROUTES.studio,
-    links: [] as { label: string; href: string }[],
+    links: [],
   },
   {
     label: "Let's chat",
@@ -50,6 +61,9 @@ const MOBILE_NAV_EXIT_S = 0.45
 
 export function Header() {
   const [open, setOpen] = useState(false)
+  const showreel = useShowreel()
+  const [showreelOpen, setShowreelOpen] = useState(false)
+  const [showreelOrigin, setShowreelOrigin] = useState<DOMRect | undefined>()
   const [hidden, setHidden] = useState(false)
   const [onDark, setOnDark] = useState(true)
   // Mirrors `open`, except on close it stays true for MOBILE_NAV_EXIT_S
@@ -110,6 +124,30 @@ export function Header() {
       </Link>
     )
   }
+
+  // Sub-links of a column; the showreel entry is a button (it opens the video
+  // over the page) and is left out while there is no showreel to play.
+  const renderSublinks = (col: (typeof MENU_COLUMNS)[number], className: string) =>
+    col.links
+      .filter((l) => l.action !== "showreel" || showreel)
+      .map((l, i) =>
+        l.action === "showreel" ? (
+          <button
+            key={`${col.label}-${i}`}
+            type="button"
+            className={`${className} nav__sublink-btn`}
+            onClick={(e) => {
+              setShowreelOrigin(e.currentTarget.getBoundingClientRect())
+              setOpen(false)
+              setShowreelOpen(true)
+            }}
+          >
+            {l.label}
+          </button>
+        ) : (
+          renderLink(l.href, l.label, `${col.label}-${i}`, className, () => setOpen(false))
+        )
+      )
 
   // The custom cursor dot is brand-orange and would vanish over this same
   // orange panel — flag it on the root element so CustomCursor's CSS (which
@@ -346,13 +384,7 @@ export function Header() {
                 <div className="nav__panel-col" key={col.label}>
                   {renderLink(col.href, col.label, col.label, "nav__panel-heading", () => setOpen(false))}
                   {col.links.length > 0 && (
-                    <div className="nav__panel-sublinks">
-                      {col.links.map((l, i) =>
-                        renderLink(l.href, l.label, `${col.label}-${i}`, "nav__panel-sublink", () =>
-                          setOpen(false)
-                        )
-                      )}
-                    </div>
+                    <div className="nav__panel-sublinks">{renderSublinks(col, "nav__panel-sublink")}</div>
                   )}
                 </div>
               ))}
@@ -386,13 +418,7 @@ export function Header() {
                 <div className="nav__mobile-group" key={col.label}>
                   {renderLink(col.href, col.label, col.label, "nav__link", () => setOpen(false))}
                   {col.links.length > 0 && (
-                    <div className="nav__mobile-sublinks">
-                      {col.links.map((l, i) =>
-                        renderLink(l.href, l.label, `${col.label}-${i}`, "nav__mobile-sublink", () =>
-                          setOpen(false)
-                        )
-                      )}
-                    </div>
+                    <div className="nav__mobile-sublinks">{renderSublinks(col, "nav__mobile-sublink")}</div>
                   )}
                 </div>
               ))}
@@ -400,6 +426,12 @@ export function Header() {
           </motion.div>
         )}
       </AnimatePresence>
+      {showreelOpen &&
+        showreel &&
+        createPortal(
+          <ShowreelModal showreel={showreel} origin={showreelOrigin} onClose={() => setShowreelOpen(false)} />,
+          document.body
+        )}
     </motion.header>
   )
 }
