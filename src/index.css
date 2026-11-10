@@ -2200,3 +2200,94 @@ html.mark-hover .cursor-hint__inner { color: var(--pw-black); animation: none; t
   padding: 0; border: 0; background: none; cursor: pointer;
   font: inherit; color: var(--pw-orange); text-decoration: underline; text-underline-offset: 2px;
 }
+
+/* ===========================================================================
+   Vision from — the globe (components/ui/route-globe.tsx, sections/VisionFrom.tsx)
+   =========================================================================== */
+/* The wrapper around Services: tall, so the page stays still for a while. Its
+   box sticks with its bottom edge on the bottom of the screen (or its top on the
+   top, when it is shorter than the screen); --vf-box-h is its own height, set in
+   VisionFrom.tsx. The stage is a screen-sized layer over the box's bottom: the
+   veil fades Services out, the globe rises from the bottom edge. */
+.vf-wrap { position: relative; }
+/* (a block, not padding: a sticky box only moves inside its parent's content box) */
+.vf-wrap::after { content: ""; display: block; height: 200vh; height: 200svh; }
+.vf-box {
+  position: sticky; --vf-box-h: 100vh; background: var(--pw-black);
+  top: min(0px, calc(100vh - var(--vf-box-h))); top: min(0px, calc(100svh - var(--vf-box-h)));
+}
+/* The empty strip under Services where the globe first peeks out. */
+.vf-gap { height: 22vh; height: 22svh; }
+.vf-stage {
+  position: absolute; left: 0; right: 0; height: 100vh; height: 100svh; overflow: hidden;
+  top: max(0px, calc(var(--vf-box-h) - 100vh)); top: max(0px, calc(var(--vf-box-h) - 100svh));
+  color: var(--pw-white);
+}
+.vf-veil { position: absolute; inset: 0; background: var(--pw-black); isolation: isolate; }
+.rg.vf-globe { position: absolute; inset: 0; width: auto; }
+.vf-intro {
+  position: absolute; left: clamp(1rem, 1.2vw, 1.25rem); top: 50%; translate: 0 -50%;
+  pointer-events: none;
+}
+.vf-intro .pw-seclabel { margin-bottom: 1.5rem; }
+.vf-title {
+  /* Same type as the service names (.svc-row__name). */
+  font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; line-height: 1;
+  font-size: clamp(2.5rem, 5vw, 6.25rem); white-space: nowrap;
+}
+.vf-sub {
+  max-width: 36ch; margin-top: 1.25rem; font-size: clamp(0.95rem, 1.15vw, 1.15rem);
+  line-height: 1.45; color: rgba(255, 255, 255, 0.7);
+}
+@media (max-width: 1023px) {
+  /* Narrow screens: the globe takes the width, so the title sits above it and the
+     text under it. */
+  .vf-intro {
+    inset: 0; translate: none; display: flex; flex-direction: column; justify-content: space-between;
+    padding: 5.5rem 1rem 2.5rem;
+  }
+  .vf-title { font-size: clamp(2rem, 9vw, 3rem); }
+  .vf-sub { margin-top: 0; max-width: 36ch; }
+}
+
+.rg { position: relative; width: 100%; overflow: hidden; }
+.rg__canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  /* Horizontal drags turn the globe; vertical ones still scroll the page. */
+  touch-action: pan-y; cursor: grab;
+}
+/* Each destination: its dot sits exactly on the point (the button is moved there
+   every frame), the label hangs off it — title, and under it the place. */
+.rg__pin {
+  position: absolute; left: 0; top: 0; padding: 0; border: 0; background: none;
+  color: var(--rg-text, var(--pw-white)); text-align: left; will-change: transform;
+}
+.rg__dot {
+  position: absolute; left: -5px; top: -5px; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--pw-orange); box-shadow: 0 0 0 4px rgba(255, 91, 0, 0.25);
+  transition: transform var(--dur-base) var(--ease-wave), box-shadow var(--dur-base) var(--ease-wave);
+}
+.rg__label {
+  position: absolute; left: 16px; top: -0.75rem; display: flex; flex-direction: column; gap: 0.15rem;
+  white-space: nowrap; cursor: pointer;
+}
+.rg__pin--left .rg__label { left: auto; right: 16px; align-items: flex-end; text-align: right; }
+.rg__title {
+  font-family: var(--font-display); font-weight: 700; font-size: clamp(0.85rem, 1.1vw, 1.05rem);
+  letter-spacing: -0.01em; line-height: 1.1; transition: color var(--dur-base) var(--ease-wave);
+}
+.rg__note {
+  font-family: var(--font-mono-accent); font-size: 0.66rem; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--rg-muted, rgba(255, 255, 255, 0.6));
+}
+/* A button over a dragged canvas: a generous hit area around the dot and label. */
+.rg__pin::after { content: ""; position: absolute; inset: -14px; }
+.rg__pin:hover .rg__title, .rg__pin:focus-visible .rg__title { color: var(--pw-orange); }
+.rg__pin:hover .rg__dot, .rg__pin:focus-visible .rg__dot {
+  transform: scale(1.5); box-shadow: 0 0 0 6px rgba(255, 91, 0, 0.35);
+}
+.rg__pin:focus-visible { outline: 2px solid var(--pw-orange); outline-offset: 6px; }
+.rg__pin--dot .rg__label { opacity: 0; pointer-events: none; }
+.rg__pin--dot:hover .rg__label, .rg__pin--dot:focus-visible .rg__label { opacity: 1; pointer-events: auto; }
+.rg__pin:hover, .rg__pin:focus-visible { z-index: 2; }
+.rg__label { transition: opacity var(--dur-base) var(--ease-wave); }

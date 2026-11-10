@@ -5,6 +5,7 @@ import { Hero } from "@/components/sections/Hero"
 import { TickerStrip } from "@/components/sections/TickerStrip"
 import { WorkReel } from "@/components/sections/WorkReel"
 import { Services } from "@/components/sections/Services"
+import { VisionFrom } from "@/components/sections/VisionFrom"
 import { Footer } from "@/components/sections/Footer"
 
 export function HomePage() {
@@ -23,7 +24,9 @@ export function HomePage() {
         <main>
           <WorkReel ctaHeadline="Hai una wave in mente?" />
           <TickerStrip />
-          <Services />
+          <VisionFrom>
+            <Services />
+          </VisionFrom>
         </main>
         <Footer />
       </div>

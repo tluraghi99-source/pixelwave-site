@@ -4,16 +4,33 @@
     {
       "name": "pixellwave-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
       "port": 5173,
       "autoPort": true
     },
     {
       "name": "pixellwave-preview",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "preview"],
+      "runtimeArgs": [
+        "run",
+        "preview"
+      ],
       "port": 4173,
       "autoPort": true
+    },
+    {
+      "name": "cms-local",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "../pixelwave-cms",
+        "run",
+        "develop"
+      ],
+      "port": 1337
     }
   ]
 }

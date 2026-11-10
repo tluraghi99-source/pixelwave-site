@@ -261,6 +261,72 @@ export async function fetchShowreel(): Promise<Showreel | null> {
   }
 }
 
+/** One "Vision from" video: a place on the globe (home page) with its title,
+ *  where it was shot, and the video that opens full screen from its dot. */
+export interface VisionFrom {
+  id: string
+  title: string
+  location: string
+  lat: number
+  lon: number
+  video: Showreel
+}
+
+interface StrapiVisionFromRaw {
+  documentId: string
+  title: string
+  location: string | null
+  latitude: number | string | null
+  longitude: number | string | null
+  video: StrapiMediaRaw | null
+  youtubeUrl: string | null
+}
+
+/** Local development only: a few stand-ins so the globe can be seen and tuned
+ *  while the CMS has no "Vision from" yet. Dead code in the production build —
+ *  there, no published entry means no section. */
+const DEV_PLACEHOLDER_VISIONS: VisionFrom[] = import.meta.env.DEV
+  ? [
+      { id: "dev-tokyo", title: "Titolo di prova", location: "Tokyo, Giappone", lat: 35.68, lon: 139.69 },
+      { id: "dev-nyc", title: "Titolo di prova", location: "New York, USA", lat: 40.71, lon: -74.0 },
+      { id: "dev-dubai", title: "Titolo di prova", location: "Dubai, Emirati Arabi", lat: 25.2, lon: 55.27 },
+      { id: "dev-sydney", title: "Titolo di prova", location: "Sydney, Australia", lat: -33.87, lon: 151.21 },
+      { id: "dev-paris", title: "Titolo di prova", location: "Parigi, Francia", lat: 48.86, lon: 2.35 },
+    ].map((v) => ({ ...v, video: { type: "video" as const, src: "/video/hero.mp4" } }))
+  : []
+
+function mapVisionFrom(raw: StrapiVisionFromRaw): VisionFrom | null {
+  const lat = Number(raw.latitude)
+  const lon = Number(raw.longitude)
+  // Without coordinates (the CMS couldn't place the location and nobody typed
+  // them in) there is nowhere on the globe to put it.
+  if (raw.latitude == null || raw.longitude == null || !Number.isFinite(lat) || !Number.isFinite(lon)) return null
+  let video: Showreel | null = null
+  if (raw.video?.mime.startsWith("video/")) video = { type: "video", src: strapiMediaUrl(raw.video.url) }
+  else {
+    const videoId = raw.youtubeUrl ? parseYoutubeId(raw.youtubeUrl) : null
+    if (videoId) video = { type: "youtube", videoId }
+  }
+  if (!video) return null
+  return { id: raw.documentId, title: raw.title, location: raw.location ?? "", lat, lon, video }
+}
+
+/** Fetches every published "Vision from", newest first. Resolves to `[]` on
+ *  any network/parse failure (the section then doesn't show). */
+export async function fetchVisionFroms(): Promise<VisionFrom[]> {
+  try {
+    const res = await fetch(`${STRAPI_URL}/api/vision-froms?populate=video&sort=createdAt:desc&pagination[pageSize]=100`)
+    if (!res.ok) return DEV_PLACEHOLDER_VISIONS
+    const json = await res.json()
+    const items = (json.data as StrapiVisionFromRaw[])
+      .map(mapVisionFrom)
+      .filter((v): v is VisionFrom => v !== null)
+    return items.length > 0 ? items : DEV_PLACEHOLDER_VISIONS
+  } catch {
+    return DEV_PLACEHOLDER_VISIONS
+  }
+}
+
 export interface TeamMember {
   id: string
   order: number

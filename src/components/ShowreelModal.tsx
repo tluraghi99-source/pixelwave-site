@@ -16,6 +16,8 @@ interface ShowreelModalProps {
   /** "logo": the origin box is the logo's square, so the shape is its L
    *  (the notch included) rather than a plain rectangle. */
   originShape?: "box" | "logo"
+  /** Accessible name of the dialog (default: the studio's showreel). */
+  label?: string
 }
 
 /** The studio's showreel, full screen over everything: close (X, top right,
@@ -24,7 +26,7 @@ interface ShowreelModalProps {
  *
  *  It grows out of `origin` (a clip-path from that shape to the whole screen)
  *  and shrinks back into it on close, instead of just appearing. */
-export function ShowreelModal({ showreel, onClose, origin, originShape = "box" }: ShowreelModalProps) {
+export function ShowreelModal({ showreel, onClose, origin, originShape = "box", label = "Showreel di PixelWave" }: ShowreelModalProps) {
   const [muted, setMuted] = useState(true)
   const [closing, setClosing] = useState(false)
   const reduceMotion = useReducedMotion()
@@ -84,7 +86,7 @@ export function ShowreelModal({ showreel, onClose, origin, originShape = "box" }
       className={`showreel${closing ? " showreel--closing" : ""}`}
       role="dialog"
       aria-modal="true"
-      aria-label="Showreel di PixelWave"
+      aria-label={label}
       initial={{ clipPath: from, opacity: 1 }}
       animate={
         closing
@@ -111,11 +113,11 @@ export function ShowreelModal({ showreel, onClose, origin, originShape = "box" }
           ref={iframeRef}
           className="showreel__media showreel__media--embed"
           src={`https://www.youtube.com/embed/${showreel.videoId}?autoplay=1&mute=1&loop=1&playlist=${showreel.videoId}&controls=0&playsinline=1&enablejsapi=1&rel=0`}
-          title="Showreel di PixelWave"
+          title={label}
           allow="autoplay; fullscreen"
         />
       )}
-      <button ref={closeRef} type="button" className="showreel__close" onClick={requestClose} aria-label="Chiudi lo showreel">
+      <button ref={closeRef} type="button" className="showreel__close" onClick={requestClose} aria-label="Chiudi il video">
         <X size={20} aria-hidden="true" />
       </button>
       <div className="project-video-pin__controls">
