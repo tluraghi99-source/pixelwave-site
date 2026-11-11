@@ -63,9 +63,12 @@ export function VisionFrom({ children }: { children: ReactNode }) {
     return Math.max(0, Math.min(1, p / GLOBE_SHARE))
   })
 
-  // Services fades to black as the globe rises; until then it stays usable.
-  const veilOpacity = useTransform(progress, [0, 0.4], [0, 1])
-  const stageEvents = useTransform(progress, (p) => (p > 0.02 ? "auto" : "none"))
+  // Services fades to black as the globe rises, and stays usable (its rows open
+  // on hover) for as long as it can be seen through the veil; the stage takes
+  // the pointer only once the veil is complete.
+  const VEIL_END = 0.4
+  const veilOpacity = useTransform(progress, [0, VEIL_END], [0, 1])
+  const stageEvents = useTransform(progress, (p) => (p >= VEIL_END ? "auto" : "none"))
   // The title comes in on the left once the globe is where it stays.
   const titleOpacity = useTransform(progress, [0.82, 1], [0, 1])
   const titleX = useTransform(progress, [0.82, 1], [-40, 0])
