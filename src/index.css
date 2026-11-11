@@ -1646,6 +1646,17 @@ a.svc-row__name { display: block; color: inherit; text-decoration: none; }
   transition: opacity 0.35s var(--ease-wave), transform 0.35s var(--ease-wave);
 }
 .svc-row--open .svc-row__tags .pw-tag { opacity: 1; transform: translateY(0); }
+/* A plain list, not underlined: an underline reads as a link, and these go
+   nowhere (the real link is "Vedi i progetti", right below). A small cyan dot
+   marks each item instead. */
+.svc-row__tags .pw-tag {
+  border-bottom: 0; padding-bottom: 0; gap: 0.7em; cursor: default;
+  color: rgba(255, 255, 255, 0.78);
+}
+.svc-row__tags .pw-tag::before {
+  content: ""; width: 0.4em; height: 0.4em; border-radius: 50%; flex: none;
+  background: var(--accent-secondary);
+}
 
 .svc-row__image {
   border-radius: 4px;
