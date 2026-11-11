@@ -203,17 +203,43 @@ function mapProject(raw: StrapiProjectRaw): Project {
  *  WorkPage.tsx, Work.tsx) shuffle for display, so the fetch itself just
  *  needs a stable order to sort from. Resolves to `[]` on any network/parse
  *  failure — callers render an empty state rather than an error message. */
-export async function fetchProjects(): Promise<Project[]> {
-  try {
-    const res = await fetch(
-      `${STRAPI_URL}/api/projects?populate=tags,heroMedia,cover,galleryImages,workCategories&sort=documentId:asc&pagination[pageSize]=100`
-    )
-    if (!res.ok) return []
-    const json = await res.json()
-    return (json.data as StrapiProjectRaw[]).map(mapProject)
-  } catch {
-    return []
+async function requestProjects(): Promise<Project[]> {
+  const url = `${STRAPI_URL}/api/projects?populate=tags,heroMedia,cover,galleryImages,workCategories&sort=documentId:asc&pagination[pageSize]=100`
+  // A phone on a weak connection (or a hiccup of the server) must not leave the
+  // home with an empty carousel until the next reload: a request that fails or
+  // hangs is tried again, a couple of times, before giving up.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 8000)
+    try {
+      const res = await fetch(url, { signal: controller.signal })
+      if (res.ok) {
+        const json = await res.json()
+        return (json.data as StrapiProjectRaw[]).map(mapProject)
+      }
+    } catch {
+      /* try again */
+    } finally {
+      clearTimeout(timer)
+    }
+    await new Promise((resolve) => setTimeout(resolve, 600 * (attempt + 1)))
   }
+  return []
+}
+
+let projectsRequest: { at: number; promise: Promise<Project[]> } | null = null
+
+/** Every section that shows projects asks for the list when it mounts — the
+ *  carousel, the services, the preloader: three identical requests per page
+ *  load. They share one for a minute (a failed or empty result is never kept). */
+export function fetchProjects(): Promise<Project[]> {
+  if (projectsRequest && Date.now() - projectsRequest.at < 60_000) return projectsRequest.promise
+  const promise = requestProjects().then((list) => {
+    if (list.length === 0 && projectsRequest?.promise === promise) projectsRequest = null
+    return list
+  })
+  projectsRequest = { at: Date.now(), promise }
+  return promise
 }
 
 /** Extracts an 11-character YouTube video id from any normal URL shape

@@ -1,16 +1,7 @@
 import { useEffect, useState } from "react"
 import { useProjectsStatus } from "@/hooks/useProjects"
-import { HERO_VIDEO_SRC } from "@/lib/motion"
+import { loadHeroVideo } from "@/lib/heroVideo"
 import { projectThumbUrl } from "@/lib/strapi"
-
-/** Downloads the scrubbed reel video completely, so it sits in the browser
- *  cache (the <video> elements in WorkReel ask for the same URL). Never
- *  rejects: a failed download must not hold the site closed. */
-function warmVideo(): Promise<void> {
-  return fetch(HERO_VIDEO_SRC, { cache: "force-cache" })
-    .then((res) => (res.ok ? res.blob() : undefined))
-    .then(() => undefined, () => undefined)
-}
 
 /** Loads (and decodes) the project cover thumbnails the home page shows — the
  *  work carousel and the services rows use these exact URLs, so once they are
@@ -27,7 +18,7 @@ export function usePreloadHomeAssets(enabled: boolean): boolean {
   useEffect(() => {
     if (!enabled) return
     let cancelled = false
-    warmVideo().then(() => {
+    loadHeroVideo().then(() => {
       if (!cancelled) setVideoReady(true)
     })
     return () => {
