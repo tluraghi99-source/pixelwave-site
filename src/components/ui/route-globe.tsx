@@ -374,7 +374,6 @@ export function RouteGlobe({
           <span className="rg__dot" aria-hidden="true" />
           <span className="rg__label">
             <strong className="rg__title">{p.name}</strong>
-            {p.note && <span className="rg__note">{p.note}</span>}
           </span>
         </button>
       ))}
