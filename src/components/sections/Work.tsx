@@ -4,13 +4,15 @@ import { motion, useMotionValue, useMotionValueEvent, useSpring } from "framer-m
 import type { MotionValue } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
 import { SectionLabel } from "@/components/pw/SectionLabel"
+import { Button } from "@/components/pw/Button"
 import { Card } from "@/components/pw/Card"
 import { Tag } from "@/components/pw/Tag"
 import { Reveal } from "@/components/motion/Reveal"
 import { shuffle } from "@/lib/array"
 import { CircularGallery, type CircularGalleryHandle } from "@/components/ui/circular-gallery"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
-import { projectPath } from "@/lib/routes"
+import { ROUTES, projectPath } from "@/lib/routes"
+import { projectCategoryLabels } from "@/lib/categories"
 
 /** Shared chain (see strapi.ts's projectThumbUrl) — this gallery only ever
  *  shows static images, so a video/youtube heroMediaType (or no cover and
@@ -114,9 +116,9 @@ function WorkTrack({ projects }: { projects: Project[] }) {
           <Card
             titleFirst
             media={<WorkMedia src={galleryImageUrl(w)} />}
-            meta={w.tags.map((t, ti) => (
-              <Tag key={ti} variant={t.highlighted ? "orange" : "outline"}>
-                {t.label}
+            meta={projectCategoryLabels(w.workCategories).map((label) => (
+              <Tag key={label} variant="outline">
+                {label}
               </Tag>
             ))}
             title={w.title}
@@ -152,7 +154,7 @@ export function WorkGallery({
       pickRandomProjects(projects, GALLERY_ITEM_COUNT).map((w) => ({
         image: galleryImageUrl(w),
         text: w.title,
-        tags: w.tags.map((t) => ({ variant: t.highlighted ? ("orange" as const) : ("outline" as const), label: t.label })),
+        tags: projectCategoryLabels(w.workCategories).map((label) => ({ variant: "outline" as const, label })),
         href: projectPath(w.slug),
       })),
     [projects]
@@ -187,6 +189,16 @@ export function WorkHeading(): ReactNode {
           <p className="lead">Le nostre waves.</p>
         </Reveal>
       </div>
+      <Reveal delay={0.15}>
+        <Button
+          variant="secondary"
+          href={ROUTES.work}
+          iconRight={<ArrowUpRight size={16} />}
+          className="reel__cta-btn"
+        >
+          Tutti i progetti
+        </Button>
+      </Reveal>
     </div>
   )
 }

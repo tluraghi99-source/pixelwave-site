@@ -103,15 +103,16 @@ export function RouteGlobe({
       cv.width = Math.round(W * dpr)
       cv.height = Math.round(Hh * dpr)
     }
-    // Opening pose: a giant globe whose top edge just peeks over the bottom of the box
-    // (its centre is below the bottom edge). Resting pose: centred, taking the
-    // box's whole height. In between it eases.
+    // Opening pose: a giant globe of which only the top ~13% of the box's height
+    // shows, peeking up from the bottom edge (the box fills the screen only once
+    // the page is pinned, so it is not seen before). Resting pose: centred,
+    // taking the box's whole height. In between it eases, so it keeps coming up.
     const frame = () => {
       const p0 = progress ? Math.max(0, Math.min(1, progress.get())) : 1
       const e = p0 * p0 * (3 - 2 * p0)
       const r0 = Math.min(W * 0.41, Hh * 0.7)
       const r1 = Math.min(W * 0.44, Hh * 0.45)
-      const cy0 = Hh * 0.88 + r0
+      const cy0 = Hh * 0.87 + r0
       return { r: r0 + (r1 - r0) * e, cy: cy0 + (Hh * 0.5 - cy0) * e, p: p0 }
     }
     const restRadius = () => Math.min(W * 0.44, Hh * 0.45)

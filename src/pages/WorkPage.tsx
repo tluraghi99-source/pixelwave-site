@@ -1,7 +1,7 @@
-import { useLayoutEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react"
 import type { ReactNode } from "react"
 import { useSearchParams } from "react-router-dom"
-import { motion } from "framer-motion"
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
 import { Card } from "@/components/pw/Card"
 import { Tag } from "@/components/pw/Tag"
@@ -14,7 +14,7 @@ import { useProjects } from "@/hooks/useProjects"
 import { usePageMeta } from "@/hooks/usePageMeta"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
 import { projectPath } from "@/lib/routes"
-import { categoryKey, categoryLabel } from "@/lib/categories"
+import { categoryKey, categoryLabel, projectCategoryLabels } from "@/lib/categories"
 import { SERVICES } from "@/data/services"
 
 /** Shared chain (see strapi.ts's projectThumbUrl) — a small grid card is
@@ -25,6 +25,7 @@ function gridThumbUrl(p: Project): string {
 }
 
 const FADE_WIDTH = 20 // px
+const WIP_TITLE = "Work in Progress"
 
 /** The scrollable filter-pill row (.work-page__filters, shared by both
  *  Category and Client mode). The edge fade only used to be a static
@@ -133,9 +134,14 @@ export function WorkPage() {
   // (e.g. /lavori?vista=cliente) — read once on mount, not kept in sync with
   // further clicks on the toggle below (out of scope for now).
   const [searchParams] = useSearchParams()
-  const [mode, setMode] = useState<"category" | "client">(
-    ["cliente", "client"].includes(searchParams.get("vista") ?? searchParams.get("mode") ?? "") ? "client" : "category"
-  )
+  // Arriving on the page, the client view is the one open — unless the link asks
+  // for the category one (?vista=categoria, or a ?categoria= to land on).
+  const [mode, setMode] = useState<"category" | "client">(() => {
+    const view = searchParams.get("vista") ?? searchParams.get("mode") ?? ""
+    const wantsCategory =
+      ["categoria", "category"].includes(view) || !!(searchParams.get("categoria") ?? searchParams.get("category"))
+    return wantsCategory ? "category" : "client"
+  })
   // One category at a time, like the client picker: choosing one replaces the
   // previous choice, and clicking the active one clears it (all projects).
   // /lavori?categoria=Video opens with that category already selected — the
@@ -153,6 +159,23 @@ export function WorkPage() {
   )
   const [activeClient, setActiveClient] = useState<string | null>(null)
 
+  // Going from one view to the other starts it clean: no category and no client
+  // stays selected.
+  function switchMode(next: "category" | "client") {
+    if (next === mode) return
+    setActiveCategories(new Set())
+    setActiveClient(null)
+    setMode(next)
+  }
+
+  // The menu's Categoria / Cliente links, used while already on this page.
+  const viewParam = searchParams.get("vista") ?? searchParams.get("mode")
+  useEffect(() => {
+    if (viewParam) switchMode(["categoria", "category"].includes(viewParam) ? "category" : "client")
+    // Only when the link's view changes (switchMode reads the current mode).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewParam])
+
   // A ?category= link to a category with no projects yet (or an unknown one)
   // is ignored rather than leaving an empty grid with no button to undo it.
   const selectedCategories = useMemo(
@@ -160,8 +183,8 @@ export function WorkPage() {
     [activeCategories, FILTER_CATEGORIES]
   )
 
-  // The page title names the category you are in (in orange); without one it
-  // stays "Progetti.".
+  // The page title names the category (or, in client mode, the client) you are
+  // in, in orange; without one it stays "Progetti.".
   const titleCategory =
     mode === "category" && selectedCategories.size === 1
       ? categoryLabel(FILTER_CATEGORIES.find((n) => selectedCategories.has(categoryKey(n))) ?? [...selectedCategories][0])
@@ -194,10 +217,35 @@ export function WorkPage() {
     return projects.filter((p) => p.client === activeClient)
   }, [projects, mode, selectedCategories, activeClient])
 
+  // A service nobody has a project for yet: its page is empty, so the whole page
+  // wears hazard stripes (work in progress). Not while the projects are loading.
+  const isWip = fetchedProjects.length > 0 && visibleProjects.length === 0
+
+  // On such a page the title swaps, now and then, between the category's name
+  // and "Work in Progress". Starts on the name; stays still with reduced motion.
+  const reduceMotion = useReducedMotion()
+  const [wipWord, setWipWord] = useState(false)
+  useEffect(() => {
+    setWipWord(false)
+    if (!isWip || !titleCategory || reduceMotion) return
+    let id = 0
+    const step = (showWip: boolean) => {
+      id = window.setTimeout(() => {
+        setWipWord(!showWip)
+        step(!showWip)
+      }, 2400)
+    }
+    step(false)
+    return () => window.clearTimeout(id)
+  }, [isWip, titleCategory, reduceMotion])
+  // Client mode: the chosen client's name takes the title's place, the same way.
+  const titleClient = mode === "client" ? activeClient : null
+  const shownTitle = titleCategory && isWip && wipWord ? WIP_TITLE : (titleCategory ?? titleClient)
+
   return (
     <>
       <main>
-        <section className="sec work-page" data-screen-label="All Work">
+        <section className={`sec work-page${isWip ? " work-page--wip" : ""}`} data-screen-label="All Work">
           <div className="work-hero" data-screen-label="Work Hero" />
           <CursorGlow className="cursor-glow" variant="light" glow />
           <CornerCta />
@@ -205,16 +253,19 @@ export function WorkPage() {
             <div className="work-page__head">
               <Reveal delay={0.1}>
                 <p className="lead">
-                  {titleCategory ? (
-                    <motion.span
-                      key={titleCategory}
-                      className="work-page__lead-active"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.35, ease: EASE_WAVE }}
-                    >
-                      {titleCategory}
-                    </motion.span>
+                  {shownTitle ? (
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={shownTitle}
+                        className="work-page__lead-active"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.35, ease: EASE_WAVE }}
+                      >
+                        {shownTitle}
+                      </motion.span>
+                    </AnimatePresence>
                   ) : (
                     "Progetti."
                   )}
@@ -225,12 +276,12 @@ export function WorkPage() {
                   <button
                     type="button"
                     role="tab"
-                    aria-selected={mode === "category"}
-                    className={`work-page__mode-tab ${mode === "category" ? "is-active" : ""}`}
-                    onClick={() => setMode("category")}
+                    aria-selected={mode === "client"}
+                    className={`work-page__mode-tab ${mode === "client" ? "is-active" : ""}`}
+                    onClick={() => switchMode("client")}
                   >
-                    Categoria
-                    {mode === "category" && (
+                    Cliente
+                    {mode === "client" && (
                       <motion.span
                         className="work-page__mode-tab-underline"
                         layoutId="work-page__mode-tab-underline"
@@ -241,12 +292,12 @@ export function WorkPage() {
                   <button
                     type="button"
                     role="tab"
-                    aria-selected={mode === "client"}
-                    className={`work-page__mode-tab ${mode === "client" ? "is-active" : ""}`}
-                    onClick={() => setMode("client")}
+                    aria-selected={mode === "category"}
+                    className={`work-page__mode-tab ${mode === "category" ? "is-active" : ""}`}
+                    onClick={() => switchMode("category")}
                   >
-                    Cliente
-                    {mode === "client" && (
+                    Categoria
+                    {mode === "category" && (
                       <motion.span
                         className="work-page__mode-tab-underline"
                         layoutId="work-page__mode-tab-underline"
@@ -310,9 +361,9 @@ export function WorkPage() {
                     <Card
                       titleFirst
                       media={<img src={gridThumbUrl(p)} alt={p.title} />}
-                      meta={p.tags.map((t, ti) => (
-                        <Tag key={ti} variant={t.highlighted ? "orange" : "outline"}>
-                          {t.label}
+                      meta={projectCategoryLabels(p.workCategories).map((label) => (
+                        <Tag key={label} variant="outline">
+                          {label}
                         </Tag>
                       ))}
                       title={p.title}

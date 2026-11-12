@@ -734,6 +734,7 @@ header.nav .nav__mobile .nav__link {
   position: absolute; z-index: 3;
   top: 76px; right: calc(clamp(1rem, 1.2vw, 1.25rem) + var(--scroll-comp, 0px));
 }
+.corner-cta-wrap--fixed { position: fixed; }
 .corner-cta {
   display: flex; flex-direction: column; justify-content: space-between;
   /* Three times the menu button's width (84px = 5.25rem at rest), same height
@@ -845,6 +846,38 @@ header.nav .nav__mobile .nav__link {
 .showreel__close:hover { border-color: var(--pw-orange); color: var(--pw-orange); }
 .showreel__close:focus-visible { outline: 2px solid var(--pw-orange); outline-offset: 2px; }
 .showreel__mute { border-radius: var(--radius-control); }
+
+/* Gallery photo, full screen (components/PhotoLightbox.tsx): black, the picture
+   letterboxed, close top right (the showreel's button), arrows at the sides. */
+.lightbox {
+  position: fixed; inset: 0; z-index: var(--z-modal);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--pw-black); color: var(--pw-white); cursor: zoom-out;
+}
+.lightbox__media {
+  display: block; max-width: calc(100vw - 2 * clamp(3.5rem, 7vw, 6rem)); max-height: calc(100svh - 2 * clamp(3.5rem, 7vw, 5rem));
+  width: auto; height: auto; object-fit: contain; cursor: default;
+  animation: lightbox-in 0.5s var(--ease-wave) both;
+}
+@keyframes lightbox-in { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: none; } }
+.lightbox__close { cursor: pointer; animation: none; }
+.lightbox__nav {
+  position: absolute; top: 50%; translate: 0 -50%; z-index: 2;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; cursor: pointer;
+  background: rgba(0, 0, 0, 0.35); color: var(--pw-white); border: 1px solid rgba(255, 255, 255, 0.5);
+  transition: border-color var(--dur-base) var(--ease-wave), color var(--dur-base) var(--ease-wave);
+}
+.lightbox__nav:hover { border-color: var(--pw-orange); color: var(--pw-orange); }
+.lightbox__nav:focus-visible { outline: 2px solid var(--pw-orange); outline-offset: 2px; }
+.lightbox__nav--prev { left: clamp(0.5rem, 1.2vw, 1.25rem); }
+.lightbox__nav--next { right: clamp(0.5rem, 1.2vw, 1.25rem); }
+.lightbox__count {
+  position: absolute; bottom: clamp(1rem, 1.6vw, 1.5rem); left: 50%; translate: -50% 0;
+  font-family: var(--font-mono-accent); font-size: 0.7rem; letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.6);
+}
+@media (prefers-reduced-motion: reduce) { .lightbox__media { animation: none; } }
 
 /* video-scrub — <video> + tint that fill their nearest positioned ancestor;
    reused both by the mobile ambient section below and inside .reel__inner */
@@ -1110,6 +1143,19 @@ header.nav .nav__mobile .nav__link {
    hero and everything below it as one continuous dot field, so there's no
    seam where the animated grid used to end at the hero's bottom edge. */
 .work-hero { height: 50svh; }
+/* An empty page (a service with no project yet): hazard stripes behind everything,
+   yellow and black, kept very light. */
+.work-page--wip::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 204, 0, 0.16) 0 18px,
+    rgba(0, 0, 0, 0.045) 18px 36px
+  );
+  animation: work-wip-in 0.6s var(--ease-wave) both;
+}
+@keyframes work-wip-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .work-page--wip::before { animation: none; } }
 /* nowrap above 767px: whether this row wraps must depend on viewport, not on
    which filter list is active. flex-wrap: wrap here would let the browser
    decide based on each child's unwrapped content width — fine for the short
@@ -1250,6 +1296,12 @@ header.nav .nav__mobile .nav__link {
   gap: var(--work-grid-gap); margin-top: clamp(2.5rem, 3vw, 4rem);
 }
 @media (max-width: 640px) { .work-grid { grid-template-columns: 1fr; } }
+/* Desktop: three columns, to see more at once (tablet stays on two). The filter
+   row above then spans the last two columns' footprint, edge to edge with them. */
+@media (min-width: 1024px) {
+  .work-grid { grid-template-columns: repeat(3, 1fr); }
+  .work-page__filter-block { max-width: calc((100% - 2 * var(--work-grid-gap)) / 3 * 2 + var(--work-grid-gap)); }
+}
 /* Landscape crop instead of the shared .pw-card's tall 3/4 default, and the
    info block hugs the image instead of centering in the leftover space. */
 .work-grid .pw-card { aspect-ratio: auto; background: transparent; border: none; border-radius: 0; }
@@ -1380,7 +1432,7 @@ header.nav .nav__mobile .nav__link {
 .project-gallery__row { overflow: hidden; margin-bottom: 0.875rem; }
 .project-gallery__track {
   display: flex; width: max-content;
-  animation: project-gallery-rtl 34s linear infinite;
+  animation: project-gallery-rtl 80s linear infinite;
 }
 .project-gallery__track--ltr { animation-name: project-gallery-ltr; }
 /* No gap here (or on .project-gallery__group): each .project-gallery__item
@@ -1403,17 +1455,9 @@ header.nav .nav__mobile .nav__link {
   height: clamp(320px, 32vw, 520px); width: auto;
   flex-shrink: 0; border-radius: 2px; overflow: hidden; margin-right: 0.875rem;
 }
-/* Placeholder slot while a still is still being extracted from the video —
-   16:9, like the videos these come from, with a slow soft sweep. */
-.project-gallery__skeleton {
-  height: 100%; aspect-ratio: 16 / 9;
-  background: linear-gradient(100deg, rgba(255,255,255,0.05) 20%, rgba(255,255,255,0.12) 40%, rgba(255,255,255,0.05) 60%) 0 0 / 200% 100%;
-  animation: project-gallery-shimmer 1.6s linear infinite;
-}
-@keyframes project-gallery-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
-@media (prefers-reduced-motion: reduce) {
-  .project-gallery__skeleton { animation: none; }
-}
+/* A photo opens full screen on a click (components/PhotoLightbox.tsx). */
+.project-gallery__item.is-zoomable { cursor: zoom-in; }
+.project-gallery__item.is-zoomable:focus-visible { outline: 2px solid var(--pw-orange); outline-offset: 2px; }
 /* height: 100% + width: auto (no object-fit) renders each image/video at its
    own natural aspect ratio scaled to the row's fixed height — content-aware
    box widths instead of the old fixed 1:1 square + object-fit: cover crop. */
@@ -1429,7 +1473,7 @@ header.nav .nav__mobile .nav__link {
    looking filmstrip instead of two oversized, sluggish rows. */
 @media (max-width: 1023px) {
   .project-gallery__item { height: clamp(140px, 42vw, 280px); margin-right: 0.5rem; }
-  .project-gallery__track { animation-duration: 16s; }
+  .project-gallery__track { animation-duration: 38s; }
 }
 @keyframes project-gallery-rtl { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes project-gallery-ltr { from { transform: translateX(-50%); } to { transform: translateX(0); } }
@@ -1548,117 +1592,67 @@ header.nav .nav__mobile .nav__link {
 .studio-gallery__item { flex: 0 0 clamp(280px, 9.4vw, 520px); aspect-ratio: 4 / 3; overflow: hidden; scroll-snap-align: start; }
 .studio-gallery__item img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-/* Services accordion — plain in-flow list, no scroll-pin. Rows expand on
-   hover (desktop) or tap (touch), one open at a time (Services.tsx owns the
-   open/close state; this is purely the `.svc-row--open` visual state). */
-.svc-list { border-top: 1px solid var(--border-subtle); }
+/* Services accordion on two columns (Services.tsx): three lines of two, a whole
+   line opens at a time (hover, or a tap on touch screens) — `.svc-row--open` is
+   only the visual state. Not links: nothing here goes anywhere. */
+.svc-list {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: clamp(2rem, 5vw, 6rem); border-top: 1px solid var(--border-subtle);
+}
+/* Each cell as tall as its line, so the rules under the two line up. */
+.svc-list > * { display: flex; }
+.svc-list > * > .svc-row { flex: 1; min-width: 0; }
 
 .svc-row {
   border-bottom: 1px solid var(--border-subtle);
-  cursor: pointer;
+  cursor: default;
   -webkit-tap-highlight-color: transparent;
 }
-
-.svc-row__head {
-  display: flex;
-  align-items: baseline;
-  gap: 1rem;
-  padding: 1.25rem 0;
-}
+.svc-row__head { display: flex; align-items: baseline; gap: 1rem; padding: 1.25rem 0; }
 .svc-row__name {
-  font-family: var(--font-display);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  font-size: clamp(3rem, 6.5vw, 6.25rem);
+  font-family: var(--font-display); font-weight: 800; letter-spacing: -0.02em; line-height: 1.05;
+  font-size: clamp(2.25rem, 4.2vw, 4.5rem);
   transition: color var(--dur-slow) var(--ease-wave), transform var(--dur-slow) var(--ease-wave);
-  /* min-width: 0 overrides the flex-item default (min-width: auto), which
-     otherwise refuses to shrink below the longest unbroken word's rendered
-     width — at this row's big display font size, a name like "Development"
-     was wider than the whole row on mobile and blew out the page's horizontal
-     bounds, cutting off the fixed header's mobile menu button. */
+  /* min-width: 0 overrides the flex-item default (min-width: auto), which would
+     otherwise refuse to shrink below the longest unbroken word. */
   flex: 1; min-width: 0; overflow-wrap: break-word; hyphens: auto;
 }
 .svc-row--open .svc-row__name { color: var(--pw-orange); transform: translateX(10px); }
-/* The name is a link to /work filtered by this category. */
-a.svc-row__name { display: block; color: inherit; text-decoration: none; }
-.svc-row--open a.svc-row__name { color: var(--pw-orange); }
-.svc-row__link {
-  display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 1.5rem;
-  font-size: 0.9rem; font-weight: 600; color: var(--pw-white); text-decoration: none;
-  border-bottom: 1px solid currentColor; padding-bottom: 0.15rem;
-  transition: color var(--dur-base) var(--ease-wave);
-}
-@media (hover: hover) {
-  .svc-row__link:hover { color: var(--pw-orange); }
-}
-
-/* Mobile: shrink enough that even the longest name ("Video & Editing")
-   fits the row on one line instead of wrapping. */
-@media (max-width: 767px) {
-  .svc-row__head { gap: 0.6rem; }
-  .svc-row__name { font-size: clamp(1.25rem, 6vw, 2rem); }
-}
-
 .svc-row__plus {
-  width: 28px; height: 28px;
-  flex-shrink: 0;
-  align-self: center;
-  position: relative;
+  width: 28px; height: 28px; flex-shrink: 0; align-self: center; position: relative;
   transition: transform var(--dur-slow) var(--ease-wave);
 }
 .svc-row--open .svc-row__plus { transform: rotate(135deg); }
 .svc-row__plus::before,
 .svc-row__plus::after {
-  content: "";
-  position: absolute;
-  background: var(--pw-orange);
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
+  content: ""; position: absolute; background: var(--pw-orange);
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
 }
 .svc-row__plus::before { width: 16px; height: 2px; }
 .svc-row__plus::after { width: 2px; height: 16px; }
 
 /* grid-template-rows 0fr -> 1fr trick: animates height without measuring it. */
-.svc-row__body {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.4s var(--ease-wave);
-}
+.svc-row__body { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.4s var(--ease-wave); }
 .svc-row--open .svc-row__body { grid-template-rows: 1fr; }
 .svc-row__body-inner { overflow: hidden; }
-
 .svc-row__content {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: start;
-  gap: 2.5rem;
-  padding: 0 0 2.5rem 4rem;
-  opacity: 0;
-  transform: translateY(10px);
+  padding: 0 0 2.5rem;
+  opacity: 0; transform: translateY(10px);
   transition: opacity 0.35s var(--ease-wave) 0.05s, transform 0.35s var(--ease-wave) 0.05s;
 }
 .svc-row--open .svc-row__content { opacity: 1; transform: translateY(0); }
-
-.svc-row__desc {
-  color: var(--text-secondary);
-  font-size: 1rem;
-  line-height: 1.6;
-  max-width: 44ch;
-  margin: 0 0 1.5rem;
-}
+.svc-row__desc { color: var(--text-secondary); font-size: 1rem; line-height: 1.6; max-width: 44ch; margin: 0 0 1.5rem; }
 .svc-row__tags { display: flex; gap: 2.5rem; }
 .svc-row__tag-col { display: flex; flex-direction: column; gap: 0.6rem; }
 /* Scoped to this component's own tag pills only — must not affect .pw-tag
-   anywhere else on the site. */
+   anywhere else on the site. They come in once the row is open. */
 .svc-row__tags .pw-tag {
-  opacity: 0;
-  transform: translateY(6px);
+  opacity: 0; transform: translateY(6px);
   transition: opacity 0.35s var(--ease-wave), transform 0.35s var(--ease-wave);
 }
 .svc-row--open .svc-row__tags .pw-tag { opacity: 1; transform: translateY(0); }
-/* A plain list, not underlined: an underline reads as a link, and these go
-   nowhere (the real link is "Vedi i progetti", right below). A small cyan dot
-   marks each item instead. */
+/* A plain list, not underlined (an underline reads as a link): a small cyan dot
+   marks each item. */
 .svc-row__tags .pw-tag {
   border-bottom: 0; padding-bottom: 0; gap: 0.7em; cursor: default;
   color: rgba(255, 255, 255, 0.78);
@@ -1667,28 +1661,14 @@ a.svc-row__name { display: block; color: inherit; text-decoration: none; }
   content: ""; width: 0.4em; height: 0.4em; border-radius: 50%; flex: none;
   background: var(--accent-secondary);
 }
-
-.svc-row__image {
-  border-radius: 4px;
-  overflow: hidden;
-  aspect-ratio: 4 / 3;
-  background: var(--pw-neutral-10);
-  width: 280px;
+/* One column on phones and small tablets: the two stacks follow each other. */
+@media (max-width: 767px) {
+  .svc-list { grid-template-columns: 1fr; }
+  .svc-row__head { gap: 0.6rem; }
+  .svc-row__name { font-size: clamp(1.25rem, 6vw, 2rem); }
 }
-.svc-row__image img {
-  width: 100%; height: 100%;
-  object-fit: cover;
-  filter: grayscale(1);
-  display: block;
-  transform: scale(1.12);
-  transition: transform 0.6s var(--ease-wave);
-}
-.svc-row--open .svc-row__image img { transform: scale(1); }
-
-@media (max-width: 860px) {
-  .svc-row__content { grid-template-columns: 1fr; padding-left: 0; }
-  .svc-row__image { width: 100%; max-width: 280px; }
-}
+/* "Tutti i progetti", under the services. */
+.svc-cta { display: flex; justify-content: flex-start; margin-top: clamp(1.75rem, 3vw, 3rem); }
 
 /* /contact — a single, non-scrolling full-viewport screen on desktop (the
    header floats transparently over it, same as the homepage hero); a giant
@@ -2014,13 +1994,6 @@ html.mark-hover .cursor-hint__inner { color: var(--pw-black); animation: none; t
   font-family: var(--font-text); font-size: 1.05rem; font-weight: 500;
   color: var(--pw-orange); white-space: nowrap;
 }
-/* Services rows turn their own name orange while open/hovered
-   (.svc-row--open .svc-row__name) — the exact same --pw-orange as this
-   label's default color, so without this override "Explore" becomes
-   invisible sitting right on top of the now-orange heading it's floating
-   over. White keeps the glow (still orange) legible regardless of the
-   row's state. */
-.svc-row .cursor-hint__inner { color: var(--pw-white); }
 .cursor-hint__inner--glow { animation: cursor-hint-glow 2.6s ease-in-out infinite; }
 @keyframes cursor-hint-glow {
   0%, 100% { text-shadow: 0 0 6px rgba(255, 91, 0, 0.25); }
@@ -2235,6 +2208,10 @@ html.mark-hover .cursor-hint__inner { color: var(--pw-black); animation: none; t
 .vf-wrap::after { content: ""; display: block; height: 200vh; height: 200svh; }
 .vf-box {
   position: sticky; --vf-box-h: 100vh; background: var(--pw-black);
+  /* At least the screen's height: with a short Services above, the globe's stage
+     (a screen tall) would otherwise hang out under the black box, over white. */
+  min-height: 100vh; min-height: 100svh;
+  padding-top: 0;
   top: min(0px, calc(100vh - var(--vf-box-h))); top: min(0px, calc(100svh - var(--vf-box-h)));
 }
 /* The empty strip under Services where the globe first peeks out. */

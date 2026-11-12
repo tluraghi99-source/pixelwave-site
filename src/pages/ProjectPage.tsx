@@ -5,22 +5,18 @@ import { ArrowUpRight, Volume2, VolumeX } from "lucide-react"
 import { Reveal, RevealGroup, RevealItem } from "@/components/motion/Reveal"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { Footer } from "@/components/sections/Footer"
+import { PhotoLightbox, type LightboxItem } from "@/components/PhotoLightbox"
 import { useProjectsStatus } from "@/hooks/useProjects"
 import { usePageMeta } from "@/hooks/usePageMeta"
 import { useNoIndex } from "@/hooks/useNoIndex"
 import { useJsonLd } from "@/hooks/useJsonLd"
-import { useVideoFrames } from "@/hooks/useVideoFrames"
 import { mediaUrl, parseYoutubeId, projectThumbUrl, type Project } from "@/lib/strapi"
 import { ROUTES, projectPath } from "@/lib/routes"
 
 type MediaItem =
-  | { type: "image"; src: string }
+  | { type: "image"; src: string; /** Bigger copy for the enlarged view. */ full?: string }
   | { type: "video"; src: string }
   | { type: "youtube"; videoId: string }
-  | { type: "skeleton" }
-
-/** Stills taken from a video hero when no gallery was uploaded. */
-const VIDEO_FRAME_COUNT = 8
 
 interface ProjectWithMedia extends Project {
   hero: MediaItem
@@ -55,11 +51,11 @@ function withMedia(p: Project): ProjectWithMedia {
       ? p.galleryImages.map((m) => ({
           type: m.mime.startsWith("video/") ? ("video" as const) : ("image" as const),
           src: mediaUrl(m, 1000),
+          // The enlarged view fills the screen, so it loads the original (only
+          // when a photo is actually opened) rather than the strip's small copy.
+          full: m.url,
         }))
-      : Array.from({ length: 8 }, (_, i) => ({
-          type: "image" as const,
-          src: `https://picsum.photos/seed/pixelwave-${p.id}-g${i}/900/700?grayscale`,
-        }))
+      : []
 
   // Used only as a static <img> "next project" teaser (and, via the same
   // logic, WorkPage.tsx's grid thumbnail — see gridThumbUrl there). Chain:
@@ -121,7 +117,6 @@ function ProjectMedia({ media, muted = true }: { media: MediaItem; muted?: boole
       />
     )
   }
-  if (media.type === "skeleton") return null
   return <img className="project-video-media" src={media.src} alt="" />
 }
 
@@ -231,8 +226,28 @@ function ProjectVideo({ media }: { media: MediaItem }) {
 // carries over exactly and it reads as easing down, not snapping.
 const GALLERY_HOVER_RATE = 0.15
 
-function GalleryRow({ items, reverse }: { items: MediaItem[]; reverse: boolean }) {
+function GalleryRow({
+  items,
+  reverse,
+  paused,
+  onOpen,
+}: {
+  items: MediaItem[]
+  reverse: boolean
+  /** Stands still while a photo is enlarged. */
+  paused: boolean
+  onOpen: (item: MediaItem) => void
+}) {
   const trackRef = useRef<HTMLDivElement>(null)
+
+  // Same Web Animations handle as the hover slowdown below: pause()/play() keep
+  // the position, so it carries on from where it stopped.
+  useEffect(() => {
+    for (const anim of trackRef.current?.getAnimations() ?? []) {
+      if (paused) anim.pause()
+      else anim.play()
+    }
+  }, [paused])
 
   function setHovered(hovered: boolean) {
     // A tap on a touch device fires a synthetic mouseenter without a
@@ -254,17 +269,40 @@ function GalleryRow({ items, reverse }: { items: MediaItem[]; reverse: boolean }
   // flex `gap`, so the two groups' rendered widths already include their own
   // connecting gap and a -50% translate lands exactly on one group's width.
   const renderItems = (keyPrefix: string) =>
-    items.map((item, i) => (
-      <div className="project-gallery__item" key={`${keyPrefix}-${i}`}>
+    items.map((item, i) => {
+      const zoomable = item.type === "image" || item.type === "video"
+      return (
+      <div
+        className={`project-gallery__item${zoomable ? " is-zoomable" : ""}`}
+        key={`${keyPrefix}-${i}`}
+        {...(zoomable
+          ? {
+              onClick: () => onOpen(item),
+              // Only the first copy is a tab stop; the second is the loop's twin.
+              ...(keyPrefix === "a"
+                ? {
+                    role: "button",
+                    tabIndex: 0,
+                    "aria-label": "Ingrandisci",
+                    onKeyDown: (e: React.KeyboardEvent) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault()
+                        onOpen(item)
+                      }
+                    },
+                  }
+                : null),
+            }
+          : null)}
+      >
         {item.type === "video" ? (
           <video src={item.src} autoPlay loop muted playsInline />
         ) : item.type === "image" ? (
           <img src={item.src} alt="" loading="lazy" />
-        ) : item.type === "skeleton" ? (
-          <div className="project-gallery__skeleton" aria-hidden="true" />
         ) : null}
       </div>
-    ))
+      )
+    })
 
   return (
     <div className="project-gallery__row">
@@ -284,6 +322,8 @@ function GalleryRow({ items, reverse }: { items: MediaItem[]; reverse: boolean }
 export function ProjectPage() {
   const { slug } = useParams<{ slug: string }>()
   const { projects, loaded } = useProjectsStatus()
+  // The enlarged gallery photo (index into the gallery's photos and clips), if any.
+  const [lightbox, setLightbox] = useState<number | null>(null)
   // The /lavori listing sets this when it was opened with only the Foto filter
   // on (see WorkPage.tsx): the photo carousel then comes before the video.
   // Router state, not a URL parameter, so a shared or typed link keeps the
@@ -340,47 +380,50 @@ export function ProjectPage() {
       : null
   )
 
-  // No uploaded gallery + a self-hosted video hero: fill the carousel with
-  // stills grabbed from that video. Extraction takes a while (it has to
-  // pull and seek through a large video), so the full set of slots shows
-  // right away as soft placeholders and each one fills in as its frame is
-  // ready — instead of an empty page for several seconds. If extraction
-  // yields nothing at all the gallery is simply left out: unrelated stock
-  // photos on a client's project page would be worse than no gallery.
-  const framesSrc =
-    project && project.galleryImages.length === 0 && project.hero.type === "video" ? project.hero.src : null
-  const videoFrames = useVideoFrames(framesSrc, VIDEO_FRAME_COUNT)
-  const galleryItems: MediaItem[] =
-    !project
-      ? []
-      : framesSrc
-        ? videoFrames.status === "failed"
-          ? []
-          : videoFrames.status === "ready"
-            ? videoFrames.frames.map((src) => ({ type: "image" as const, src }))
-            : Array.from({ length: VIDEO_FRAME_COUNT }, (_, i): MediaItem =>
-                videoFrames.frames[i] ? { type: "image", src: videoFrames.frames[i] } : { type: "skeleton" }
-              )
-        : project.gallery
+  // Only what was uploaded in the CMS: with no photos there is no carousel (no
+  // stills taken from the video, no stock placeholders).
+  const galleryItems: MediaItem[] = project ? project.gallery : []
 
   // Carousel before the video only when the visitor asked for it, there is a
-  // carousel to show (uploaded photos, or the stills taken from the video) and
-  // the hero is a video — otherwise there is nothing to swap.
+  // carousel to show (uploaded photos) and the hero is a video — otherwise there is nothing to swap.
   const photosFirst =
     photosFirstRequested &&
     !!project &&
     galleryItems.length > 0 &&
     (project.hero.type === "video" || project.hero.type === "youtube")
 
+  const zoomable = galleryItems.filter(
+    (m): m is Extract<MediaItem, { type: "image" | "video" }> => m.type === "image" || m.type === "video"
+  )
+  const lightboxItems: LightboxItem[] = zoomable.map((m) => ({
+    type: m.type,
+    src: m.type === "image" ? (m.full ?? m.src) : m.src,
+  }))
+  const openLightbox = (item: MediaItem) => {
+    if (item.type !== "image" && item.type !== "video") return
+    const i = zoomable.findIndex((m) => m.src === item.src)
+    if (i >= 0) setLightbox(i)
+  }
+
   const galleryBlock =
     galleryItems.length > 0 ? (
       <RevealGroup className="project-gallery" stagger={0.1} data-screen-label="Project Gallery">
         <RevealItem>
-          <GalleryRow items={galleryItems.slice(0, Math.ceil(galleryItems.length / 2))} reverse={false} />
+          <GalleryRow
+            items={galleryItems.slice(0, Math.ceil(galleryItems.length / 2))}
+            reverse={false}
+            paused={lightbox !== null}
+            onOpen={openLightbox}
+          />
         </RevealItem>
         {galleryItems.length > 1 && (
           <RevealItem>
-            <GalleryRow items={galleryItems.slice(Math.ceil(galleryItems.length / 2))} reverse={true} />
+            <GalleryRow
+              items={galleryItems.slice(Math.ceil(galleryItems.length / 2))}
+              reverse={true}
+              paused={lightbox !== null}
+              onOpen={openLightbox}
+            />
           </RevealItem>
         )}
       </RevealGroup>
@@ -470,6 +513,9 @@ export function ProjectPage() {
         </div>
       </main>
       <Footer />
+      {lightbox !== null && lightboxItems.length > 0 && (
+        <PhotoLightbox items={lightboxItems} start={lightbox} onClose={() => setLightbox(null)} />
+      )}
     </>
   )
 }
