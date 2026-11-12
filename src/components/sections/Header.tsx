@@ -11,6 +11,7 @@ import { PixelTrail } from "@/components/ui/pixel-trail"
 import { useShowreel } from "@/hooks/useShowreel"
 import { EASE_WAVE, HERO_CROSSFADE_RATIO, HERO_NAV_HIDE_AFTER, HERO_REVEAL_END, HERO_REVEAL_START } from "@/lib/motion"
 import { ROUTES } from "@/lib/routes"
+import { SERVICES } from "@/data/services"
 
 // Desktop-only full menu panel — columns mirror the top-level nav, filled
 // out with a level of real sub-navigation (mirrors a reference layout).
@@ -19,6 +20,8 @@ interface MenuLink {
   label: string
   href: string
   action?: "showreel"
+  /** Left out of the phone's full-screen menu (it only shows the top level there). */
+  desktopOnly?: boolean
 }
 const MENU_COLUMNS: { label: string; href: string; links: MenuLink[] }[] = [
   {
@@ -35,7 +38,12 @@ const MENU_COLUMNS: { label: string; href: string; links: MenuLink[] }[] = [
   {
     label: "Servizi",
     href: "#services",
-    links: [],
+    // Each service opens the Work page on its own category.
+    links: SERVICES.map((s) => ({
+      label: s.name,
+      href: `${ROUTES.work}?categoria=${encodeURIComponent(s.name)}`,
+      desktopOnly: true,
+    })),
   },
   {
     label: "Studio",
@@ -131,9 +139,9 @@ export function Header() {
 
   // Sub-links of a column; the showreel entry is a button (it opens the video
   // over the page) and is left out while there is no showreel to play.
-  const renderSublinks = (col: (typeof MENU_COLUMNS)[number], className: string) =>
+  const renderSublinks = (col: (typeof MENU_COLUMNS)[number], className: string, phone = false) =>
     col.links
-      .filter((l) => l.action !== "showreel" || showreel)
+      .filter((l) => (l.action !== "showreel" || showreel) && !(phone && l.desktopOnly))
       .map((l, i) =>
         l.action === "showreel" ? (
           <button
@@ -425,8 +433,8 @@ export function Header() {
               {MENU_COLUMNS.map((col) => (
                 <div className="nav__mobile-group" key={col.label}>
                   {renderLink(col.href, col.label, col.label, "nav__link", () => setOpen(false))}
-                  {col.links.length > 0 && (
-                    <div className="nav__mobile-sublinks">{renderSublinks(col, "nav__mobile-sublink")}</div>
+                  {col.links.some((l) => !l.desktopOnly) && (
+                    <div className="nav__mobile-sublinks">{renderSublinks(col, "nav__mobile-sublink", true)}</div>
                   )}
                 </div>
               ))}

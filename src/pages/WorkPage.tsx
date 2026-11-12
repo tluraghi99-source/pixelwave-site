@@ -10,8 +10,7 @@ import { Footer } from "@/components/sections/Footer"
 import { CornerCta } from "@/components/sections/CornerCta"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { EASE_WAVE } from "@/lib/motion"
-import { useProjectsStatus } from "@/hooks/useProjects"
-import { useWorkCategories } from "@/hooks/useWorkCategories"
+import { useProjects } from "@/hooks/useProjects"
 import { usePageMeta } from "@/hooks/usePageMeta"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
 import { projectPath } from "@/lib/routes"
@@ -108,7 +107,7 @@ export function WorkPage() {
     "Tutti i progetti — PixelWave",
     "Sfoglia tutti i progetti di PixelWave — video, foto, branding, web design, social ed eventi — filtrabili per categoria o cliente."
   )
-  const { projects: fetchedProjects, loaded: projectsLoaded } = useProjectsStatus()
+  const fetchedProjects = useProjects()
   // Newest year first, then older ones. Projects from the same year are
   // ordered alphabetically by title so the order is predictable (the CMS has
   // no finer date than the year).
@@ -116,18 +115,11 @@ export function WorkPage() {
     () => [...fetchedProjects].sort((a, b) => b.year - a.year || a.title.localeCompare(b.title, "it")),
     [fetchedProjects]
   )
-  const workCategories = useWorkCategories()
-
-  // The fixed Video/Photo/Branding/Web Design/Social/Events taxonomy (see
-  // useWorkCategories), in its own editorial order — but only the categories
-  // that at least one project currently has assigned. A category with nothing
-  // in it stays hidden and appears on its own once the CMS assigns it to a
-  // project. Separate from each project's own display `tags`, which never
-  // drove this filter's button list.
-  const FILTER_CATEGORIES = useMemo(() => {
-    const used = new Set(projects.flatMap((p) => p.workCategories.map(categoryKey)))
-    return workCategories.map((c) => c.name).filter((name) => used.has(categoryKey(name)))
-  }, [workCategories, projects])
+  // Every service, always — in the order the home page lists them — whether or
+  // not a project has it yet: one without any opens its own page, titled with
+  // it and empty, until the CMS assigns it to a project. (Matched to the CMS's
+  // Work Categories by name, see lib/categories.)
+  const FILTER_CATEGORIES = useMemo(() => SERVICES.map((s) => s.name), [])
 
   // Alphabetical (unlike FILTER_CATEGORIES' editorial order) — categories are
   // a small curated set where order doesn't matter; clients are the
@@ -168,27 +160,10 @@ export function WorkPage() {
     [activeCategories, FILTER_CATEGORIES]
   )
 
-  // /lavori?categoria=Foto for a service that has no project yet: its own page,
-  // titled with the service and empty (nothing to show yet), until you pick
-  // anything else. Only once the projects have arrived, so it never flashes
-  // for a category that does have some.
-  const [wipDismissed, setWipDismissed] = useState(false)
-  const requestedKey = categoryKey((searchParams.get("categoria") ?? searchParams.get("category") ?? "").split(",")[0] ?? "")
-  const wipService = SERVICES.find((s) => categoryKey(s.name) === requestedKey)
-  const wip =
-    !wipDismissed &&
-    projectsLoaded &&
-    mode === "category" &&
-    !!wipService &&
-    !projects.some((p) => p.workCategories.some((c) => categoryKey(c) === requestedKey))
-      ? wipService
-      : null
-
   // The page title names the category you are in (in orange); without one it
   // stays "Progetti.".
-  const titleCategory = wip
-    ? categoryLabel(wip.name)
-    : mode === "category" && selectedCategories.size === 1
+  const titleCategory =
+    mode === "category" && selectedCategories.size === 1
       ? categoryLabel(FILTER_CATEGORIES.find((n) => selectedCategories.has(categoryKey(n))) ?? [...selectedCategories][0])
       : null
 
@@ -197,7 +172,6 @@ export function WorkPage() {
   const photosOnly = mode === "category" && selectedCategories.has("photo")
 
   function toggleCategory(category: string) {
-    setWipDismissed(true)
     const key = categoryKey(category)
     setActiveCategories((prev) => (prev.has(key) ? new Set() : new Set([key])))
   }
@@ -205,7 +179,6 @@ export function WorkPage() {
   // Single-select: picking a client is a lookup ("show me X's work"), not a
   // facet you stack with other clients — clicking the active one clears it.
   function selectClient(client: string) {
-    setWipDismissed(true)
     setActiveClient((prev) => (prev === client ? null : client))
   }
 
@@ -213,14 +186,13 @@ export function WorkPage() {
   // clears the other dimension's picks, only the active mode's selection
   // actually drives the grid below.
   const visibleProjects = useMemo(() => {
-    if (wip) return []
     if (mode === "category") {
       if (selectedCategories.size === 0) return projects
       return projects.filter((p) => p.workCategories.some((c) => selectedCategories.has(categoryKey(c))))
     }
     if (!activeClient) return projects
     return projects.filter((p) => p.client === activeClient)
-  }, [projects, mode, selectedCategories, activeClient, wip])
+  }, [projects, mode, selectedCategories, activeClient])
 
   return (
     <>
