@@ -2312,3 +2312,10 @@ html.mark-hover .cursor-hint__inner { color: var(--pw-black); animation: none; t
 .rg__pin--dot:hover .rg__label, .rg__pin--dot:focus-visible .rg__label { opacity: 1; pointer-events: auto; }
 .rg__pin:hover, .rg__pin:focus-visible { z-index: 2; }
 .rg__label { transition: opacity var(--dur-base) var(--ease-wave); }
+/* The departure point: the hub's dot is on the canvas, this is just its name. */
+.rg__hub {
+  position: absolute; left: 0; top: 0; pointer-events: none; will-change: transform;
+  color: var(--rg-text, var(--pw-white));
+}
+.rg__hub .rg__label { left: 18px; cursor: default; }
+.rg__hub--left .rg__label { left: auto; right: 18px; align-items: flex-end; text-align: right; }

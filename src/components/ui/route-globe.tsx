@@ -61,6 +61,7 @@ export function RouteGlobe({
   const host = useRef<HTMLDivElement>(null)
   const canvas = useRef<HTMLCanvasElement>(null)
   const pinEls = useRef<(HTMLButtonElement | null)[]>([])
+  const hubEl = useRef<HTMLDivElement>(null)
   // Set while a label is hovered or focused: the globe stops turning so the
   // label doesn't slide away from under the pointer.
   const hold = useRef(0)
@@ -184,6 +185,24 @@ export function RouteGlobe({
       // top of one already placed (nearer the viewer wins) fold down to just
       // their dot, and open again while hovered or focused.
       const boxes: { l: number; t: number; r: number; b: number }[] = []
+      // The hub's own label (not clickable) takes its place first.
+      const hp = project(H, 1, r, cx, cy)
+      const hubNode = hubEl.current
+      if (hubNode) {
+        const shownHub = hp.z > 0.08 && pinFade > 0.02
+        hubNode.style.transform = `translate(${hp.x.toFixed(1)}px, ${hp.y.toFixed(1)}px)`
+        hubNode.style.opacity = shownHub ? String(Math.min(1, hp.z * 5) * pinFade) : "0"
+        hubNode.style.visibility = shownHub ? "visible" : "hidden"
+        const hubLeft = hp.x > cx
+        if (hubNode.classList.contains("rg__hub--left") !== hubLeft) hubNode.classList.toggle("rg__hub--left", hubLeft)
+        if (shownHub) {
+          const lab = hubNode.querySelector<HTMLElement>(".rg__label")
+          const w = lab?.offsetWidth ?? 0
+          const h = lab?.offsetHeight ?? 0
+          const l = hubLeft ? hp.x - 18 - w : hp.x + 18
+          boxes.push({ l, t: hp.y - 12, r: l + w, b: hp.y - 12 + h })
+        }
+      }
       const order = pinState
         .map((_, i) => i)
         .filter((i) => pinState[i].z > 0.08)
@@ -322,6 +341,12 @@ export function RouteGlobe({
         role="img"
         aria-label={`Un globo con ${places.length} ${places.length === 1 ? "tappa" : "tappe"} da ${hub.name}`}
       />
+      <div ref={hubEl} className="rg__hub" aria-hidden="true">
+        <span className="rg__label">
+          <strong className="rg__title">{hub.name}</strong>
+          <span className="rg__note">Partenza</span>
+        </span>
+      </div>
       {places.map((p, i) => (
         <button
           key={p.id}
