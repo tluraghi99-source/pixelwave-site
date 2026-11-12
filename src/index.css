@@ -1156,6 +1156,8 @@ header.nav .nav__mobile .nav__link {
 @media (min-width: 768px) {
   .work-page__head .lead { font-size: clamp(4rem, 3.2vw, 9rem); }
 }
+/* The category you are in, as the page title. */
+.work-page__lead-active { display: inline-block; }
 /* A single non-wrapping row instead of wrapping to multiple lines — Client
    mode's list can run long (one pill per client), and even Category mode's
    list wrapped to two lines and pushed the page title down once there were
@@ -1190,7 +1192,15 @@ header.nav .nav__mobile .nav__link {
 @media (hover: hover) {
   .work-page__filter:hover { color: var(--text-primary); }
 }
-.work-page__filter.is-active { color: var(--accent-primary); }
+/* The selected filter is a little heavier. A hidden copy of the label at that
+   weight (::after) reserves its width, so picking one doesn't nudge the rest of
+   the row. */
+.work-page__filter { display: inline-flex; flex-direction: column; align-items: center; }
+.work-page__filter::after {
+  content: attr(data-label); font-weight: 500; height: 0; overflow: hidden;
+  visibility: hidden; pointer-events: none;
+}
+.work-page__filter.is-active { color: var(--accent-primary); font-weight: 500; }
 /* min-width: 0 overrides the flex item's default content-based auto
    minimum — without it, .work-page__head can't shrink this block below the
    filter row's full unwrapped width, so the whole PAGE overflows

@@ -10,12 +10,13 @@ import { Footer } from "@/components/sections/Footer"
 import { CornerCta } from "@/components/sections/CornerCta"
 import { CursorGlow } from "@/components/motion/CursorGlow"
 import { EASE_WAVE } from "@/lib/motion"
-import { useProjects } from "@/hooks/useProjects"
+import { useProjectsStatus } from "@/hooks/useProjects"
 import { useWorkCategories } from "@/hooks/useWorkCategories"
 import { usePageMeta } from "@/hooks/usePageMeta"
 import { projectThumbUrl, type Project } from "@/lib/strapi"
 import { projectPath } from "@/lib/routes"
 import { categoryKey, categoryLabel } from "@/lib/categories"
+import { SERVICES } from "@/data/services"
 
 /** Shared chain (see strapi.ts's projectThumbUrl) — a small grid card is
  *  never a sensible place to autoplay a video or a YouTube embed,
@@ -107,7 +108,7 @@ export function WorkPage() {
     "Tutti i progetti — PixelWave",
     "Sfoglia tutti i progetti di PixelWave — video, foto, branding, web design, social ed eventi — filtrabili per categoria o cliente."
   )
-  const fetchedProjects = useProjects()
+  const { projects: fetchedProjects, loaded: projectsLoaded } = useProjectsStatus()
   // Newest year first, then older ones. Projects from the same year are
   // ordered alphabetically by title so the order is predictable (the CMS has
   // no finer date than the year).
@@ -167,11 +168,36 @@ export function WorkPage() {
     [activeCategories, FILTER_CATEGORIES]
   )
 
+  // /lavori?categoria=Foto for a service that has no project yet: its own page,
+  // titled with the service and empty (nothing to show yet), until you pick
+  // anything else. Only once the projects have arrived, so it never flashes
+  // for a category that does have some.
+  const [wipDismissed, setWipDismissed] = useState(false)
+  const requestedKey = categoryKey((searchParams.get("categoria") ?? searchParams.get("category") ?? "").split(",")[0] ?? "")
+  const wipService = SERVICES.find((s) => categoryKey(s.name) === requestedKey)
+  const wip =
+    !wipDismissed &&
+    projectsLoaded &&
+    mode === "category" &&
+    !!wipService &&
+    !projects.some((p) => p.workCategories.some((c) => categoryKey(c) === requestedKey))
+      ? wipService
+      : null
+
+  // The page title names the category you are in (in orange); without one it
+  // stays "Progetti.".
+  const titleCategory = wip
+    ? categoryLabel(wip.name)
+    : mode === "category" && selectedCategories.size === 1
+      ? categoryLabel(FILTER_CATEGORIES.find((n) => selectedCategories.has(categoryKey(n))) ?? [...selectedCategories][0])
+      : null
+
   // The Foto filter on: the project pages opened from here show their
   // photo carousel before the video (see ProjectPage.tsx).
   const photosOnly = mode === "category" && selectedCategories.has("photo")
 
   function toggleCategory(category: string) {
+    setWipDismissed(true)
     const key = categoryKey(category)
     setActiveCategories((prev) => (prev.has(key) ? new Set() : new Set([key])))
   }
@@ -179,6 +205,7 @@ export function WorkPage() {
   // Single-select: picking a client is a lookup ("show me X's work"), not a
   // facet you stack with other clients — clicking the active one clears it.
   function selectClient(client: string) {
+    setWipDismissed(true)
     setActiveClient((prev) => (prev === client ? null : client))
   }
 
@@ -186,13 +213,14 @@ export function WorkPage() {
   // clears the other dimension's picks, only the active mode's selection
   // actually drives the grid below.
   const visibleProjects = useMemo(() => {
+    if (wip) return []
     if (mode === "category") {
       if (selectedCategories.size === 0) return projects
       return projects.filter((p) => p.workCategories.some((c) => selectedCategories.has(categoryKey(c))))
     }
     if (!activeClient) return projects
     return projects.filter((p) => p.client === activeClient)
-  }, [projects, mode, selectedCategories, activeClient])
+  }, [projects, mode, selectedCategories, activeClient, wip])
 
   return (
     <>
@@ -204,7 +232,21 @@ export function WorkPage() {
           <div className="wrap">
             <div className="work-page__head">
               <Reveal delay={0.1}>
-                <p className="lead">Progetti.</p>
+                <p className="lead">
+                  {titleCategory ? (
+                    <motion.span
+                      key={titleCategory}
+                      className="work-page__lead-active"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.35, ease: EASE_WAVE }}
+                    >
+                      {titleCategory}
+                    </motion.span>
+                  ) : (
+                    "Progetti."
+                  )}
+                </p>
               </Reveal>
               <Reveal delay={0.15} className="work-page__filter-block">
                 <div className="work-page__mode-toggle" role="tablist">
@@ -248,6 +290,7 @@ export function WorkPage() {
                       <button
                         key={category}
                         type="button"
+                        data-label={categoryLabel(category)}
                         className={`work-page__filter ${selectedCategories.has(categoryKey(category)) ? "is-active" : ""}`}
                         aria-pressed={selectedCategories.has(categoryKey(category))}
                         onClick={() => toggleCategory(category)}
@@ -262,6 +305,7 @@ export function WorkPage() {
                       <button
                         key={client}
                         type="button"
+                        data-label={client}
                         className={`work-page__filter ${activeClient === client ? "is-active" : ""}`}
                         aria-pressed={activeClient === client}
                         onClick={() => selectClient(client)}
