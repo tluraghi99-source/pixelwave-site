@@ -8,6 +8,14 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+  # Always HTTPS. The CMS only answers requests from https://pixelwave.it (its
+  # CORS list), so on plain http:// the page opened but every project list
+  # came back empty — and the browser showed a "not secure" warning. Phones
+  # that open a typed "pixelwave.it" as http:// hit exactly this. The
+  # .well-known folder is left alone so certificate renewals keep working.
+  RewriteCond %{HTTPS} off
+  RewriteCond %{REQUEST_URI} !^/\.well-known/
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
   # Old English addresses -> the Italian ones (permanent, keeps ?query).
   RewriteRule ^work/?$ /lavori [R=301,L,QSA]
   RewriteRule ^work/(.+)$ /lavori/$1 [R=301,L,QSA]
