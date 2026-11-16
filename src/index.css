@@ -2205,7 +2205,12 @@ html.mark-hover .cursor-hint__inner { color: var(--pw-black); animation: none; t
    veil fades Services out, the globe rises from the bottom edge. */
 .vf-wrap { position: relative; }
 /* (a block, not padding: a sticky box only moves inside its parent's content box) */
-.vf-wrap::after { content: ""; display: block; height: 200vh; height: 200svh; }
+/* The 200 is the globe's own run; --vf-hold (set in VisionFrom.tsx) is the pause
+   on Services before it starts. */
+.vf-wrap::after {
+  content: ""; display: block;
+  height: calc(200vh + var(--vf-hold, 0px)); height: calc(200svh + var(--vf-hold, 0px));
+}
 .vf-box {
   position: sticky; --vf-box-h: 100vh; background: var(--pw-black);
   /* At least the screen's height: with a short Services above, the globe's stage

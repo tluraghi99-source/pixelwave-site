@@ -18,6 +18,12 @@ const HUB: Place = { id: "hub", name: "Milano", lon: 9.19, lat: 45.46 }
  *  screen; the rest is a pause with it there. */
 const GLOBE_SHARE = 0.8
 
+/** A pause on arrival: once Services is in place the page holds there, with the
+ *  globe not yet rising, for this much scroll — as a share of the screen's
+ *  height — so the services can be read before the globe takes over. About two
+ *  or three clicks of a mouse wheel; raise it for a longer hold. */
+const HOLD_SHARE = 0.4
+
 /** "Vision from": a globe with a dot wherever the studio has shot one of these
  *  videos. Each dot carries the video's title and, under it, the place; click it
  *  and the video opens full screen, growing out of the dot. All of it comes
@@ -39,27 +45,40 @@ export function VisionFrom({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState<{ item: VisionFromItem; origin: DOMRect } | null>(null)
 
   // The box (Services + the empty strip under it) sticks to the screen with its
-  // bottom edge on the screen's bottom edge, so its CSS needs its own height.
+  // bottom edge on the screen's bottom edge, so its CSS needs its own height —
+  // and the wrapper needs the length of the opening hold, in pixels, to add to
+  // its own height (see .vf-wrap::after in index.css).
   useEffect(() => {
     const box = boxRef.current
-    if (!box || !hasItems) return
-    const set = () => box.style.setProperty("--vf-box-h", `${box.offsetHeight}px`)
+    const wrap = wrapRef.current
+    if (!box || !wrap || !hasItems) return
+    const set = () => {
+      box.style.setProperty("--vf-box-h", `${box.offsetHeight}px`)
+      wrap.style.setProperty("--vf-hold", `${Math.round(window.innerHeight * HOLD_SHARE)}px`)
+    }
     set()
     const ro = new ResizeObserver(set)
     ro.observe(box)
-    return () => ro.disconnect()
+    // A phone's toolbars growing and shrinking change the screen's height without
+    // resizing the box.
+    window.addEventListener("resize", set)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener("resize", set)
+    }
   }, [hasItems])
 
-  // 0 when the box gets pinned, 1 when the globe has settled.
+  // 0 until the opening hold is over, then up to 1 when the globe has settled.
   const { scrollY } = useScroll()
   const progress = useTransform(scrollY, () => {
     const wrap = wrapRef.current
     const box = boxRef.current
     if (!wrap || !box) return 0
     const stuckTop = parseFloat(getComputedStyle(box).top) || 0
-    const length = wrap.offsetHeight - box.offsetHeight
+    const hold = parseFloat(wrap.style.getPropertyValue("--vf-hold")) || 0
+    const length = wrap.offsetHeight - box.offsetHeight - hold
     if (length <= 0) return 0
-    const p = (stuckTop - wrap.getBoundingClientRect().top) / length
+    const p = (stuckTop - wrap.getBoundingClientRect().top - hold) / length
     return Math.max(0, Math.min(1, p / GLOBE_SHARE))
   })
 
